@@ -31,7 +31,7 @@
         </div>
         <div class="col-lg-6">
             <form class="" style="" >
-                <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;" value="Join a Room" placeholder="Room Code" onclick="onetimechange(this)">
+                <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;" value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
             </form>
         </div>
     </div>
@@ -39,11 +39,19 @@
 </body>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
-    function onetimechange(e) {
-        e.value = "";
-        e.style.color = "black";
-        e.style.backgroundColor = "#fefefe";
-        e.onclick = null;
+    function toggleform(e) {
+        if(e.value === "Join a Room"){
+            e.value = "";
+            e.style.color = "black";
+            e.style.backgroundColor = "#fefefe";
+        }
+        else if(e.value === ""){
+            e.value = "Join a Room";
+            e.style.color = "white";
+            e.style.backgroundColor = "transparent";
+        }else{
+
+        }
     }
 </script>
 </html>
