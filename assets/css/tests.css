@@ -1,0 +1,17 @@
+.running{
+    animation: pulse 1.8s infinite ease-in-out;
+}
+
+.test-fail{
+    color: #ff5555;
+}
+
+.test-pass{
+    color: #55ff55;
+}
+
+
+@keyframes pulse {
+    from{background-color: #80ccff}
+    to {background-color: white}
+}
