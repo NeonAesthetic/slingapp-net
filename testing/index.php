@@ -46,6 +46,7 @@
     <div class="card" style="width:624px; padding: 7px">
         <button class="btn btn-circle" onclick="clearconsole()"><span title="Clears the Console window" class="glyphicon glyphicon-console"></span> Clear Console </button>
         <button class="btn btn-circle" onclick="clearTestStatus()"><span title="Clears the status of all tests" class="glyphicon glyphicon-menu-hamburger"></span> Clear Test Status </button>
+        <button class="btn btn-circle" onclick="pullLatest()"><span title="Pulls the latest from the testing repo" class="glyphicon glyphicon-menu-hamburger"></span> Pull From Testing Branch </button>
     </div>
     <div id="console" class="card" style="width:624px;color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll;">
     </div>
@@ -101,5 +102,13 @@
         tests.forEach(function (t) {
             t.className = "list-group-item";
         })
+    }
+    
+    function pullLatest() {
+        var console = document.getElementById("console");
+        console.innerHTML+= "<br>git pull origin testing<br>"
+        get("gitpulltesting.php", "", function (data, num) {
+            console.innerHTML+=data;
+        });
     }
 </script>
