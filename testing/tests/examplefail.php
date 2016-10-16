@@ -1,7 +1,7 @@
 <?php
 
-//testname: Test pass
-//testdesc: Checks to see that 1 is equal to 1
+//testname: Test Fail
+//testdesc: Purposely fails
 
 /**
  * Created by PhpStorm.
@@ -10,8 +10,8 @@
  * Time: 9:00 AM
  */
 
-echo ("Asserting that 1 is equal to 1");
-assert(1==1, "Assert that 1 is 1");
+echo ("Asserting that 1 is equal to 2");
+assert(1==2, "Assert that 1 is 1");
 
 cleanup();
 
@@ -19,7 +19,7 @@ function cleanup(){
     try{
 
     }catch (Exception $e){
-        
+
     }
 }
 
