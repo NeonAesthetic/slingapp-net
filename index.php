@@ -14,7 +14,7 @@
     </title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
 <body>
 <div class="screenshot" style="width: 600px; min-height: 400px; top: 150px; text-align: center">
