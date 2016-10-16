@@ -8,7 +8,7 @@
 
 assert_options(ASSERT_ACTIVE, 1);
 assert_options(ASSERT_WARNING, 0);
-assert_options(ASSERT_QUIET_EVAL, 1);
+assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
 
@@ -24,9 +24,7 @@ function fail_test(){
 function assert_handler($file, $line, $code, $desc = null)
 {
     echo "<span class='assert-fail'>Assertion failed at " . basename($file) . ":$line</span><br>";
-    if ($desc) {
-        echo "\"$desc\"";
-    }
+    echo "\"$desc\"";
     echo "<br>";
     fail_test();
 };
@@ -36,6 +34,7 @@ register_shutdown_function(function (){
     if($GLOBALS['TEST_FAILED']){
         echo "<span class='test-fail'>Test Failed</span><br>";
         echo ob_get_clean();
+        echo $GLOBALS["TEST_OUTPUT"];
     }else{
         echo "<span class='test-pass'>Test Passed</span><br>";
         echo $GLOBALS["TEST_OUTPUT"];
@@ -44,6 +43,7 @@ register_shutdown_function(function (){
 
 });
 assert_options(ASSERT_CALLBACK, 'assert_handler');
+
 set_exception_handler(function(Throwable $exception){
     echo "PHP Exception on line " . $exception->getLine() . " of " . $exception->getFile() . ". " . $exception->getMessage();
     fail_test();
