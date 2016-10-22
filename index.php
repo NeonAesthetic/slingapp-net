@@ -33,7 +33,7 @@
             </button>
         </div>
         <div class="col-lg-6">
-            <form class="" style="margin: 30px; " >
+            <form class="" style="margin: 30px;" onsubmit="joinroom(event, this);">
                 <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;" value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
             </form>
         </div>
@@ -55,6 +55,14 @@
         }else{
 
         }
+    }
+
+    function joinroom(event, f) {
+        event.preventDefault();
+        console.log(f);
+        var room = f["room"].value;
+        window.location = "/room/"+room;
+        return false;
     }
 </script>
 </html>
