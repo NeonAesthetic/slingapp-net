@@ -19,3 +19,8 @@
     from{background-color: #80ccff}
     to {background-color: white}
 }
+
+body{
+    background-color: #fff;
+    padding: 3px;
+}
