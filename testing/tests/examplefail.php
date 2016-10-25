@@ -11,8 +11,8 @@
  */
 
 
-echo ("Asserting that 1 is equal to 2") . "<br>";
-assert(1==2, "Assert that 1 is 1");
+//echo ("Asserting that 1 is equal to 2") . "<br>";
+assert(1==2, "Assert that 1 is 2");
 
 
 

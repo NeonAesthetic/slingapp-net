@@ -11,6 +11,7 @@ assert_options(ASSERT_WARNING, 0);
 assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/classes/");
 
 function test_end(){
     if(function_exists("cleanup"))

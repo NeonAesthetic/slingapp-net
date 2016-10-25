@@ -1,6 +1,16 @@
 use sling;
 
 
+SET FOREIGN_KEY_CHECKS = 0;
+drop table if exists Rooms;
+drop table if exists Accounts;
+drop table if exists Participants;
+drop table if exists Resources;
+drop table if exists RoomCodes;
+drop table if exists RoomChat;
+drop table if exists Files;
+SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE Rooms (
   RoomID SERIAL,
   RoomName VARCHAR(32) NOT NULL,
@@ -23,14 +33,17 @@ CREATE TABLE Accounts (
 CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
-  AccountID BIGINT UNSIGNED NOT NULL,
+  AccountID BIGINT UNSIGNED NULL,
+  Username VARCHAR(20) NOT NULL,
+  LoginToken VARCHAR(50) NULL,
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
+  FOREIGN KEY (LoginToken) REFERENCES Accounts(LoginToken)
 );
 
-CREATE TABLE Resources(
+CREATE TABLE Resources (
   ResourceID SERIAL,
   ParticipantID BIGINT UNSIGNED NOT NULL,
   RoomID BIGINT UNSIGNED NOT NULL,

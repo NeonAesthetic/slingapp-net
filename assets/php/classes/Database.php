@@ -10,17 +10,17 @@ class Database
 {
     const TESTING = 1;
     const PRODUCTION = 0;
-
-
-    public function __construct()
-    {
-
-    }
+    private static $_instance;
 
     /**
      * @return PDO
      */
-    public function connect(){
-        return new PDO('mysql:host=localhost;dbname=sling', "sling", '');
+    public static function connect(){
+        if(static::$_instance instanceof PDO){
+            //pass
+        }else{
+            static::$_instance = new PDO('mysql:host=localhost;dbname=sling', "sling", '');
+        }
+        return static::$_instance;
     }
 }
