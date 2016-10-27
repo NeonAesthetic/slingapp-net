@@ -36,6 +36,7 @@ CREATE TABLE Participants (
   AccountID BIGINT UNSIGNED NULL,
   Username VARCHAR(20) NOT NULL,
   LoginToken VARCHAR(50) NULL,
+  FingerPrint VARCHAR(50)
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
@@ -56,11 +57,10 @@ CREATE TABLE Resources (
 
 
 CREATE TABLE RoomCodes (
-  RoomCodeID SERIAL,
+  RoomCode VARCHAR(8),
   RoomID BIGINT UNSIGNED NOT NULL,
-  RoomCode VARCHAR(8) NOT NULL UNIQUE,
   CreatedBy BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY(RoomCodeID),
+  PRIMARY KEY(RoomCode),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
