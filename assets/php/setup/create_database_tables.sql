@@ -31,9 +31,6 @@ CREATE TABLE Accounts (
 CREATE INDEX IDX_Account_Email
   ON Accounts(Email);
 
-
-
-
 CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
@@ -69,11 +66,21 @@ CREATE TABLE RoomCodes (
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
 
-# CREATE TABLE Files(
-#
-# );
-#
-# CREATE TABLE RoomChat();
+-- # CREATE TABLE Files(
+-- # );
+
+CREATE TABLE RoomChat(
+  RoomChatID  SERIAL,
+  RoomID  BIGINT  UNSIGNED NOT NULL,
+  ParticipantID BIGINT UNSIGNED NOT NULL,
+  SenderName  VARCHAR(20) NOT NULL,
+  Message VARCHAR(400) NULL,
+  SentTime  TIMESTAMP NOT NULL,
+  PRIMARY KEY(RoomChatID),
+  FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID),
+  FOREIGN KEY (SenderName)  REFERENCES  Participants (ScreenName)
+);
 
 
 
