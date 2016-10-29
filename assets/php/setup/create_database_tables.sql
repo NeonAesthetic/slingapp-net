@@ -34,14 +34,15 @@ CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
   AccountID BIGINT UNSIGNED NULL,
+  #Should we change from Username to Alias to prevent confusion with Username in Accounts?
+  #Should we change VARCHAR length from 20 to 32? Username in Accounts is length 32
   Username VARCHAR(20) NOT NULL,
   LoginToken VARCHAR(50) NULL,
-  FingerPrint VARCHAR(50)
+  FingerPrint VARCHAR(50),
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
-  FOREIGN KEY (LoginToken) REFERENCES Accounts(LoginToken)
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 
 CREATE TABLE Resources (
@@ -57,7 +58,7 @@ CREATE TABLE Resources (
 
 
 CREATE TABLE RoomCodes (
-  RoomCode VARCHAR(8),
+  RoomCode CHAR(8), #changed VARCHAR to CHAR since its always going to be a length of 8 characters
   RoomID BIGINT UNSIGNED NOT NULL,
   CreatedBy BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY(RoomCode),
