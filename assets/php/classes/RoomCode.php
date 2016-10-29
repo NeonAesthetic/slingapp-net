@@ -6,7 +6,7 @@
  * Date: 10/27/16
  * Time: 1:20 PM
  */
-class RoomCode
+class RoomCode extends DatabaseObject
 {
     private $_code;
     private $_roomid;

@@ -19,8 +19,7 @@ CREATE TABLE Rooms (
 
 CREATE TABLE Accounts (
   AccountID SERIAL,
-  Username VARCHAR(32) NOT NULL UNIQUE,
-  Email VARCHAR(64) NOT NULL,
+  Email VARCHAR(64) NOT NULL UNIQUE,
   FullName VARCHAR(64) NOT NULL,
   PasswordHash VARCHAR(60),
   LoginToken VARCHAR(50),
@@ -29,19 +28,21 @@ CREATE TABLE Accounts (
   JoinDate DATETIME
 );
 
+CREATE INDEX IDX_Account_Email
+  ON Accounts(Email);
+
+
+
 
 CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
   AccountID BIGINT UNSIGNED NULL,
-  Username VARCHAR(20) NOT NULL,
-  LoginToken VARCHAR(50) NULL,
-  FingerPrint VARCHAR(50)
-
+  ScreenName VARCHAR(20) NOT NULL,
+  FingerPrint VARCHAR(50),
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
-  FOREIGN KEY (LoginToken) REFERENCES Accounts(LoginToken)
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 
 CREATE TABLE Resources (
@@ -57,17 +58,21 @@ CREATE TABLE Resources (
 
 
 CREATE TABLE RoomCodes (
-  RoomCode VARCHAR(8),
+  RoomCode CHAR(6),
   RoomID BIGINT UNSIGNED NOT NULL,
   CreatedBy BIGINT UNSIGNED NOT NULL,
+  ExpirationDate DATETIME,
+  RemainingUses INT NULL,
   PRIMARY KEY(RoomCode),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
 
-CREATE TABLE Files();
-
-CREATE TABLE RoomChat();
+# CREATE TABLE Files(
+#
+# );
+#
+# CREATE TABLE RoomChat();
 
 
 
