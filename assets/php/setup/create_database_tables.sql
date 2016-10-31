@@ -66,6 +66,8 @@ CREATE TABLE RoomCodes (
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
 
+-- Idea: If any image type is shared a user can hover over the file to view a
+--        thumbnail without downloading
 -- # CREATE TABLE Files(
 -- # );
 
