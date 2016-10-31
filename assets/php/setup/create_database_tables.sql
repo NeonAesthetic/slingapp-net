@@ -9,6 +9,7 @@ drop table if exists Resources;
 drop table if exists RoomCodes;
 drop table if exists RoomChat;
 drop table if exists Files;
+drop table if exists RoomChat;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE Rooms (
