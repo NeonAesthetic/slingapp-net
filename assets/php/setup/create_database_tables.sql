@@ -90,7 +90,6 @@ CREATE TABLE RoomChat(
   PRIMARY KEY(RoomChatID),
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
   FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID)
-  --  FOREIGN KEY (SenderName)  REFERENCES  Participants (ScreenName)
 );
 
 
