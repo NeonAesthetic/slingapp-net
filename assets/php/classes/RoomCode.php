@@ -2,24 +2,40 @@
 
 /**
  * Created by PhpStorm.
- * User: ian
+ * User: Ryan
  * Date: 10/27/16
  * Time: 1:20 PM
  */
-class RoomCode extends DatabaseObject
+class RoomCode extends Database
 {
     private $_code;
-    private $_roomid;
+    private $_roomID;
     private $_creator;
-    
-    public function __construct($code, $roomid, $creator)
+
+    public function __construct($code, $roomID, $creator)
     {
         $this->_code = $code;
-        $this->_roomid = $roomid;
+        $this->_roomid = $roomID;
         $this->_creator = $creator;
     }
+
+    public function generate()
+    {
+        return (rand(1000, 9999) . rand(1000, 9999));
+    }
     
-    public function delete(){
+    public function delete($code)
+    {
         
+    }
+
+    private function getCode()
+    {
+        return $_code;
+    }
+
+    private function setCode($code)
+    {
+        $_code = $code;
     }
 }

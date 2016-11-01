@@ -8,7 +8,7 @@
  */
 require "Database.php";
 
-class Room extends DatabaseObject
+class Room extends Database
 {
     private $_room_codes = [];
     private $_room_id;

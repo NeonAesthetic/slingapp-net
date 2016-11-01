@@ -6,7 +6,7 @@
  * Date: 10/27/16
  * Time: 11:43 AM
  */
-class Participant extends DatabaseObject
+class Participant extends Database
 {
     private $_pid;
     private $_roomid;

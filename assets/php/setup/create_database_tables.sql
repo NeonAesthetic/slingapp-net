@@ -49,7 +49,7 @@ CREATE TABLE Resources (
   ParticipantID BIGINT UNSIGNED NOT NULL,
   RoomID BIGINT UNSIGNED NOT NULL,
   Location VARCHAR(32) UNIQUE,
-  TypeID BIGINT UNSIGNED NOT NULL,
+  TypeID CHAR NOT NULL,
   PRIMARY KEY (ResourceID),
   FOREIGN KEY (ParticipantID) REFERENCES Participants(ParticipantID),
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
@@ -81,8 +81,8 @@ CREATE TABLE RoomChat(
   SentTime  TIMESTAMP NOT NULL,
   PRIMARY KEY(RoomChatID),
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID),
-  FOREIGN KEY (SenderName)  REFERENCES  Participants (ScreenName)
+  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID)
+  --  FOREIGN KEY (SenderName)  REFERENCES  Participants (ScreenName)
 );
 
 
