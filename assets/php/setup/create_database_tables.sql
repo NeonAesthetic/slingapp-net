@@ -18,6 +18,7 @@ drop table if exists RoomCodes;
 drop table if exists RoomChat;
 drop table if exists Files;
 drop table if exists RoomChat;
+drop table if exists MimeTypes;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE Rooms (
@@ -75,21 +76,33 @@ CREATE TABLE RoomCodes (
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
 
--- Idea: If any image type is shared a user can hover over the file to view a
---        thumbnail without downloading
--- # CREATE TABLE Files(
--- # );
+
+CREATE TABLE MimeTypes(
+  TypeID SERIAL,
+  MimeType VARCHAR(64),
+  PRIMARY KEY (TypeID)
+);
+
+CREATE TABLE Files(
+FileID SERIAL,
+Data MEDIUMBLOB,
+Filename VARCHAR(64),
+TypeID BIGINT UNSIGNED NOT NULL,
+PRIMARY KEY (FileID),
+FOREIGN KEY (TypeID) REFERENCES MimeTypes(TypeID)
+);
 
 CREATE TABLE RoomChat(
   RoomChatID  SERIAL,
   RoomID  BIGINT  UNSIGNED NOT NULL,
   ParticipantID BIGINT UNSIGNED NOT NULL,
-  SenderName  VARCHAR(20) NOT NULL,
   Message VARCHAR(400) NULL,
+  FileID BIGINT UNSIGNED NULL ,
   SentTime  TIMESTAMP NOT NULL,
   PRIMARY KEY(RoomChatID),
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID)
+  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID),
+  FOREIGN KEY (FileID) REFERENCES Files(FileID)
 );
 
 
