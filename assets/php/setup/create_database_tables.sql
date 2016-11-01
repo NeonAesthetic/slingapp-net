@@ -1,3 +1,11 @@
+# CREATE USER 'sling'@'localhost';
+
+# CREATE DATABASE sling;
+#
+# GRANT ALL PRIVILEGES ON sling.* TO 'sling';
+#
+
+
 use sling;
 
 
@@ -20,10 +28,10 @@ CREATE TABLE Rooms (
 
 CREATE TABLE Accounts (
   AccountID SERIAL,
-  Email VARCHAR(64) NOT NULL UNIQUE,
-  FullName VARCHAR(64) NOT NULL,
-  PasswordHash VARCHAR(60),
-  LoginToken VARCHAR(50),
+  Email VARCHAR(64) NULL UNIQUE,
+  FullName VARCHAR(64) NULL,
+  PasswordHash VARCHAR(60) NULL,
+  LoginToken VARCHAR(50) NOT NULL,
   TokenGenTime DATETIME,
   LastLogin DATETIME,
   JoinDate DATETIME
@@ -60,7 +68,7 @@ CREATE TABLE RoomCodes (
   RoomCode CHAR(6),
   RoomID BIGINT UNSIGNED NOT NULL,
   CreatedBy BIGINT UNSIGNED NOT NULL,
-  ExpirationDate DATETIME,
+  ExpirationDate DATETIME NULL,
   RemainingUses INT NULL,
   PRIMARY KEY(RoomCode),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),

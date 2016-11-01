@@ -6,17 +6,23 @@
  * Date: 10/27/16
  * Time: 1:24 PM
  */
-public abstract class DatabaseObject
+
+abstract class DatabaseObject
 {
-    private $_components = [];
+
+    protected $_has_changed;
     //deletes object from database
+
+    public function hasChanged(){
+        return $this->_has_changed;
+    }
     public abstract function delete();
 
     protected function delete_components(){
-        foreach ($this->_components as &$component) {
-            $component->delete();
-        }
-        $this->_components = [];
+//        foreach ($this->_components as &$component) {
+//            $component->delete();
+//        }
+//        $this->_components = [];
     }
 
     protected function getComponents(){
@@ -27,9 +33,9 @@ public abstract class DatabaseObject
 
     protected function updateComponents(){
         foreach ($this->_components as &$component) {
-            $component->update();
+            if ($component->hasChanged())
+                $component->update();
         }
     }
-
 
 }

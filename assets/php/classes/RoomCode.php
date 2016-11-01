@@ -28,14 +28,5 @@ class RoomCode extends Database
     {
         
     }
-
-    private function getCode()
-    {
-        return $_code;
-    }
-
-    private function setCode($code)
-    {
-        $_code = $code;
-    }
+    
 }

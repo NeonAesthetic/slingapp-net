@@ -14,7 +14,7 @@ class Participant extends Database
     private $_login_token;
     private $_room_codes = [];
     private $_resources = [];
-    public function __construct($id = null, $login_token = null){
+    public function __construct($id = null, $fingerprint = null){
         if($id !== null){
             $sql = "SELECT ParticipantID, RoomID, Username, LoginToken 
                     FROM Participants
@@ -49,4 +49,35 @@ class Participant extends Database
 
     }
 
+    public static function createParticipant($room_id, $screen_name){
+
+    }
+
+    public function __get($name)
+    {
+        $public_get = ["id"];
+
+        if(array_key_exists($name)){
+            return $this->$name;
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        // TODO: Implement __set() method.
+    }
+
+    public function id(){
+
+    }
+
+    public function delete()
+    {
+        // TODO: Implement delete() method.
+    }
+
+    public function update()
+    {
+        // TODO: Implement update() method.
+    }
 }
