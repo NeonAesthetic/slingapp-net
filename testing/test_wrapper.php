@@ -11,7 +11,7 @@ assert_options(ASSERT_WARNING, 0);
 assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
-set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/classes/");
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 
 function test_end(){
     $GLOBALS["TEST_OUTPUT"] = ob_get_clean();

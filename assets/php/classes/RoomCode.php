@@ -22,4 +22,9 @@ class RoomCode extends DatabaseObject
     public function delete(){
         
     }
+
+    public function update()
+    {
+        
+    }
 }
