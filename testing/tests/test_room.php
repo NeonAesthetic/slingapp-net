@@ -10,6 +10,7 @@
 //testdesc: Create a non-existant room and alter its state with Room methods.
 
 require_once "classes/Room.php";
+require_once "classes/Participant.php";
 $room;
 $was_exception = false;
 try{
@@ -24,24 +25,11 @@ $room = Room::createRoom("Test-Room");
 $roomid = $room->getRoomID();
 echo $roomid;
 
-$participant = Participant::createParticipant();
+$participant = Participant::createParticipant($roomid, "Test Participant");
 
-//assert(is_int($roomid), "Assert that the room id is an int");
-//
-//$room_name = $room->getRoomName();
-//assert($room_name === "Test-Room", "Assert that the room name is set correctly");
-//
-//$room->deleteRoom();
-//$was_exception = false;
-//try{
-//    $room = new Room("Test-Room");
-//}catch (Exception $e){
-//    $was_exception = true;
-//}
-//
-//assert($was_exception === true, "Assert that room was deleted correctly");
-//
-//
+var_dump($room);
+
+
 function cleanup(){
     try{
         $room = new Room("Test-Room");
