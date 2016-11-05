@@ -11,13 +11,6 @@ require_once "interfaces/DatabaseObject.php";
 require_once "classes/Participant.php";
 require_once "classes/RoomCode.php";
 
-class Room extends Database
-
-/**
- * Class Room
- *
- *
- */
 class Room extends DatabaseObject
 {
     /** @var RoomCode[] $_room_codes **/

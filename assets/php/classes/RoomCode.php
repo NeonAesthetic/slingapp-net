@@ -19,6 +19,11 @@ class RoomCode extends Database
         $this->_creator = $creator;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
+
+        $sql = "    INSERT INTO RoomCodes
+                    VALUES ($this->_code, $roomid, $creator, $this->expire_date, $uses)";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute();
     }
 
     public function generate_code(){
