@@ -32,8 +32,16 @@ class RoomCode extends Database
         return $chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)];
     }
 
+    public function delete($roomid)
+    {
+        $sql = "    DELETE FROM RoomCodes
+                    WHERE RoomID = $roomid";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute();
+    }
+
     
-    public function delete($code)
+    public function update($code)
     {
         $sql = "INSERT INTO RoomCodes (RoomID, CreatedBy, ExpirationDate, RemainingUses)
                     VALUES(':roomid', ':created_by', ':exp', ':rem')";
