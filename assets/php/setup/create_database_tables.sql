@@ -35,7 +35,9 @@ CREATE TABLE Accounts (
   LoginToken VARCHAR(50) NOT NULL,
   TokenGenTime DATETIME,
   LastLogin DATETIME,
-  JoinDate DATETIME
+  JoinDate DATETIME,
+
+  PRIMARY KEY (AccountID)
 );
 
 CREATE INDEX IDX_Account_Email
