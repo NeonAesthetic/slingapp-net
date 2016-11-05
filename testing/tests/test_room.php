@@ -26,14 +26,16 @@ $roomid = $room->getRoomID();
 
 $participant = Participant::createParticipant($roomid, "Test Participant");
 
+$room->addParticipant($participant);
 
+echo $room->getJSON();
 
 
 function cleanup(){
-    try{
-        $room = new Room("Test-Room");
-        $room->deleteRoom();
-    }catch (Exception $e){
-
-    }
+//    try{
+//        $room = new Room("Test-Room");
+//        $room->deleteRoom();
+//    }catch (Exception $e){
+//
+//    }
 }

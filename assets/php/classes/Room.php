@@ -78,8 +78,8 @@ class Room extends DatabaseObject
         $this->_has_changed = true;
     }
 
-    public function addParticipant(Participant $p){
-        $this->_participants[] = $p;
+    public function addParticipant($fingerprint){
+        $this->_participants[] = new Participant($fingerprint);
     }
     
     public function deleteRoom(){
@@ -121,6 +121,19 @@ class Room extends DatabaseObject
     
     public function getJSON(){
         $json = [];
-        $json['Participants'] = $this->_participants
+        $json['Participants'] = [];
+        foreach($this->_participants as $p){
+            $json['Participants'][] = json_decode($p->getJSON(), true);
+        }
+
+        $json['RoomCodes'] = [];
+        foreach($this->_participants as $p){
+            $json['RoomCodes'][] = json_decode($p->getJSON(), true);
+        }
+
+        $json["RoomID"] = $this->_room_id;
+        $json["RoomName"] = $this->_room_name;
+
+        return json_encode($json);
     }
 }

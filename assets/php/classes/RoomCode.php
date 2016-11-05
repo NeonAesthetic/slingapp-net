@@ -6,7 +6,7 @@
  * Date: 10/27/16
  * Time: 1:20 PM
  */
-class RoomCode extends Database
+class RoomCode extends DatabaseObject
 {
     private $_code;
     private $_roomID;
@@ -32,20 +32,27 @@ class RoomCode extends Database
         return $chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)];
     }
 
-    public function delete($roomid)
+    public function delete()
     {
         $sql = "    DELETE FROM RoomCodes
-                    WHERE RoomID = $roomid";
+                    WHERE RoomID = $this->_roomid";
         $statement = Database::connect()->prepare($sql);
         $statement->execute();
     }
 
     
-    public function update($code)
+    public function update()
     {
         $sql = "INSERT INTO RoomCodes (RoomID, CreatedBy, ExpirationDate, RemainingUses)
                     VALUES(':roomid', ':created_by', ':exp', ':rem')";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":roomid" => $this->_roomid, ":created_by"=>$this->_creator, ":exp"=>$this->_expire_date]);
+    }
+
+    public function getJSON()
+    {
+        $json = [];
+        $json['type'] = "RoomCode";
+        return json_encode($json);
     }
 }

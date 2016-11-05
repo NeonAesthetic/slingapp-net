@@ -6,7 +6,7 @@
  * Date: 10/27/16
  * Time: 11:43 AM
  */
-class Participant extends Database
+class Participant extends DatabaseObject
 {
     private $_pid;
     private $_roomid;
@@ -15,7 +15,7 @@ class Participant extends Database
     private $_room_codes = [];
     private $_resources = [];
     public function __construct($id = null, $fingerprint = null){
-        if($id !== null){
+        if($id !== null) {
             $sql = "SELECT ParticipantID, RoomID, Username, LoginToken 
                     FROM Participants
                     JOIN Resources 
@@ -24,10 +24,6 @@ class Participant extends Database
                     ON Participants.ParticipantID = RoomCodes.CreatedBy
                     WHERE ParticipantID = :param;";
             $param = $id;
-        }else if($login_token !== null){
-
-        }else{
-            throw new Exception("ID or login_token must be set");
         }
 
         $statement = Database::connect()->prepare($sql);
@@ -50,7 +46,8 @@ class Participant extends Database
     }
 
     public static function createParticipant($room_id, $screen_name){
-
+        $sql = "INSERT INTO Participants ()"
+        return new Participant($room_id);
     }
 
     public function __get($name)
@@ -79,5 +76,12 @@ class Participant extends Database
     public function update()
     {
         // TODO: Implement update() method.
+    }
+
+    public function getJSON()
+    {
+        $json = [];
+        $json["type"] = "ParticipantObject";
+        return json_encode($json);
     }
 }
