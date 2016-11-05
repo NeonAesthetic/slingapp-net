@@ -23,11 +23,10 @@ assert($was_exception === true, "Assert that the Room threw an exception");
 
 $room = Room::createRoom("Test-Room");
 $roomid = $room->getRoomID();
-echo $roomid;
 
 $participant = Participant::createParticipant($roomid, "Test Participant");
 
-var_dump($room);
+
 
 
 function cleanup(){

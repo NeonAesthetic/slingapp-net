@@ -72,6 +72,15 @@ class Room extends DatabaseObject
     {
         return $this->_room_name;
     }
+
+    public function setRoomName($new_room_name){
+        $this->_room_name = $new_room_name;
+        $this->_has_changed = true;
+    }
+
+    public function addParticipant(Participant $p){
+        $this->_participants[] = $p;
+    }
     
     public function deleteRoom(){
         $sql = "DELETE FROM Rooms WHERE RoomID = :id";
@@ -94,6 +103,24 @@ class Room extends DatabaseObject
 
     public function update()
     {
-        // TODO: Implement update() method.
+        foreach ($this->_participants as $particpant){
+            $particpant->update();
+        }
+        foreach ($this->_room_codes as $rc){
+            $rc->update();
+        }
+        if($this->hasChanged()) $this->updateRoom();
+    }
+
+    private function updateRoom(){
+        $sql = "UPDATE Rooms SET RoomName = :roomname WHERE RoomID = $this->_room_id";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":roomname" => $this->_room_name]);
+
+    }
+    
+    public function getJSON(){
+        $json = [];
+        $json['Participants'] = $this->_participants
     }
 }
