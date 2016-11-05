@@ -6,12 +6,25 @@
  * Date: 10/16/16
  * Time: 5:53 PM
  */
-require "classes/Database.php";
+require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
+require_once "classes/Participant.php";
+require_once "classes/RoomCode.php";
 
 class Room extends Database
+
+/**
+ * Class Room
+ *
+ *
+ */
+class Room extends DatabaseObject
 {
+    /** @var RoomCode[] $_room_codes **/
     private $_room_codes = [];
+
+    /** @var Participant[] $_participants **/
+    private $_participants = [];
     private $_room_id;
     private $_room_name;
     public function __construct($room_code = null, $room_id = null)
@@ -54,16 +67,14 @@ class Room extends Database
     }
     
     public function createNewRoomCode(Participant $creator){
-        
+        $this->_room_codes[] = new RoomCode($this->_room_id, $creator);
     }
 
     public function getRoomID(){
         return $this->_room_id;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getRoomName()
     {
         return $this->_room_name;
@@ -78,7 +89,14 @@ class Room extends Database
 
     public function delete()
     {
-        // TODO: Implement delete() method.
+        foreach($this->_participants as $participant){
+            $participant->delete();
+        }
+        foreach ($this->_room_codes as $room_code){
+            $room_code->delete();
+        }
+        $sql = "DELETE FROM Rooms WHERE RoomID=$this->_room_id";
+        Database::connect()->exec($sql);
     }
 
     public function update()
