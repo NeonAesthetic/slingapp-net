@@ -32,6 +32,19 @@ function assert_handler($file, $line, $code, $desc = null)
     fail_test();
 };
 
+function recurse_backtrace(array $bt, $level){
+    $indent = str_repeat("&nbsp;", $level * 2);
+    foreach ($bt as $key=>$value){
+        if(is_array($value)){
+            echo $indent . $key . ":<br>";
+            recurse_backtrace($value, $level + 1);
+        }else{
+            echo $indent . $key . ": " . $value . "<br>";
+        }
+
+    }
+}
+
 register_shutdown_function(function (){
     test_end();
     if($GLOBALS['TEST_FAILED']){
@@ -52,8 +65,9 @@ set_exception_handler(function(Throwable $exception){
 
     fail_test();
 });
-set_error_handler(function($errno, $errstr, $errline, $errfile){
+set_error_handler(function($errno, $errstr, $errfile, $errline){
     echo "PHP Error: " . $errstr . " at line " . $errline . " in " . $errfile . "<br>";
+//    recurse_backtrace(debug_backtrace(), 0 );
     fail_test();
 });
 

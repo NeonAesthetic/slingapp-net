@@ -21,6 +21,8 @@ abstract class DatabaseObject
     public abstract function update();
 
     public abstract function getJSON();
-
-
+    
+    public static function Log($classname, $action, $description){
+        
+    }
 }
