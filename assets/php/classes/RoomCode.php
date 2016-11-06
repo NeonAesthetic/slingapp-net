@@ -40,7 +40,6 @@ class RoomCode extends Database
         $statement->execute();
     }
 
-    
     public function update($code)
     {
         $sql = "INSERT INTO RoomCodes (RoomID, CreatedBy, ExpirationDate, RemainingUses)
