@@ -8,65 +8,51 @@
  */
 class Participant extends DatabaseObject
 {
-    private $_pid;
-    private $_roomid;
-    private $_user_name;
-    private $_login_token;
-    private $_room_codes = [];
-    private $_resources = [];
+    protected $_pid;
+    protected $_roomid;
+    protected $_user_name;
+    protected $_login_token;
+    protected $_room_codes = [];
+    protected $_resources = [];
     public function __construct($id = null, $fingerprint = null){
-        if($id !== null) {
-            $sql = "SELECT ParticipantID, RoomID, Username, LoginToken 
-                    FROM Participants
-                    JOIN Resources 
-                    ON Resources.ParticipantID = Participants.ParticipantID
-                    JOIN RoomCodes
-                    ON Participants.ParticipantID = RoomCodes.CreatedBy
-                    WHERE ParticipantID = :param;";
+        $sql = "";
+        $param = "";
+        if($id != null) {
+            $sql = "SELECT p.ParticipantID, p.RoomID, p.ScreenName, p.FingerPrint 
+                    FROM Participants p
+                    WHERE p.ParticipantID = :param;";
             $param = $id;
         }
+        if ($sql !== ""){
+            
+            $statement = Database::connect()->prepare($sql);
+            $statement->execute([":param"=> $param]);
+            $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+            if($results !== false AND count($results) !== 0){
 
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute([":param"=> $param]);
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-        if($results !== false){
-            if (!array_key_exists("ParticipantID", $results))
-                $record = $results[0];
-            else
-                $record = $results;
-            $this->_pid = $record["ParticipantID"];
-            $this->_roomid = $record["RoomID"];
-            $this->_user_name = $record["Username"];
+                if (!array_key_exists("ParticipantID", $results))
+                    $record = $results[0];
+                else
+                    $record = $results;
+
+                $this->_pid = $record["ParticipantID"];
+                $this->_roomid = $record["RoomID"];
+                $this->_user_name = $record["ScreenName"];
+            }
+
         }
 //        foreach ($results as $row){
 //
 //        }
-        var_dump($results);
+//        var_dump($results);
 
     }
 
     public static function createParticipant($room_id, $screen_name){
-        $sql = "INSERT INTO Participants ()"
-        return new Participant($room_id);
-    }
-
-    public function __get($name)
-    {
-        $public_get = ["id"];
-
-        if(array_key_exists($name)){
-            return $this->$name;
-        }
-    }
-
-    public function __set($name, $value)
-    {
-        // TODO: Implement __set() method.
-    }
-
-    public function id(){
 
     }
+
+    
 
     public function delete()
     {
@@ -82,6 +68,11 @@ class Participant extends DatabaseObject
     {
         $json = [];
         $json["type"] = "ParticipantObject";
+        $json["ParticpantID"] = $this->_pid;
         return json_encode($json);
+    }
+
+    public function getID(){
+        return $this->_pid;
     }
 }

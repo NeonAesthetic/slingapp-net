@@ -11,6 +11,7 @@
 
 require_once "classes/Room.php";
 require_once "classes/Participant.php";
+require_once "classes/dummy/DummyParticipant.php";
 $room;
 $was_exception = false;
 try{
@@ -24,18 +25,23 @@ assert($was_exception === true, "Assert that the Room threw an exception");
 $room = Room::createRoom("Test-Room");
 $roomid = $room->getRoomID();
 
-$participant = Participant::createParticipant($roomid, "Test Participant");
+$particpantID = $room->addParticipant("Test1");
+$particpantID = $room->addParticipant("Test2");
 
-$room->addParticipant($participant);
-
+$room_code = $room->addRoomCode($particpantID);
+echo "<br><br>Room Code: " . $room_code . "<br>";
+$room = new Room($room_code);
 echo $room->getJSON();
 
+//$room->delete();
 
-function cleanup(){
+
+//
+//function cleanup(){
 //    try{
-//        $room = new Room("Test-Room");
-//        $room->deleteRoom();
+//        $room = new Room($GLOBALS["RoomCode"]);
+//        $room->delete();
 //    }catch (Exception $e){
 //
 //    }
-}
+//}

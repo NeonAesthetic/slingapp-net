@@ -1,9 +1,9 @@
-# CREATE USER 'sling'@'localhost';
+CREATE USER 'sling'@'localhost';
 
-# CREATE DATABASE sling;
-#
-# GRANT ALL PRIVILEGES ON sling.* TO 'sling';
-#
+CREATE DATABASE sling;
+
+GRANT ALL PRIVILEGES ON sling.* TO 'sling';
+
 
 
 use sling;
@@ -24,6 +24,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE Rooms (
   RoomID SERIAL,
   RoomName VARCHAR(32) NOT NULL,
+  Active BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (RoomID)
 );
 
@@ -107,6 +108,10 @@ CREATE TABLE RoomChat(
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
   FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID),
   FOREIGN KEY (FileID) REFERENCES Files(FileID)
+);
+
+CREATE TABLE Logs(
+
 );
 
 

@@ -41,7 +41,6 @@ class Accounts extends DatabaseObject
         $statement->execute();
     }
 
-
     public function update()
     {
         $statement = Database::connect();

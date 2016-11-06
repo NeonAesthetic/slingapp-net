@@ -33,7 +33,7 @@
         $files = glob("./tests/*");
         foreach ($files as $testfile){
             $text = fread(fopen($testfile, "r"), filesize($testfile));
-            preg_match("#(?<=testname:)([ ]?)[a-zA-Z0-9 ]+?(?=\n)#", $text, $match);
+            preg_match("#(?<=testname:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
             $test_name = $match[0];
             if(strpos($test_name, "NOINCLUDE") !== false) continue;
             preg_match("#(?<=testdesc:).+(?=\n)#", $text, $matches);
