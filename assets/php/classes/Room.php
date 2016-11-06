@@ -116,7 +116,6 @@ class Room extends DatabaseObject
         $sql = "UPDATE Rooms SET RoomName = :roomname WHERE RoomID = $this->_room_id";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":roomname" => $this->_room_name]);
-
     }
     
     public function getJSON(){

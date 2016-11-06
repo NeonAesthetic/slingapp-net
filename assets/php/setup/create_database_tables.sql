@@ -30,7 +30,9 @@ CREATE TABLE Rooms (
 CREATE TABLE Accounts (
   AccountID SERIAL,
   Email VARCHAR(64) NULL UNIQUE,
-  FullName VARCHAR(64) NULL,
+  #FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
+  FirstName VARCHAR(32) NULL,
+  LastName VARCHAR(32) NULL,
   PasswordHash VARCHAR(60) NULL,
   LoginToken VARCHAR(50) NOT NULL,
   TokenGenTime DATETIME,
