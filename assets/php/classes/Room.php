@@ -26,8 +26,8 @@ class Room extends DatabaseObject
             $sql = "SELECT * FROM Rooms
                     JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
-                    JOIN roomcodes
-                    ON participants.ParticipantID = roomcodes.CreatedBy
+                    LEFT JOIN roomcodes
+                    ON Rooms.RoomID = RoomCodes.RoomID
                     WHERE Rooms.RoomID = (SELECT RoomID 
                                           FROM RoomCodes 
                                           WHERE RoomCode = :roomcode
@@ -35,13 +35,16 @@ class Room extends DatabaseObject
             $statement = Database::connect()->prepare($sql);
             $statement->execute([":roomcode" => $room_code]);
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($result);
+            foreach($result as $row){
+//                var_dump($row);
+                echo "<br><br>";
+            }
             if($result != false){
                 $this->_room_id = $result[0]["RoomID"];
                 $this->_room_name = $result[0]["RoomName"];
                 foreach ($result as $row) {
                     $this->_participants[] = new Participant($row["ParticipantID"]);
-//                    $this->_room_codes[] = new RoomCode();
+                    $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 }
 
             }else{
@@ -134,7 +137,7 @@ class Room extends DatabaseObject
     }
 
     public function addRoomCode($creator, $uses = null, $expires = null){
-        $new_code = new RoomCode($this->_room_id, $creator, $uses, $expires);
+        $new_code = RoomCode::createRoomCode($this->_room_id, $creator, $uses, $expires);
         $this->_room_codes[] = $new_code;
         return $new_code->getCode();
     }

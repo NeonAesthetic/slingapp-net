@@ -35,7 +35,10 @@ class RoomCode extends DatabaseObject
             ":rem_uses"=>$uses
         ])){
             throw new PDOException($statement->errorInfo()[2]);
+        }else{
+            DatabaseObject::Log("Create", "Participant with ID $creator created Code $code");
         }
+        return new RoomCode($code, $roomid, $creator);
     }
 
     public static function generate_code(){
@@ -65,6 +68,7 @@ class RoomCode extends DatabaseObject
     {
         $json = [];
         $json['type'] = "RoomCode";
+        $json["code"] = $this->_code;
         return json_encode($json);
     }
 

@@ -109,7 +109,10 @@ CREATE TABLE RoomChat(
 );
 
 CREATE TABLE Logs(
-
+  Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  File VARCHAR(64),
+  Action VARCHAR(64),
+  Description VARCHAR(256)
 );
 
 
