@@ -19,6 +19,7 @@ drop table if exists RoomChat;
 drop table if exists Files;
 drop table if exists RoomChat;
 drop table if exists MimeTypes;
+drop table if exists Logs;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE Rooms (
@@ -110,6 +111,7 @@ CREATE TABLE RoomChat(
 
 CREATE TABLE Logs(
   Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  IP CHAR(15),
   File VARCHAR(64),
   Action VARCHAR(64),
   Description VARCHAR(256)
