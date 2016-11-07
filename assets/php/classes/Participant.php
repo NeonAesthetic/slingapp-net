@@ -7,6 +7,7 @@
  * Time: 11:43 AM
  */
 require_once "interfaces/DatabaseObject.php";
+
 class Participant extends DatabaseObject
 {
     protected $_pid;
@@ -14,6 +15,9 @@ class Participant extends DatabaseObject
     protected $_screenname;
     protected $_room_codes = [];
     protected $_resources = [];
+    protected $_finger_print;
+    protected $_participant_id;
+
     public function __construct($id, $finger_print, $account_id, $room_id){
 
 //        foreach ($results as $row){
@@ -29,13 +33,26 @@ class Participant extends DatabaseObject
         return hash("sha256", $userAgent.$ip);
     }
 
-    public static function createParticipant($room_id, $screen_name){
+    public function createParticipant($account_id, $screen_name, $room_code){
         //Creates the participant
         $finger_print = self::createFingerPrint();
         $id = self::getParticipantFromFingerPrint();
         if($id!= null){
+            //Need to get room ID, use room code as join?
+//            $sql = "SELECT RoomID
+//                    FROM RoomCodes
+//                    WHERE RoomCode = :roomCode";
+//            $statement = Database::connect()->prepare($sql);
+//            $statement->execute([":roomID"=>$room_id]);
+//            $results = $statement->fetch(PDO::FETCH_ASSOC);
+
+
             //Account Exists
-//            $sql = "SELECT"
+            $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
+            VALUES (:accountID, :fingerPrint,:pid, :roomID, :screenName)";
+            $statement = Database::connect()->prepare($sql);
+            if(!$statement->execute(array(':accountId' => $this->account_id, ':fingerPrint' => $this->finger_print, ':pid' => $this->id)));
+            DatabaseObject::Log("CreateParticipant", "Could Not Insert");
         }
 
 
@@ -52,7 +69,7 @@ class Participant extends DatabaseObject
         $statement->execute([":fp"=>$finger_print]);
         $results = $statement->fetch(PDO::FETCH_ASSOC);
         if(count($results) > 0){
-
+            //Maybe return entire participant?
             return $results["ParticipantID"];
         }
         else{
@@ -63,12 +80,19 @@ class Participant extends DatabaseObject
 
     public function delete()
     {
-        // TODO: Implement delete() method.
+        $sql = "    DELETE FROM Particpants
+                    WHERE ParticipantID = $this->_pid";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute();
     }
 
     public function update()
     {
-        // TODO: Implement update() method.
+        $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
+            VALUES (:accountID, :fingerPrint,:pid, :roomID, :screenName)";
+        $statement = Database::connect()->prepare($sql);
+        if(!$statement->execute(array(':accountId' => $this->account_id, ':fingerPrint' => $this->finger_print, ':pid' => $this->id)));
+        DatabaseObject::Log("CreateParticipant", "Could Not Insert");
     }
 
     public function getJSON()
