@@ -4,6 +4,8 @@
  * User: Isaac
  * Date: 11/6/2016
  * Time: 5:06 PM
+ * Test Name: Login With Account
+ * Description: Logs into the system assuming there is a valid account
  */
 
 session_start();

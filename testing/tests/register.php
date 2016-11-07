@@ -4,11 +4,14 @@
  * User: Isaac
  * Date: 11/6/2016
  * Time: 5:06 PM
+ *
+ * Test Name: Forms
+ * Description: Echos form data
  */
 
 session_start();
 
-require_once '../../assets/php/classes/Accounts.php';
+require_once 'classes/Accounts.php';
 
 if(isset($_POST['register']))
 {
@@ -27,10 +30,10 @@ $token = $_SESSION['token'] = md5(uniqid(mt_rand(),true));
 
 <form method="POST">
     <table>
-        <tr><td>FirstName:</td><td><input type="text" name="fName" /></td></tr>
-        <tr><td>LastName:</td><td><input type="text" name="lName" /></td></tr>
-        <tr><td>Email:</td><td><input type="email" name="email" /></td></tr>
-        <tr><td>Password:</td><td><input type="password" name="password" /></td></tr>
+        <tr><td>FirstName:</td><td><input type="text" name="fName" placeholder="First Name" /></td></tr>
+        <tr><td>LastName:</td><td><input type="text" name="lName" placeholder="Last Name"/></td></tr>
+        <tr><td>Email:</td><td><input type="email" name="email" placeholder="Email"/></td></tr>
+        <tr><td>Password:</td><td><input type="password" name="password" placeholder="Password"/></td></tr>
 
     </table>
     <input type="hidden" name="token" value="<?php echo $token;?>" />

@@ -7,8 +7,10 @@
  * Time: 9:21 AM
  */
 
-require_once "Database.php";
-require_once "../interfaces/DatabaseObject.php";
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
+
+require_once "classes/Database.php";
+require_once "interfaces/DatabaseObject.php";
 
 class Accounts extends DatabaseObject
 {
