@@ -23,7 +23,7 @@ abstract class DatabaseObject
     public abstract function getJSON();
     
     public static function Log($action, $description){
-        $file = __FILE__;
+        $file = basename(__FILE__);
         $sql = "INSERT INTO Logs (File, Action, Description) VALUES(:file, :action, :desc)";
         Database::connect()->prepare($sql)->execute([
             ":file"=>$file,

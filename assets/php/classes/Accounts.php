@@ -6,33 +6,51 @@
  * Date: 11/6/2016
  * Time: 9:21 AM
  */
+
+require_once "Database.php";
+require_once "../interfaces/DatabaseObject.php";
+
 class Accounts extends DatabaseObject
 {
-    private $_accountID;
+    private $_fName;
+    private $_lName;
     private $_email;
-    private $_firstName;
-    private $_lastName;
-    private $_passwordHash;
-    private $_loginToken;
-    private $_tokenGenTime;
+    private $_password;
+    private $_passHash;
+    private $_errors;
+    private $_access;       //1 if account exists
+    private $_login;
+    private $_token;
+    private $_tokenGen;
     private $_lastLogin;
     private $_joinDate;
 
-    public function __construct($accountID, $email = null, $firstName = null, $lastName = null, $passwordHash = null, $loginToken, $tokenGenTime, $lastLogin, $joinDate)
+    public function __construct($reg)
     {
-        $this->_accountID = $accountID;
-        $this->_email = $email;
-        $this->_firstName = $firstName;
-        $this->_lastName = $lastName;
-        $this->_passwordHash = $passwordHash;
-        $this->_loginToken = $loginToken;
-        $this->_tokenGenTime = $tokenGenTime;
-        $this->_lastLogin = $lastLogin;
-        $this->_joinDate = $joinDate;
+        $this->_errors = array();
+        $this->_token = $_POST['token'];
+        $this->_tokenGen = $_POST['tokgen'];
 
-        if($email != null)      //check to see if account has been created
-            $this->_passwordHash;
+        if($reg == 0)
+        {
+            $this->_login = isset($_POST['login']) ? 1 : 0;
+            $this->_access = 0;
+            //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
+            $this->_email = ($this->_login) ? $this->filter($_POST['email']) : $_SESSION['email'];
+            //If user presses submit, pull password from POST otherwise leave blank
+            $this->_password = ($this->_login) ? $this->filter($_POST['password']) : '';
+            //$this->_passHash = ($this->_login) ? crypt($this->_password) : $_SESSION['password'];
+        }
+        else
+        {
+            $this->_email = $this->filter($_POST['email']);
+            $this->_password = $this->filter($_POST['password']);
+            $this->_passHash  = crypt($this->_password);
+            $this->_fName = $_POST['fName'];
+            $this->_lName = $_POST['lName'];
+        }
     }
+
     public function delete()
     {
         $sql = "    DELETE FROM Accounts
@@ -43,12 +61,18 @@ class Accounts extends DatabaseObject
 
     public function update()
     {
-        $statement = Database::connect();
-        $statement->query("INSERT INTO Accounts (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
-                    VALUES(':email', ':first', ':last', ':pass', 'logintok', 'tokenGenTime', 'lastLogin', 'joinDate')");
+        $sql = "INSERT INTO Accounts
+                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
 
-        if(!$statement->execute([":email" => $this->_email, ":first"=>$this->_firstName, ":last"=>$this->_lastName, ":pass"=>$this->_passwordHash, ":logintok"=>$this->_loginToken, ":tokenGenTime"=>$this->_tokenGenTime, ":lastLogin"=>$this->_lastLogin, ":joinDate"=>$this->_joinDate]))
-            $this->errors[] = 'Could Not Insert';
+        $statement = Database::connect()->prepare($sql);
+        if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))));
+        DatabaseObject::Log("AccountUpdate", "Could Not Insert");
+        #$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        #foreach($result as $row)
+        #    var_dump($row);
+        //create error if result is nothing
     }
 
     public function getJSON()
@@ -58,47 +82,105 @@ class Accounts extends DatabaseObject
         return json_encode($json);
     }
 
-    //both parameters need to be hashed using crypt function, don't send plain text!
-    public function verifyPassword($user_input, $hashed_password)
-    {
-        return (hash_equals($hashed_password, crypt($user_input, $hashed_password))) ? 1 : 0;       #1 = password verified
-    }
-
-    public function createToken($data)
-    {
-
-    }
-
     public function process()
-    {}
+    {
+        if($this->isTokenValid() && $this->isDataValid()) {
+            $this->update();
+        }
 
-    public function filter($var)    //filter out any unwanted characters in variables
+        return count($this->_errors) ? 0 : 1;   //0 if no errors
+    }
+
+    public function isLoggedIn()
+    {
+        ($this->_login)? $this->verifyPost() : $this->verify_Session();
+
+        return $this->_access;
+    }
+
+    public function filter($var)
     {
         return preg_replace('/[^a-zA-Z0-9@.]/', '', $var);
     }
 
-    public function show_errors()
+    public function verifyPost()
     {
-        echo "<h3>Errors</h3>";
+        try
+        {
+            if(!$this->isTokenValid())
+                throw new Exception('Invalid Form Submission');
+            if(!$this->isDataValid())
+                throw new Exception('Invalid Form Data');
+            if(!$this->verifyDatabase())
+                throw new Exception('Invalid Username/Password');
 
-        foreach($this->errors as $key=>$value)
+            $this->_access = 1;
+
+            $this->registerSession();
+        }
+        catch (Exception $e)
+        {
+            $this->_errors[] = $e->getMessage();
+        }
+    }
+
+    public function verify_Session()
+    {
+        if($this->sessionExist() && $this->verifyDatabase())
+            $this->_access = 1;
+    }
+
+    public function verifyDatabase()
+    {
+        $verify = false;
+
+        $sql = "SELECT Email, PasswordHash
+                FROM Accounts
+                WHERE Email = :email";
+
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute(array(':email' => $this->_email));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        #foreach($result as $row)
+        #   var_dump($row);
+
+        if($this->_email == $result[0]["Email"] && password_verify($this->_password, $result[0]["PasswordHash"]))
+            $verify = true;
+
+        return $verify;
+    }
+
+    public function isDataValid()
+    {
+        $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z]+/";
+        $passExp =  "/[a-zA-Z0-9_.+]/";
+
+        //add validation for first and last name?
+        return (preg_match($emailExp, $this->_email) && preg_match($passExp, $this->_password)) ? 1 : 0;
+    }
+
+    public function isTokenValid()
+    {
+        return (!isset($_SESSION['token']) || $this->_token != $_SESSION['token']) ? 0 : 1;
+    }
+
+    public function registerSession()
+    {
+        $_SESSION['email'] = $this->_email;
+        $_SESSION['password'] = $this->_password;   //change to passhash
+
+        #var_dump($_SESSION);
+    }
+
+    public function sessionExist()
+    {
+        return (isset($_SESSION['email']) && isset($_SESSION['password'])) ? 1:0;   //change to passhash
+    }
+
+    public function showErrors()
+    {
+        foreach($this->_errors as $key=>$value)
             echo $value."<br>";
     }
-
-    public function valid_data()
-    {
-        if(empty($this->email))
-            $this->errors[] = 'Invalid email';
-        if(empty($this->_passwordHash))
-            $this->errors[] = 'Invalid password';
-
-        return count($this->errors) ? 0 : 1;
-    }
-
-    public function valid_token()
-    {
-        if(!isset($_SESSION['token']) || $this->token != $_SESSION['token'])
-
-    }
-
 }

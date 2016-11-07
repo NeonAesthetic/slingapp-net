@@ -101,7 +101,6 @@ class Room extends DatabaseObject
         $statement->execute([":id" => $this->_room_id]);
     }
 
-
     public function delete()
     {
         $sql = "DELETE FROM RoomCodes WHERE RoomID=:roomid";

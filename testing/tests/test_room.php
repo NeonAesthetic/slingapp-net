@@ -14,6 +14,7 @@ require_once "classes/Participant.php";
 require_once "classes/dummy/DummyParticipant.php";
 $room;
 $was_exception = false;
+
 try{
     $room = new Room("Test-Room");
 }catch (Exception $e){
