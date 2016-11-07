@@ -15,4 +15,4 @@
 //  
 //
 
-set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/classes");
+set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");

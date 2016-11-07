@@ -19,41 +19,36 @@
 </head>
 <body style="background-color: #eee">
 
-<div class="" style="margin: 0 auto; position: relative; left: 0; right: 0; max-width: 1036px" >
-    <div class="card" style="width: 100%; ">
-        <center>
-            <h1 style="font-size: 2.5em; font-weight: 100">Sling Testing</h1>
-        </center>
-
-    </div>
-    <div class="card" style="width: 400px;">
-        <div class="list-group">
-            <a onclick="runAllTests()" href="#" class="list-group-item list-group-item-heading"><b>Run all tests</b></a>
-        <?php
-        $files = glob("./tests/*");
-        foreach ($files as $testfile){
-            $text = fread(fopen($testfile, "r"), filesize($testfile));
-            preg_match("#(?<=Test Name:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
-            $test_name = $match[0];
-            if(strpos($test_name, "NOINCLUDE") !== false) continue;
-            preg_match("#(?<=Description:).+(?=\n)#", $text, $matches);
-            $test_desc = $matches[0];
-
-            echo "<a href='#' title=\"" . $test_desc . "\" name=\"test\" testfile='". basename($testfile) . "' onclick='runTest(this)' class='list-group-item'>" . $test_name . " - <span class='tfile'>" . basename($testfile) . "</span></a>";
-        }
-        ?>
-        </div>
-    </div>
-    <div class="card" style="width:624px; padding: 7px">
+<div class="" style="margin: 0 auto; position: relative; left: 0; right: 0; max-width: 1200px; padding: 5px" >
+    <div class="card" style="width: 90%;padding: 7px; margin: 5px;">
         <button class="btn btn-circle" onclick="clearconsole()"><span title="Clears the Console window" class="glyphicon glyphicon-console"></span> Clear Console </button>
         <button class="btn btn-circle" onclick="clearTestStatus()"><span title="Clears the status of all tests" class="glyphicon glyphicon-menu-hamburger"></span> Clear Test Status </button>
-        <button class="btn btn-circle" onclick="pullLatest()"><span title="Pulls the latest from the testing repo" class="glyphicon glyphicon-menu-hamburger"></span> Pull From Testing Branch </button>
+        <button class="btn btn-circle" onclick="refreshTests()"><span title="Refresh Test List" class="glyphicon glyphicon-refresh"></span> Repopulate Tests </button>
     </div>
-    <div id="console" class="card" style="width:624px;color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll;">
+<!--    <div class="card" style="width: 100%; ">-->
+<!--        <center>-->
+<!--            <h1 style="font-size: 2.5em; font-weight: 100">Sling Testing</h1>-->
+<!--        </center>-->
+<!---->
+<!--    </div>-->
+    <div class="card" style="max-width: calc(30% - 5px); margin: 5px;">
+        <div class="list-group">
+            <a onclick="runAllTests()" href="#" class="list-group-item list-group-item-heading"><b>Run all tests</b></a>
+            <div id="tests">
+                
+            </div>
+        
+        </div>
+    </div>
+    <div id="console" class="card" style="width: calc(60% - 5px);color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll; max-width: 800px; margin: 5px;">
     </div>
 </div>
 </body>
 <script>
+    window.addEventListener("load", function () {
+        refreshTests();
+    });
+
     function runAllTests(){
         var tests = document.getElementsByName("test");
         for(var i = 0; i<tests.length; i++){
@@ -105,11 +100,11 @@
         })
     }
     
-    function pullLatest() {
-        var console = document.getElementById("console");
-        console.innerHTML+= "<br>git pull origin testing<br>"
-        get("gitpulltesting.php", "", function (data, num) {
-            console.innerHTML+=data;
+    function refreshTests() {
+        var tdiv = document.getElementById("tests");
+        tdiv.innerHTML = "";
+        get("populate_tests.php", "", function (data, num) {
+            tdiv.innerHTML+=data;
         });
     }
 </script>
