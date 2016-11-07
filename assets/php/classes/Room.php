@@ -6,7 +6,6 @@
  * Date: 10/16/16
  * Time: 5:53 PM
  */
-require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
 require_once "classes/Participant.php";
 require_once "classes/RoomCode.php";
@@ -22,42 +21,51 @@ class Room extends DatabaseObject
     private $_room_name;
     public function __construct($room_code = null, $room_id = null)
     {
-        if($room_code !== null){
-            $sql = "SELECT * FROM Rooms
-                    JOIN Participants
+        $sql = "";
+        $param = "";
+        if($room_code != null) {
+//            echo "Room Code Lookup on: $room_code <br>";
+            $sql = "SELECT DISTINCT * FROM Rooms
+                    LEFT JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
-                    LEFT JOIN roomcodes
-                    ON Rooms.RoomID = RoomCodes.RoomID
+                    LEFT JOIN RoomCodes rc
+                    ON rooms.RoomID = rc.RoomID
                     WHERE Rooms.RoomID = (SELECT RoomID 
                                           FROM RoomCodes 
-                                          WHERE RoomCode = :roomcode
+                                          WHERE RoomCode = :param
                                           )";
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute([":roomcode" => $room_code]);
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            foreach($result as $row){
-//                var_dump($row);
-                echo "<br><br>";
-            }
-            if($result != false){
-                $this->_room_id = $result[0]["RoomID"];
-                $this->_room_name = $result[0]["RoomName"];
+            $param = $room_code;
+        }else if ($room_id !== null) {
+//            echo "RoomID lookup: ".$room_id."<br>";
+            $sql = "SELECT * FROM Rooms
+                    WHERE Rooms.RoomID = :param";
+            $param = $room_id;
+        }
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":param" => $param]);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+//        var_dump($result);
+//        echo
+
+        if($result != false){
+            $this->_room_id = $result[0]["RoomID"];
+//            echo $this->_room_id . "-------";
+            $this->_room_name = $result[0]["RoomName"];
+            if($room_code != null){
+
                 foreach ($result as $row) {
                     $this->_participants[] = new Participant($row["ParticipantID"]);
-                    $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
+                    if($row["RoomCode"] != null)
+                        $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 }
+                $this->_room_codes = array_unique($this->_room_codes);
+                $this->_participants = array_unique($this->_participants);
 
-            }else{
-                throw new Exception("A Room with that code could not be found");
+
+
             }
-
-        }else if ($room_id != null){
-            $sql = "SELECT * FROM Rooms
-                    WHERE RoomID = :roomid";
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute([":roomid" => $room_id]);
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
-            $this->_room_id = $result["RoomID"];
+        }else{
+            throw new Exception("A Room with that code could not be found");
         }
     }
 
@@ -68,6 +76,7 @@ class Room extends DatabaseObject
             throw new Exception("Could not create room");
         }
         $id = Database::connect()->lastInsertId();
+//        echo "Last Inserted: " . $id . "<br>";
         return new Room(null,$id);
     }
     
@@ -103,16 +112,26 @@ class Room extends DatabaseObject
 
     public function delete()
     {
+//        echo "ROOM ID: " . $this->_room_id;
         $sql = "DELETE FROM RoomCodes WHERE RoomID=:roomid";
-        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        if(!Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]))
+        {
+            echo Database::connect()->errorInfo()[2]."<br>";
+        }
         $this->_room_codes = [];
 
         $sql = "DELETE FROM Participants WHERE RoomID=:roomid";
-        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        if(!Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]))
+        {
+            echo Database::connect()->errorInfo()[2]."<br>";
+        }
         $this->_participants = [];
 
         $sql = "DELETE FROM Rooms WHERE RoomID=:roomid";
-        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        if(!Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]))
+        {
+            echo Database::connect()->errorInfo()[2]."<br>";
+        }
         $this->_room_id = null;
     }
 

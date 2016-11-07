@@ -75,4 +75,11 @@ class RoomCode extends DatabaseObject
     public function getCode(){
         return $this->_code;
     }
+
+    public function __toString()
+    {
+        return $this->_code;
+    }
+
+
 }

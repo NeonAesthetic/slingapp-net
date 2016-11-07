@@ -7,6 +7,9 @@
  * Time: 1:24 PM
  */
 
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
+require_once "classes/Database.php";
+
 abstract class DatabaseObject
 {
 
@@ -24,8 +27,10 @@ abstract class DatabaseObject
     
     public static function Log($action, $description){
         $file = basename(__FILE__);
-        $sql = "INSERT INTO Logs (File, Action, Description) VALUES(:file, :action, :desc)";
+        $ip = $_SERVER["REMOTE_ADDR"];
+        $sql = "INSERT INTO Logs (IP, File, Action, Description) VALUES(:ip, :file, :action, :desc)";
         Database::connect()->prepare($sql)->execute([
+            ":ip"=>$ip,
             ":file"=>$file,
             ":action"=>$action,
             ":desc"=>$description

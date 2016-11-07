@@ -75,4 +75,9 @@ class Participant extends DatabaseObject
     public function getID(){
         return $this->_pid;
     }
+
+    public function __toString()
+    {
+        return $this->_pid;
+    }
 }
