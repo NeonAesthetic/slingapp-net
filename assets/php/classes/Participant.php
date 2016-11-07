@@ -6,41 +6,16 @@
  * Date: 10/27/16
  * Time: 11:43 AM
  */
+require_once "interfaces/DatabaseObject.php";
 class Participant extends DatabaseObject
 {
     protected $_pid;
     protected $_roomid;
-    protected $_user_name;
-    protected $_login_token;
+    protected $_screenname;
     protected $_room_codes = [];
     protected $_resources = [];
-    public function __construct($id = null, $fingerprint = null){
-        $sql = "";
-        $param = "";
-        if($id != null) {
-            $sql = "SELECT p.ParticipantID, p.RoomID, p.ScreenName, p.FingerPrint 
-                    FROM Participants p
-                    WHERE p.ParticipantID = :param;";
-            $param = $id;
-        }
-        if ($sql !== ""){
-            
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute([":param"=> $param]);
-            $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-            if($results !== false AND count($results) !== 0){
+    public function __construct($id, $finger_print, $account_id, $room_id){
 
-                if (!array_key_exists("ParticipantID", $results))
-                    $record = $results[0];
-                else
-                    $record = $results;
-
-                $this->_pid = $record["ParticipantID"];
-                $this->_roomid = $record["RoomID"];
-                $this->_user_name = $record["ScreenName"];
-            }
-
-        }
 //        foreach ($results as $row){
 //
 //        }
@@ -48,10 +23,42 @@ class Participant extends DatabaseObject
 
     }
 
+    public static function createFingerPrint(){
+        $ip = $_SERVER["REMOTE_ADDR"];
+        $userAgent = $_SERVER["HTTP_USER_AGENT"];
+        return hash("sha256", $userAgent.$ip);
+    }
+
     public static function createParticipant($room_id, $screen_name){
+        //Creates the participant
+        $finger_print = self::createFingerPrint();
+        $id = self::getParticipantFromFingerPrint();
+        if($id!= null){
+            //Account Exists
+//            $sql = "SELECT"
+        }
+
+
+        //Insert the roomid screenid
+        //Gets RoomID
+        //Gets ScreenName
 
     }
 
+    public static function getParticipantFromFingerPrint($finger_print)
+    {
+        $sql = "SELECT PaticipantID FROM Participants WHERE FingerPrint = :fp";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":fp"=>$finger_print]);
+        $results = $statement->fetch(PDO::FETCH_ASSOC);
+        if(count($results) > 0){
+
+            return $results["ParticipantID"];
+        }
+        else{
+            return null;
+        }
+    }
     
 
     public function delete()
