@@ -88,7 +88,6 @@ class Room extends DatabaseObject
         return $this->_room_id;
     }
 
-
     public function getRoomName()
     {
         return $this->_room_name;
@@ -110,7 +109,6 @@ class Room extends DatabaseObject
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":id" => $this->_room_id]);
     }
-
 
     public function delete()
     {
@@ -152,7 +150,6 @@ class Room extends DatabaseObject
         $sql = "UPDATE Rooms SET RoomName = :roomname WHERE RoomID = $this->_room_id";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":roomname" => $this->_room_name]);
-
     }
 
     public function addRoomCode($creator, $uses = null, $expires = null){

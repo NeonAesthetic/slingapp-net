@@ -6,14 +6,15 @@
  * Time: 10:29 AM
  */
 
-//testname: Create Room Through Room Class
-//testdesc: Create a non-existant room and alter its state with Room methods.
+//Test Name: Create Room Through Room Class
+//Description: Create a non-existant room and alter its state with Room methods.
 
 require_once "classes/Room.php";
 require_once "classes/Participant.php";
 require_once "classes/dummy/DummyParticipant.php";
 $room;
 $was_exception = false;
+
 try{
     $room = new Room("Test-Room");
 }catch (Exception $e){
