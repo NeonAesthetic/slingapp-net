@@ -62,7 +62,7 @@ class RoomCode extends DatabaseObject
             return $code;
         }
 
-        //check
+        //check check
     }
 
     public function delete()
