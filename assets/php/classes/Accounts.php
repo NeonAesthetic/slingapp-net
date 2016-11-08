@@ -168,7 +168,6 @@ class Accounts extends DatabaseObject
         }
         else
             echo "Inserted Part";
->>>>>>> 449e787bf2429b5b1b82c6ebc64f89e3604024ff
     }
 
     public function getJSON()
