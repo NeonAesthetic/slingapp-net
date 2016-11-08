@@ -11,11 +11,11 @@ assert_options(ASSERT_WARNING, 0);
 assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
+
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 
 function test_end(){
     $GLOBALS["TEST_OUTPUT"] = ob_get_clean();
-//    echo $GLOBALS["TEST_OUTPUT"];
     if(function_exists("cleanup"))
         call_user_func("cleanup");
 }
@@ -41,7 +41,6 @@ function recurse_backtrace(array $bt, $level){
         }else{
             echo $indent . $key . ": " . $value . "<br>";
         }
-
     }
 }
 
@@ -58,6 +57,7 @@ register_shutdown_function(function (){
 
 
 });
+
 assert_options(ASSERT_CALLBACK, 'assert_handler');
 
 set_exception_handler(function(Throwable $exception){
@@ -66,6 +66,7 @@ set_exception_handler(function(Throwable $exception){
 
     fail_test();
 });
+
 set_error_handler(function($errno, $errstr, $errfile, $errline){
     echo "PHP Error: " . $errstr . " at line " . $errline . " in " . $errfile . "<br>";
 //    recurse_backtrace(debug_backtrace(), 0 );

@@ -61,6 +61,7 @@
         var div = element;
         var testScript = element.getAttribute("testfile");
         div.className = "list-group-item running";
+        div.innerHTML += ""
         get(base + testScript, "", function (data, responsetype) {
             var newstuff = "";
             newstuff += "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
