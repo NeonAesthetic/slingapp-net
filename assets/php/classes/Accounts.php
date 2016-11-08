@@ -17,7 +17,6 @@ class Accounts extends DatabaseObject
     private $_fName;
     private $_lName;
     private $_email;
-    private $_password;
     private $_passHash;
     private $_errors;
     private $_access;       //1 if account exists
@@ -30,16 +29,17 @@ class Accounts extends DatabaseObject
     private $_roomID;
     private $_screenName;
 
-    public function __construct($accountID)
+    public function __construct($accountID, $email = null, $fName = null, $lName = null, $passHash = null, $token, $_tokenGen, $lastLogin, $joinDate)
     {
-        $sql = "SELECT *
-                FROM Accounts
-                WHERE AccountID = :accountID";
-
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute(array(':accountID' => $accountID));
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
+        $this->_accountID = $accountID;
+        $this->_email = $email;
+        $this->_fName = $fName;
+        $this->_lName = $lName;
+        $this->_passHash = $passHash;
+        $this->_token = $token;
+        $this->_tokenGen = $_tokenGen;
+        $this->_lastLogin = $lastLogin;
+        $this->_joinDate = $joinDate;
 
 //        $this->_errors = array();
 //        $this->_token = $_POST['token'];
@@ -81,10 +81,40 @@ class Accounts extends DatabaseObject
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
+        $accountID = (int)Database::connect()->lastInsertId()[0];
 
-        return new Accounts((int)Database::connect()->lastInsertId()[0]);
+
+        return new Accounts($accountID, $email, $fName, $lName, $passHash, $token, $currentDate, $currentDate, $currentDate);
     }
 
+    public static function login($token_email, $password = null)        //add validity checks
+    {
+        $retval = null;
+        if($password)
+        {
+            $sql = "SELECT *
+                FROM Accounts
+                WHERE Email = :email";
+            $statement = Database::connect()->prepare($sql);
+            $statement->execute(array(':logtok' => $token_email));
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            if(!password_verify($password, $result[0]['PasswordHash']))
+                $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName'], $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime'], $result[0]['LastLogin'], $result[0]['JoinDate']);
+        }
+        else
+        {
+            $sql = "SELECT *
+                FROM Accounts
+                WHERE LoginToken = :logtok";
+
+            $statement = Database::connect()->prepare($sql);
+            $statement->execute(array(':logtok' => $token_email));
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName'], $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime'], $result[0]['LastLogin'], $result[0]['JoinDate']);
+        }
+        return $retval;
+    }
     public function delete()
     {
         $sql = "SELECT AccountID
