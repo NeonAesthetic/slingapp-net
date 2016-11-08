@@ -8,6 +8,8 @@
  * Description: Logs into the system assuming there is a valid account
  */
 
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
+require_once 'classes/Accounts.php';
 session_start();
 
 
