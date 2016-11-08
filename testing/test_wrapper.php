@@ -11,11 +11,11 @@ assert_options(ASSERT_WARNING, 0);
 assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
+
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 
 function test_end(){
     $GLOBALS["TEST_OUTPUT"] = ob_get_clean();
-//    echo $GLOBALS["TEST_OUTPUT"];
     if(function_exists("cleanup"))
         call_user_func("cleanup");
 }
@@ -41,7 +41,6 @@ function recurse_backtrace(array $bt, $level){
         }else{
             echo $indent . $key . ": " . $value . "<br>";
         }
-
     }
 }
 
@@ -51,12 +50,14 @@ register_shutdown_function(function (){
         echo "<span class='test-fail'>Test Failed</span><br>";
 //        echo $GLOBALS["TEST_OUTPUT"];
     }else{
-        echo "<span class='test-pass'>Test Passed</span><br>";
+        $ms = round($GLOBALS['RunTime']*1000, 3);
+        echo "<span class='test-pass'>Test Passed in $ms milliseconds</span><br>";
     }
     echo $GLOBALS["TEST_OUTPUT"];
 
 
 });
+
 assert_options(ASSERT_CALLBACK, 'assert_handler');
 
 set_exception_handler(function(Throwable $exception){
@@ -65,6 +66,7 @@ set_exception_handler(function(Throwable $exception){
 
     fail_test();
 });
+
 set_error_handler(function($errno, $errstr, $errfile, $errline){
     echo "PHP Error: " . $errstr . " at line " . $errline . " in " . $errfile . "<br>";
 //    recurse_backtrace(debug_backtrace(), 0 );
@@ -73,8 +75,10 @@ set_error_handler(function($errno, $errstr, $errfile, $errline){
 
 if(isset($_GET['test'])){
     ob_start();
-
+    $start = microtime(true);
     include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/tests/". $_GET["test"]);
+    $end = microtime(true);
+    $GLOBALS["RunTime"] = ($end - $start);
 }else{
     echo "Test file name was not provided<br>";
 }

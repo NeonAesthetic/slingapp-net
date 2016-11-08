@@ -19,6 +19,7 @@ drop table if exists RoomChat;
 drop table if exists Files;
 drop table if exists RoomChat;
 drop table if exists MimeTypes;
+drop table if exists Logs;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE Rooms (
@@ -31,7 +32,9 @@ CREATE TABLE Rooms (
 CREATE TABLE Accounts (
   AccountID SERIAL,
   Email VARCHAR(64) NULL UNIQUE,
-  FullName VARCHAR(64) NULL,
+  #FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
+  FirstName VARCHAR(32) NULL,
+  LastName VARCHAR(32) NULL,
   PasswordHash VARCHAR(60) NULL,
   LoginToken VARCHAR(50) NOT NULL,
   TokenGenTime DATETIME,
@@ -109,7 +112,11 @@ CREATE TABLE RoomChat(
 );
 
 CREATE TABLE Logs(
-
+  Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  IP CHAR(15),
+  File VARCHAR(64),
+  Action VARCHAR(64),
+  Description VARCHAR(256)
 );
 
 
