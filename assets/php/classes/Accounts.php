@@ -26,6 +26,9 @@ class Accounts extends DatabaseObject
     private $_tokenGen;
     private $_lastLogin;
     private $_joinDate;
+    private $_accountID;
+    private $_roomID;
+    private $_screenName;
 
     public function __construct($reg)
     {
@@ -63,6 +66,7 @@ class Accounts extends DatabaseObject
 
     public function update()
     {
+        #echo "Updated";
         $sql = "INSERT INTO Accounts
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
@@ -70,11 +74,17 @@ class Accounts extends DatabaseObject
         $statement = Database::connect()->prepare($sql);
         if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))));
             DatabaseObject::Log("AccountUpdate", "Could Not Insert");
-        #$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        #foreach($result as $row)
-        #    var_dump($row);
+        foreach($result as $row)
+            var_dump($row);
         //create error if result is nothing
+
+        $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
+            VALUES (:accountID, :roomID, :screenName)";
+        $statement = Database::connect()->prepare($sql);
+        if(!$statement->execute(array(':accountId' => $this->_accountID, ':roomID' => $this->_roomID, ':screenName' => $this->_screenName)));
+        DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
     }
 
     public function getJSON()
@@ -155,7 +165,7 @@ class Accounts extends DatabaseObject
 
     public function isDataValid()
     {
-        $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z]+/";
+        $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z](6-40)+/";
         $passExp =  "/[a-zA-Z0-9_.+]/";
 
         //add validation for first and last name?
