@@ -26,6 +26,9 @@ class Accounts extends DatabaseObject
     private $_tokenGen;
     private $_lastLogin;
     private $_joinDate;
+    private $_accountID;
+    private $_roomID;
+    private $_screenName;
 
     public function __construct($reg)
     {
@@ -55,26 +58,86 @@ class Accounts extends DatabaseObject
 
     public function delete()
     {
-        $sql = "    DELETE FROM Accounts
-                    WHERE AccountID = $this->_accountID";
+        $sql = "SELECT AccountID
+                    FROM Accounts
+                    WHERE Email = :email";
         $statement = Database::connect()->prepare($sql);
-        $statement->execute();
+
+        if($statement->execute(array(':email' => $this->_email)))
+        {
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            #foreach($result as $row)
+            #    var_dump($row);
+
+            $this->_accountID = $result[0]["AccountID"];
+
+            $sql = "    DELETE FROM Particpants
+                    WHERE AccountID = $this->_accountID";
+            $statement = Database::connect()->prepare($sql);
+
+            if($statement->execute())
+            {
+                $sql = "    DELETE FROM Accounts
+                    WHERE AccountID = $this->_accountID";
+                $statement = Database::connect()->prepare($sql);
+                $statement->execute();
+            }
+        }
     }
 
     public function update()
     {
+        #echo "Updated";
         $sql = "INSERT INTO Accounts
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
 
         $statement = Database::connect()->prepare($sql);
-        if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))));
-        DatabaseObject::Log("AccountUpdate", "Could Not Insert");
-        #$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if($statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))))
+        {
+            $sql = "SELECT AccountID
+                    FROM Accounts
+                    WHERE Email = :email";
+            $statement = Database::connect()->prepare($sql);
 
-        #foreach($result as $row)
-        #    var_dump($row);
-        //create error if result is nothing
+            if($statement->execute(array(':email' => $this->_email)))
+            {
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                #foreach($result as $row)
+                #    var_dump($row);
+
+                $this->_accountID = $result[0]["AccountID"];
+            }
+            //Do select statement and pull accnt id after account created.
+            $sql = "INSERT INTO Participants
+                (AccountID, RoomID, ScreenName)
+                VALUES (:accountID, :roomID, :screenName)";
+            $statement = Database::connect()->prepare($sql);
+            if($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $this->_roomID, ':screenName' => $this->_screenName)))
+            {
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                #foreach($result as $row)
+                #    var_dump($row);
+            }
+            //create error if result is nothing
+            //FOUND OUT WHAT WAS WRONG, tests faile dbecause no room existed, ref. integrity.
+            //Need REAL account info
+            //NEED ACTUAL room id
+
+            echo "Inserted Acc";
+        }
+        else
+        {
+            DatabaseObject::Log("AccountUpdate", "Could Not Insert");
+        }
+
+        if(!$statement->execute(array(':accountID' => 19, ':roomID' => 776, ':screenName' => "Derp")))
+        {
+            echo "Uh oh";
+            DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
+        }
+        else
+            echo "Inserted Part";
     }
 
     public function getJSON()

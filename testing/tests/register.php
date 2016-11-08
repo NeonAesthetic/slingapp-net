@@ -11,6 +11,7 @@
 
 session_start();
 
+set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once 'classes/Accounts.php';
 
 if(isset($_POST['register']))
@@ -37,7 +38,7 @@ $token = $_SESSION['token'] = md5(uniqid(mt_rand(),true));
 
     </table>
     <input type="hidden" name="token" value="<?php echo $token;?>" />
-    <input type="hidden" name="tokgen" value="<?php echo date('Y-m-d H:i:s')?>" />
+    <input type="hidden" name="tokgen" value="<?php echo date('Y-m-d H:i:s:u')?>" />
     <p><input type="submit" name="register" value="Sign Up" /></p>
 </form>
 

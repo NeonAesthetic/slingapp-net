@@ -17,7 +17,7 @@ class Participant extends DatabaseObject
     protected $_resources = [];
     protected $_finger_print;
     protected $_participant_id;
-
+    protected $_account_id;
     public function __construct($id, $finger_print, $account_id, $room_id){
 
 //        foreach ($results as $row){
@@ -91,7 +91,7 @@ class Participant extends DatabaseObject
         $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
             VALUES (:accountID, :fingerPrint,:pid, :roomID, :screenName)";
         $statement = Database::connect()->prepare($sql);
-        if(!$statement->execute(array(':accountId' => $this->account_id, ':fingerPrint' => $this->finger_print, ':pid' => $this->id)));
+        if(!$statement->execute(array(':accountId' => $this->_account_id, ':fingerPrint' => $this->_finger_print, ':pid' => $this->_pid)));
         DatabaseObject::Log("CreateParticipant", "Could Not Insert");
     }
 

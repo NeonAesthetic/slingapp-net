@@ -24,7 +24,7 @@ abstract class DatabaseObject
     public abstract function update();
 
     public abstract function getJSON();
-    
+
     public static function Log($action, $description){
         $file = basename(__FILE__);
         $ip = $_SERVER["REMOTE_ADDR"];
@@ -36,4 +36,5 @@ abstract class DatabaseObject
             ":desc"=>$description
         ]);
     }
+    
 }

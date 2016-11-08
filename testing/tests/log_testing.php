@@ -19,7 +19,6 @@ $results = $stmt->fetch(PDO::FETCH_ASSOC);
 foreach ($results as $k=>$v){
     echo $k . ": ". $v. "<br>";
 }
-cleanup();
 
 function cleanup(){
     Database::connect()->exec("DELETE FROM logs WHERE Action = 'Testing'");
