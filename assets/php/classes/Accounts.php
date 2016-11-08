@@ -8,7 +8,7 @@
  */
 
 require_once "Database.php";
-require_once "../interfaces/DatabaseObject.php";
+require_once "interfaces/DatabaseObject.php";
 
 class Accounts extends DatabaseObject
 {
@@ -67,7 +67,7 @@ class Accounts extends DatabaseObject
 
         $statement = Database::connect()->prepare($sql);
         if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))));
-        DatabaseObject::Log("AccountUpdate", "Could Not Insert");
+            DatabaseObject::Log("AccountUpdate", "Could Not Insert");
         #$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         #foreach($result as $row)

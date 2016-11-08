@@ -8,7 +8,7 @@
 
 session_start();
 
-require_once '../../assets/php/classes/Accounts.php';
+require_once 'classes/Accounts.php';
 
 if(isset($_POST['register']))
 {
