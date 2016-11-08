@@ -26,6 +26,8 @@ class Room extends DatabaseObject
             $sql = "SELECT * FROM Rooms
                     JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
+                    JOIN roomcodes
+                    ON participants.ParticipantID = roomcodes.CreatedBy
                     WHERE Rooms.RoomID = (SELECT RoomID 
                                           FROM RoomCodes 
                                           WHERE RoomCode = :roomcode
@@ -33,8 +35,15 @@ class Room extends DatabaseObject
             $statement = Database::connect()->prepare($sql);
             $statement->execute([":roomcode" => $room_code]);
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($result);
             if($result != false){
-                $this->_room_id = $result["RoomID"];
+                $this->_room_id = $result[0]["RoomID"];
+                $this->_room_name = $result[0]["RoomName"];
+                foreach ($result as $row) {
+                    $this->_participants[] = new Participant($row["ParticipantID"]);
+//                    $this->_room_codes[] = new RoomCode();
+                }
+
             }else{
                 throw new Exception("A Room with that code could not be found");
             }
@@ -72,8 +81,19 @@ class Room extends DatabaseObject
     {
         return $this->_room_name;
     }
+
+    public function setRoomName($new_room_name){
+        $this->_room_name = $new_room_name;
+        $this->_has_changed = true;
+    }
+
+    public function addParticipant($fingerprint){
+        $new_part = new DummyParticipant($this->_room_id, $fingerprint);
+        $this->_participants[] = $new_part;
+        return $new_part->getID();
+    }
     
-    public function deleteRoom(){
+    private function deleteRoom(){
         $sql = "DELETE FROM Rooms WHERE RoomID = :id";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":id" => $this->_room_id]);
@@ -82,18 +102,58 @@ class Room extends DatabaseObject
 
     public function delete()
     {
-        foreach($this->_participants as $participant){
-            $participant->delete();
-        }
-        foreach ($this->_room_codes as $room_code){
-            $room_code->delete();
-        }
-        $sql = "DELETE FROM Rooms WHERE RoomID=$this->_room_id";
-        Database::connect()->exec($sql);
+        $sql = "DELETE FROM RoomCodes WHERE RoomID=:roomid";
+        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        $this->_room_codes = [];
+
+        $sql = "DELETE FROM Participants WHERE RoomID=:roomid";
+        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        $this->_participants = [];
+
+        $sql = "DELETE FROM Rooms WHERE RoomID=:roomid";
+        Database::connect()->prepare($sql)->execute([":roomid"=>$this->_room_id]);
+        $this->_room_id = null;
     }
 
     public function update()
     {
-        // TODO: Implement update() method.
+        foreach ($this->_participants as $particpant){
+            $particpant->update();
+        }
+        foreach ($this->_room_codes as $rc){
+            $rc->update();
+        }
+        if($this->hasChanged()) $this->updateRoom();
+    }
+
+    private function updateRoom(){
+        $sql = "UPDATE Rooms SET RoomName = :roomname WHERE RoomID = $this->_room_id";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":roomname" => $this->_room_name]);
+
+    }
+
+    public function addRoomCode($creator, $uses = null, $expires = null){
+        $new_code = new RoomCode($this->_room_id, $creator, $uses, $expires);
+        $this->_room_codes[] = $new_code;
+        return $new_code->getCode();
+    }
+    
+    public function getJSON(){
+        $json = [];
+        $json["Type"] = "Room";
+        $json['Participants'] = [];
+        foreach($this->_participants as $p){
+            $json['Participants'][] = json_decode($p->getJSON(), true);
+        }
+        $json['RoomCodes'] = [];
+        foreach($this->_room_codes as $p){
+            $json['RoomCodes'][] = json_decode($p->getJSON(), true);
+        }
+
+        $json["RoomID"] = $this->_room_id;
+        $json["RoomName"] = $this->_room_name;
+
+        return json_encode($json);
     }
 }
