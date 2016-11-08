@@ -30,30 +30,59 @@ class Accounts extends DatabaseObject
     private $_roomID;
     private $_screenName;
 
-    public function __construct($reg)
+    public function __construct($accountID)
     {
-        $this->_errors = array();
-        $this->_token = $_POST['token'];
-        $this->_tokenGen = $_POST['tokgen'];
+        $sql = "SELECT *
+                FROM Accounts
+                WHERE AccountID = :accountID";
 
-        if($reg == 0)
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute(array(':accountID' => $accountID));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+
+//        $this->_errors = array();
+//        $this->_token = $_POST['token'];
+//        $this->_tokenGen = $_POST['tokgen'];
+//
+//        if($reg == 0)
+//        {
+//            $this->_login = isset($_POST['login']) ? 1 : 0;
+//            $this->_access = 0;
+//            //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
+//            $this->_email = ($this->_login) ? $this->filter($_POST['email']) : $_SESSION['email'];
+//            //If user presses submit, pull password from POST otherwise leave blank
+//            $this->_password = ($this->_login) ? $this->filter($_POST['password']) : '';
+//            //$this->_passHash = ($this->_login) ? crypt($this->_password) : $_SESSION['password'];
+//        }
+//        else
+//        {
+//            $this->_email = $this->filter($_POST['email']);
+//            $this->_password = $this->filter($_POST['password']);
+//            $this->_passHash  = crypt($this->_password);
+//            $this->_fName = $_POST['fName'];
+//            $this->_lName = $_POST['lName'];
+//        }
+    }
+
+    public static function CreateAccount($email, $fName, $lName, $password)
+    {
+        $passHash  = password_hash($password, PASSWORD_BCRYPT);
+        $token = md5(uniqid(mt_rand(),true));
+        $currentDate = date('Y-m-d H:i:s:u');
+
+        $sql = "INSERT INTO Accounts 
+                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+        $statement = Database::connect()->prepare($sql);
+
+        if(!$statement->execute([':email' => $email, ':fName' => $fName, ':lName' => $lName, ':passHash' => $passHash, ':logTok' => $token, ':tokGen' => $currentDate, ':lastLog' => $currentDate, ':joinDate' => $currentDate]))
         {
-            $this->_login = isset($_POST['login']) ? 1 : 0;
-            $this->_access = 0;
-            //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
-            $this->_email = ($this->_login) ? $this->filter($_POST['email']) : $_SESSION['email'];
-            //If user presses submit, pull password from POST otherwise leave blank
-            $this->_password = ($this->_login) ? $this->filter($_POST['password']) : '';
-            //$this->_passHash = ($this->_login) ? crypt($this->_password) : $_SESSION['password'];
+            var_dump(Database::connect()->errorInfo());
+            throw new Exception("Could not create account");
         }
-        else
-        {
-            $this->_email = $this->filter($_POST['email']);
-            $this->_password = $this->filter($_POST['password']);
-            $this->_passHash  = crypt($this->_password);
-            $this->_fName = $_POST['fName'];
-            $this->_lName = $_POST['lName'];
-        }
+
+        return new Accounts((int)Database::connect()->lastInsertId()[0]);
     }
 
     public function delete()
@@ -72,19 +101,18 @@ class Accounts extends DatabaseObject
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
 
         $statement = Database::connect()->prepare($sql);
-        if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))));
+        if(!$statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))))
             DatabaseObject::Log("AccountUpdate", "Could Not Insert");
+
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach($result as $row)
-            var_dump($row);
         //create error if result is nothing
 
-        $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
-            VALUES (:accountID, :roomID, :screenName)";
-        $statement = Database::connect()->prepare($sql);
-        if(!$statement->execute(array(':accountId' => $this->_accountID, ':roomID' => $this->_roomID, ':screenName' => $this->_screenName)));
-        DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
+//        $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
+//            VALUES (:accountID, :roomID, :screenName)";
+//        $statement = Database::connect()->prepare($sql);
+//        if(!$statement->execute(array(':accountId' => $this->_accountID, ':roomID' => $this->_roomID, ':screenName' => $this->_screenName)))
+//        DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
     }
 
     public function getJSON()
@@ -93,6 +121,15 @@ class Accounts extends DatabaseObject
         $json['type'] = "Accounts";
         return json_encode($json);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->_email;
+    }
+
 
     public function process()
     {
