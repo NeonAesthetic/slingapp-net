@@ -20,7 +20,7 @@
 <body style="background-color: #eee">
 
 <div class="" style="margin: 0 auto; position: relative; left: 0; right: 0; max-width: 1200px; padding: 5px" >
-    <div class="card" style="width: 90%;padding: 7px; margin: 5px;">
+    <div class="card" style="width: calc(100% - 10px);padding: 7px; margin: 5px;">
         <button class="btn btn-circle" onclick="clearconsole()"><span title="Clears the Console window" class="glyphicon glyphicon-console"></span> Clear Console </button>
         <button class="btn btn-circle" onclick="clearTestStatus()"><span title="Clears the status of all tests" class="glyphicon glyphicon-menu-hamburger"></span> Clear Test Status </button>
         <button class="btn btn-circle" onclick="refreshTests()"><span title="Refresh Test List" class="glyphicon glyphicon-refresh"></span> Repopulate Tests </button>
@@ -31,7 +31,7 @@
 <!--        </center>-->
 <!---->
 <!--    </div>-->
-    <div class="card" style="max-width: calc(30% - 5px); margin: 5px;">
+    <div class="card" style="max-width: calc(35% - 10px); margin: 5px;">
         <div class="list-group">
             <a onclick="runAllTests()" href="#" class="list-group-item list-group-item-heading"><b>Run all tests</b></a>
             <div id="tests">
@@ -40,7 +40,7 @@
         
         </div>
     </div>
-    <div id="console" class="card" style="width: calc(60% - 5px);color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll; max-width: 800px; margin: 5px;">
+    <div id="console" class="card" style="width: calc(65% - 10px);color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll; max-width: 800px; margin: 5px;">
     </div>
 </div>
 </body>
@@ -61,6 +61,7 @@
         var div = element;
         var testScript = element.getAttribute("testfile");
         div.className = "list-group-item running";
+        div.innerHTML += ""
         get(base + testScript, "", function (data, responsetype) {
             var newstuff = "";
             newstuff += "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
