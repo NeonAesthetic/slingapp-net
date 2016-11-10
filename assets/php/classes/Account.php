@@ -122,9 +122,11 @@ class Account extends DatabaseObject
         $token = md5(uniqid(mt_rand(),true));
         $currentDate = date("Y-m-d H:i:s");
 
-        $sql = "INSERT INTO Accounts 
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+//        $sql = "INSERT INTO Accounts 
+//                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+//                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+        
+        $sql = "CALL AddUser(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
 
         if(!$statement->execute([
