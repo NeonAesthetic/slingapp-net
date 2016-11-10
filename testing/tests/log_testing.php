@@ -22,5 +22,9 @@ foreach ($results as $k=>$v){
 }
 
 function cleanup(){
-    Database::connect()->exec("DELETE FROM logs WHERE Action = 'Testing'");
+    try{
+        Database::connect()->exec("DELETE FROM Logs WHERE Action = 'Testing'");
+    }catch(Exception $e){
+
+    }
 }
