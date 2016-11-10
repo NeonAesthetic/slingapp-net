@@ -120,7 +120,7 @@ class Account extends DatabaseObject
         mark();
         $passHash  = password_hash($password, PASSWORD_BCRYPT);
         $token = md5(uniqid(mt_rand(),true));
-        $currentDate = date('Y-m-d H:i:s:u');
+        $currentDate = date("Y-m-d H:i:s");
         mark("Hash");
 
         $sql = "INSERT INTO Accounts 
