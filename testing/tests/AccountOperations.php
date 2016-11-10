@@ -4,17 +4,30 @@
  * User: ian
  * Date: 11/10/16
  * Time: 9:17 AM
+ *
+ * Test Name: All Account Tests
+ * Description: Runs all the tests required to make sure Account works as intended: Login, Create, set, get, update
  */
 
 require_once "classes/Account.php";
 
-
+/**
+ *      TEST LOGIN STATIC METHOD
+ */
 $account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
 assert($account == false, "Invalid login returns false");
 
 $account = Account::Login("test token");
 //var_dump($account);
 assert($account == false, "Invalid login returns false");
+/***********************************************
+ *
+ **/
+
+
+/**
+ *          CREATE NEW ACCOUNT
+ */
 
 $account = Account::CreateAccount("testemail@test.com","Bob", "Marley", "password");
 

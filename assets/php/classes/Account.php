@@ -169,10 +169,13 @@ class Account extends DatabaseObject
 
             if(!password_verify($password, $result['PasswordHash']))
                 $retval = false;
+            else{
+                $retval = new Account($result['AccountID'], $result['Email'], $result['FirstName']
+                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
+                    , $result['LastLogin'], $result['JoinDate']);
 
-//                    new Account($result['AccountID'], $result['Email'], $result['FirstName']
-//                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
-//                    , $result['LastLogin'], $result['JoinDate']);
+            }
+
         }
         else {      //no password provided, lookup based on token
             $sql = "SELECT *
