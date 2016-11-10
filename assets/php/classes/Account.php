@@ -65,8 +65,8 @@ class Account extends DatabaseObject
      * These elements make up the new account in the database and will persist until removed on command
      * by the Delete Account function.
     */
-    public function __construct($accountID, $email = null, $fName = null, $lName = null, $passHash = null
-        , $token = null, $_tokenGen = null, $lastLogin = null , $joinDate = null)
+    public function __construct($accountID, $token, $email = null, $fName = null, $lName = null, $passHash = null
+        ,  $_tokenGen = null, $lastLogin = null , $joinDate = null)
     {
         $this->_accountID = $accountID;
         $this->_email = $email;
