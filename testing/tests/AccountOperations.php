@@ -37,14 +37,15 @@ require_once "classes/Account.php";
 
     $first_name = $account->getName()["First"];
     $last_name = $account->getName()["Last"];
-    $id = $account->getJSON(true);
-    var_dump($id);
+    $id = $account->getJSON(true)["ID"];
     assert($first_name == "Bob", "First name is Bob");
     assert($last_name == "Marley", "Last name is Marley");
 
     $account->email = "test";
 
     assert($account->getEmail() == "test", "Email is 'test'");
+
+//    assert();
 }
 
 
@@ -86,5 +87,7 @@ require_once "classes/Account.php";
 
 //NEED BETTER CLEANUP
 function cleanup(){
-    Database::connect()->query("DELETE FROM Accounts WHERE Email = 'testemail@test.com'");
+    try{
+        Database::connect()->query("DELETE FROM Accounts WHERE Email = 'testemail@test.com'");
+    }catch (Exception $e){}
 }

@@ -14,7 +14,7 @@ $p = GetParams("action", "email", "fname", "lname", "password");
 
 switch ($p["action"]){
     case "register":{
-        Accounts::CreateAccount($p["email"], $p["fname"], $p["lname"], $p["password"]);
+        Account::CreateAccount($p["email"], $p["fname"], $p["lname"], $p["password"]);
         break;
     }
     case "login":{

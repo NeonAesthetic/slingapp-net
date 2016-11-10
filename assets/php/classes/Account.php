@@ -117,17 +117,15 @@ class Account extends DatabaseObject
      */
     public static function CreateAccount($email, $fName, $lName, $password)
     {
-        mark();
+
         $passHash  = password_hash($password, PASSWORD_BCRYPT);
         $token = md5(uniqid(mt_rand(),true));
         $currentDate = date("Y-m-d H:i:s");
-        mark("Hash");
 
         $sql = "INSERT INTO Accounts 
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
-        mark("Prepare");
 
         if(!$statement->execute([
             ':email' => $email,
@@ -142,9 +140,8 @@ class Account extends DatabaseObject
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
-        mark("Execute");
+
         $accountID = (int)Database::connect()->lastInsertId()[0];
-        mark("Get last id");
         return new Account($accountID, $token, $email, $fName, $lName, $passHash
             , $currentDate, $currentDate, $currentDate);
     }
@@ -306,7 +303,12 @@ class Account extends DatabaseObject
     public function getJSON($as_array = false)
     {
         $json = [];
-        $json['type'] = "Accounts";
+        $json['Type'] = "Account";
+        $json['Email'] = $this->_email;
+        $json["FirstName"] = $this->_fName;
+        $json["LastName"] = $this->_lName;
+        $json["LoginToken"] = $this->_token;
+        $json['ID'] = $this->_accountID;
         if($as_array)
             return $json;
         return json_encode($json);
