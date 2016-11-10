@@ -117,14 +117,17 @@ class Account extends DatabaseObject
      */
     public static function CreateAccount($email, $fName, $lName, $password)
     {
+        mark();
         $passHash  = password_hash($password, PASSWORD_BCRYPT);
         $token = md5(uniqid(mt_rand(),true));
         $currentDate = date('Y-m-d H:i:s:u');
+        mark("Hash");
 
         $sql = "INSERT INTO Accounts 
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
+        mark("Prepare");
 
         if(!$statement->execute([
             ':email' => $email,
@@ -139,9 +142,11 @@ class Account extends DatabaseObject
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
+        mark("Execute");
         $accountID = (int)Database::connect()->lastInsertId()[0];
-        return new Account($accountID, $email, $fName, $lName, $passHash
-            , $token, $currentDate, $currentDate, $currentDate);
+        mark("Get last id");
+        return new Account($accountID, $token, $email, $fName, $lName, $passHash
+            , $currentDate, $currentDate, $currentDate);
     }
 
     /**

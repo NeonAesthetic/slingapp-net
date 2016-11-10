@@ -35,12 +35,25 @@
         <div class="list-group">
             <a onclick="runAllTests()" href="#" class="list-group-item list-group-item-heading"><b>Run all tests</b></a>
             <div id="tests">
-                
+                <div class="spinner">
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                </div>
             </div>
         
         </div>
     </div>
     <div id="console" class="card" style="width: calc(65% - 10px);color: #CCC; background-color: #333; font-family: monospace; min-height: 70vh; overflow-y: scroll; max-width: 800px; margin: 5px;">
+    </div>
+</div>
+<div id="spinner" style="visibility: hidden;">
+    <div class="spinner">
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
     </div>
 </div>
 </body>
@@ -103,9 +116,9 @@
     
     function refreshTests() {
         var tdiv = document.getElementById("tests");
-        tdiv.innerHTML = "";
+        tdiv.innerHTML = document.getElementById("spinner").innerHTML;
         get("populate_tests.php", "", function (data, num) {
-            tdiv.innerHTML+=data;
+            tdiv.innerHTML=data;
         });
     }
 </script>

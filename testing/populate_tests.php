@@ -1,5 +1,6 @@
 <?php
 $files = glob("./tests/*");
+usleep(1000000);
 foreach ($files as $testfile){
     $text = fread(fopen($testfile, "r"), filesize($testfile));
     preg_match("#(?<=Test Name:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
