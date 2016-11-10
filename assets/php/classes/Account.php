@@ -298,10 +298,12 @@ class Account extends DatabaseObject
      * @return string
      * This function allows the Accounts type to be encoded.
     */
-    public function getJSON()
+    public function getJSON($as_array = false)
     {
         $json = [];
         $json['type'] = "Accounts";
+        if($as_array)
+            return $json;
         return json_encode($json);
     }
     /**

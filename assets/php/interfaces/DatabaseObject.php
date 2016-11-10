@@ -23,7 +23,7 @@ abstract class DatabaseObject
 
     public abstract function update();
 
-    public abstract function getJSON();
+    public abstract function getJSON($as_array = false);
 
     public static function Log($action, $description){
         $file = basename(__FILE__);

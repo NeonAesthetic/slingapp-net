@@ -37,6 +37,7 @@ require_once "classes/Account.php";
 
     $first_name = $account->getName()["First"];
     $last_name = $account->getName()["Last"];
+    $id = $account->getJSON(true);
     assert($first_name == "Bob", "First name is Bob");
     assert($last_name == "Marley", "Last name is Marley");
 
