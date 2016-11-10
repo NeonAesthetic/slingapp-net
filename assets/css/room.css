@@ -18,7 +18,7 @@
 
 .module:hover{
     /*box-shadow: 5px 10px 30px rgba(0,0,0,.3);*/
-    animation: e 30s ease forwards;
+    animation: e 0.3s ease forwards;
 }
 
 .module-container{
@@ -55,6 +55,6 @@
 }
 
 @keyframes e {
-    from {; z-index: 10000}
-    to {transform: scale(2); box-shadow: 200px 200px 50px rgba(0,0,0,.8)}
+    from {}
+    to {box-shadow: 1px 1px 5px rgba(0,0,0,.3);transform: scale(1.01)}
 }

@@ -1,13 +1,15 @@
 <?php
 
-//testname: Test Fail
-//testdesc: Purposely fails
+
 
 /**
  * Created by PhpStorm.
  * User: Ian Murphy
  * Date: 9/6/2016
  * Time: 9:00 AM
+ *
+ * Test Name: Test Fail
+ * Description: Purposely fails
  */
 
 

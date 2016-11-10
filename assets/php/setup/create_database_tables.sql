@@ -1,3 +1,11 @@
+CREATE USER 'sling'@'localhost';
+
+CREATE DATABASE sling;
+
+GRANT ALL PRIVILEGES ON sling.* TO 'sling';
+
+
+
 use sling;
 
 
@@ -9,38 +17,46 @@ drop table if exists Resources;
 drop table if exists RoomCodes;
 drop table if exists RoomChat;
 drop table if exists Files;
+drop table if exists RoomChat;
+drop table if exists MimeTypes;
+drop table if exists Logs;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE Rooms (
   RoomID SERIAL,
   RoomName VARCHAR(32) NOT NULL,
+  Active BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (RoomID)
 );
 
 CREATE TABLE Accounts (
   AccountID SERIAL,
-  Username VARCHAR(32) NOT NULL UNIQUE,
-  Email VARCHAR(64) NOT NULL,
-  FullName VARCHAR(64) NOT NULL,
-  PasswordHash VARCHAR(60),
-  LoginToken VARCHAR(50),
+  Email VARCHAR(64) NULL UNIQUE,
+  #FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
+  FirstName VARCHAR(32) NULL,
+  LastName VARCHAR(32) NULL,
+  PasswordHash VARCHAR(60) NULL,
+  LoginToken VARCHAR(50) NOT NULL,
   TokenGenTime DATETIME,
   LastLogin DATETIME,
-  JoinDate DATETIME
+  JoinDate DATETIME,
+
+  PRIMARY KEY (AccountID)
 );
 
+CREATE INDEX IDX_Account_Email
+  ON Accounts(Email);
 
 CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
   AccountID BIGINT UNSIGNED NULL,
-  Username VARCHAR(20) NOT NULL,
-  LoginToken VARCHAR(50) NULL,
+  ScreenName VARCHAR(20) NOT NULL,
+  FingerPrint VARCHAR(50),
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
-  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
-  FOREIGN KEY (LoginToken) REFERENCES Accounts(LoginToken)
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 
 CREATE TABLE Resources (
@@ -48,7 +64,7 @@ CREATE TABLE Resources (
   ParticipantID BIGINT UNSIGNED NOT NULL,
   RoomID BIGINT UNSIGNED NOT NULL,
   Location VARCHAR(32) UNIQUE,
-  TypeID BIGINT UNSIGNED NOT NULL,
+  TypeID CHAR NOT NULL,
   PRIMARY KEY (ResourceID),
   FOREIGN KEY (ParticipantID) REFERENCES Participants(ParticipantID),
   FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
@@ -56,18 +72,52 @@ CREATE TABLE Resources (
 
 
 CREATE TABLE RoomCodes (
-  RoomCodeID SERIAL,
+  RoomCode CHAR(6),
   RoomID BIGINT UNSIGNED NOT NULL,
-  RoomCode VARCHAR(8) NOT NULL UNIQUE,
   CreatedBy BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY(RoomCodeID),
+  ExpirationDate DATETIME NULL,
+  RemainingUses INT NULL,
+  PRIMARY KEY(RoomCode),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
   FOREIGN KEY (CreatedBy) REFERENCES Participants(ParticipantID)
 );
 
-CREATE TABLE Files();
 
-CREATE TABLE RoomChat();
+CREATE TABLE MimeTypes(
+  TypeID SERIAL,
+  MimeType VARCHAR(64),
+  PRIMARY KEY (TypeID)
+);
+
+CREATE TABLE Files(
+FileID SERIAL,
+Data MEDIUMBLOB,
+Filename VARCHAR(64),
+TypeID BIGINT UNSIGNED NOT NULL,
+PRIMARY KEY (FileID),
+FOREIGN KEY (TypeID) REFERENCES MimeTypes(TypeID)
+);
+
+CREATE TABLE RoomChat(
+  RoomChatID  SERIAL,
+  RoomID  BIGINT  UNSIGNED NOT NULL,
+  ParticipantID BIGINT UNSIGNED NOT NULL,
+  Message VARCHAR(400) NULL,
+  FileID BIGINT UNSIGNED NULL ,
+  SentTime  TIMESTAMP NOT NULL,
+  PRIMARY KEY(RoomChatID),
+  FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+  FOREIGN KEY (ParticipantID) REFERENCES Participants (ParticipantID),
+  FOREIGN KEY (FileID) REFERENCES Files(FileID)
+);
+
+CREATE TABLE Logs(
+  Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  IP CHAR(15),
+  File VARCHAR(64),
+  Action VARCHAR(64),
+  Description VARCHAR(256)
+);
 
 
 
