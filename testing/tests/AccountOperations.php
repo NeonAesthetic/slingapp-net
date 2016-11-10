@@ -12,34 +12,70 @@
 require_once "classes/Account.php";
 
 /**
- *      TEST LOGIN STATIC METHOD
+ *          TEST LOGIN STATIC METHOD
  */
-$account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
-assert($account == false, "Invalid login returns false");
+{
+    $account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
+    assert($account == false, "Invalid login returns false");
 
-$account = Account::Login("test token");
+    $account = Account::Login("test token");
 //var_dump($account);
-assert($account == false, "Invalid login returns false");
-/***********************************************
- *
- **/
-
-
+    assert($account == false, "Invalid login returns false");
+}
 /**
  *          CREATE NEW ACCOUNT
  */
+{
+    $account = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
 
-$account = Account::CreateAccount("testemail@test.com","Bob", "Marley", "password");
+    $first_name = $account->getName()["First"];
+    $last_name = $account->getName()["Last"];
+    assert($first_name == "Bob", "First name is Bob");
+    assert($last_name == "Marley", "Last name is Marley");
 
-$first_name = $account->getName()["First"];
-$last_name = $account->getName()["Last"];
-assert($first_name == "Bob", "First name is Bob");
-assert($last_name == "Marley", "Last name is Marley");
+    $account->email = "test";
 
-$account->email = "test";
+    assert($account->getEmail() == "test", "Email is 'test'");
+}
 
-assert($account->getEmail() == "test", "Email is 'test'");
 
+/**
+ *          Set Account
+ */
+
+/**
+ *          Get Account
+ */
+
+/**
+ *          Update Account
+ */
+
+/**
+ *          Delete Account
+ */
+
+/**
+ *          Create Participant
+ */
+
+/**
+ *          Set Participant
+ */
+
+/**
+ *          Get Participant
+ */
+
+/**
+ *          Update Participant
+ */
+
+/**
+ *          Delete Participant
+ */
+
+//NEED BETTER CLEANUP
 function cleanup(){
     Database::connect()->query("DELETE FROM Accounts WHERE Email = 'testemail@test.com'");
 }
