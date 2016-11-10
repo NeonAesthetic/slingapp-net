@@ -13,7 +13,8 @@ require_once "classes/Database.php";
 
 DatabaseObject::Log(__FILE__, "Testing", "Test Description");
 
-$stmt = Database::connect()->query("SELECT * FROM logs WHERE Action='Testing'");
+$stmt = Database::connect()->query("SELECT * FROM Logs WHERE Action='Testing'");
+if(!$stmt) var_dump(Database::connect()->errorInfo());
 $results = $stmt->execute();
 $results = $stmt->fetch(PDO::FETCH_ASSOC);
 foreach ($results as $k=>$v){
