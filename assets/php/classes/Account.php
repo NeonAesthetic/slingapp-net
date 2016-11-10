@@ -20,8 +20,19 @@ require_once "interfaces/DatabaseObject.php";
  * accounts in the database and any participants linked to that account and any room
  * that the single participant and account are participating in.
  * */
-class Accounts extends DatabaseObject
+class Account extends DatabaseObject
 {
+    /**
+     * @return string[]
+     */
+    public function getName()
+    {
+        return ["First"=>$this->_fName, "Last"=>$this->_lName];
+    }
+
+    /**
+     * @return null
+     */
     private $_fName;
     private $_lName;
     private $_email;
@@ -55,7 +66,7 @@ class Accounts extends DatabaseObject
      * by the Delete Account function.
     */
     public function __construct($accountID, $email = null, $fName = null, $lName = null, $passHash = null
-        , $token, $_tokenGen, $lastLogin, $joinDate)
+        , $token = null, $_tokenGen = null, $lastLogin = null , $joinDate = null)
     {
         $this->_accountID = $accountID;
         $this->_email = $email;
@@ -97,7 +108,7 @@ class Accounts extends DatabaseObject
      * @param $fName
      * @param $lName
      * @param $password
-     * @return Accounts
+     * @return Account
      * @throws Exception
      * This function is used to create a new account in the database. It will be called when a user
      * is attempting to join a room without already having an account, or when a user opts to register
@@ -115,14 +126,21 @@ class Accounts extends DatabaseObject
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
 
-        if(!$statement->execute([':email' => $email, ':fName' => $fName, ':lName' => $lName, ':passHash' => $passHash
-            , ':logTok' => $token, ':tokGen' => $currentDate, ':lastLog' => $currentDate
-            , ':joinDate' => $currentDate])) {
+        if(!$statement->execute([
+            ':email' => $email,
+            ':fName' => $fName,
+            ':lName' => $lName,
+            ':passHash' => $passHash,
+            ':logTok' => $token,
+            ':tokGen' => $currentDate,
+            ':lastLog' => $currentDate,
+            ':joinDate' => $currentDate
+        ])) {
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
         $accountID = (int)Database::connect()->lastInsertId()[0];
-        return new Accounts($accountID, $email, $fName, $lName, $passHash
+        return new Account($accountID, $email, $fName, $lName, $passHash
             , $token, $currentDate, $currentDate, $currentDate);
     }
 
@@ -130,14 +148,15 @@ class Accounts extends DatabaseObject
      * Function Login
      * @param $token_email
      * @param null $password
-     * @return Accounts|null
+     * @return Account|false
      * This function facilitates the data lookup of a user who is attempting to log into the Sling Application.
      * If the user has provided a password the function will return the account data through an SQL query based
      * on the stored password.
      * If the user has not provided a password, then the system will return a new account with a login token as
      * the search criteria.
+     * If the username or password do not match, the system will return false
      */
-    public static function login($token_email, $password = null)        //add validity checks
+    public static function Login($token_email, $password = null)        //add validity checks
     {
         $retval = null;
         if($password) {
@@ -145,25 +164,32 @@ class Accounts extends DatabaseObject
                 FROM Accounts
                 WHERE Email = :email";
             $statement = Database::connect()->prepare($sql);
-            $statement->execute(array(':logtok' => $token_email));
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $statement->execute(array(':email' => $token_email));
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-            if(!password_verify($password, $result[0]['PasswordHash']))
-                $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName']
-                    , $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime']
-                    , $result[0]['LastLogin'], $result[0]['JoinDate']);
+            if(!password_verify($password, $result['PasswordHash']))
+                $retval = false;
+
+//                    new Account($result['AccountID'], $result['Email'], $result['FirstName']
+//                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
+//                    , $result['LastLogin'], $result['JoinDate']);
         }
-        else {
+        else {      //no password provided, lookup based on token
             $sql = "SELECT *
                 FROM Accounts
                 WHERE LoginToken = :logtok";
 
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':logtok' => $token_email));
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName']
-                , $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime']
-                , $result[0]['LastLogin'], $result[0]['JoinDate']);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            if($result){
+                $retval = new Account($result['AccountID'], $result['Email'], $result['FirstName']
+                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
+                    , $result['LastLogin'], $result['JoinDate']);
+            }else{
+                $retval = false;
+            }
+
         }
         return $retval;
     }
@@ -403,4 +429,23 @@ class Accounts extends DatabaseObject
         foreach($this->_errors as $key=>$value)
             echo $value."<br>";
     }
+
+    function __set($name, $value)
+    {
+        switch (strtolower($name)){
+            case "email":
+                $this->_email = $value;
+                break;
+            case "fname":
+                $this->_fName = $value;
+                break;
+            case "lname":
+                $this->_lName = $value;
+                break;
+
+        }
+        return $value;
+    }
+
+
 }

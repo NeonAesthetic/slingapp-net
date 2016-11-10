@@ -1,6 +1,6 @@
 <?php
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-require_once 'classes/Accounts.php';
+require_once 'classes/Account.php';
 /**
  * Created by PhpStorm.
  * User: Isaac
@@ -9,7 +9,9 @@ require_once 'classes/Accounts.php';
  */
 
 
-    $account = Accounts::CreateAccount("asdf@asdf.com", "first", "last", "pass");
+    $account = Account::CreateAccount("asdf@asdf.com", "first", "last", "pass");
+
+    assert()
 
     function cleanup()
     {
