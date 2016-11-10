@@ -5,18 +5,18 @@
  * Date: 11/6/2016
  * Time: 5:06 PM
  *
- * Test Name: Forms
+ * Test Name: NOINCLUDE
  * Description: Echos form data
  */
 
 session_start();
 
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-require_once 'classes/Accounts.php';
+require_once 'classes/Account.php';
 
 if(isset($_POST['register']))
 {
-    #include('../../assets/php/classes/Accounts.php');
+    #include('../../assets/php/classes/Account.php');
 
     $login = new Accounts(1);
 

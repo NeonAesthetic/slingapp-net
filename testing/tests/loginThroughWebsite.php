@@ -4,12 +4,12 @@
  * User: Isaac
  * Date: 11/6/2016
  * Time: 5:06 PM
- * Test Name: Login With Account
+ * Test Name: NOINCLUDE
  * Description: Logs into the system assuming there is a valid account
  */
 
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-require_once 'classes/Accounts.php';
+require_once 'classes/Account.php';
 session_start();
 
 

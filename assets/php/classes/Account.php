@@ -1,25 +1,44 @@
 <?php
-
 /**
+ * Accounts Class
  * Created by PhpStorm.
- * User: Isaac
+ * User: Isaac, Tristan
  * Date: 11/6/2016
  * Time: 9:21 AM
  */
-
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-
 require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
-
-class Accounts extends DatabaseObject
+/**
+ * This Class handles all Accounts and linked participants in the database.
+ * This class will create a new account for  user that does not already have
+ * one based on the status of the login token. The account will be used in order
+ * to maintain a single participant to any room a single account is participating
+ * in. The account class can have at most one participant per session.
+ *
+ * This class uses SQL statements in order to locate data pertaining to any current
+ * accounts in the database and any participants linked to that account and any room
+ * that the single participant and account are participating in.
+ * */
+class Account extends DatabaseObject
 {
+    /**
+     * @return string[]
+     */
+    public function getName()
+    {
+        return ["First"=>$this->_fName, "Last"=>$this->_lName];
+    }
+
+    /**
+     * @return null
+     */
     private $_fName;
     private $_lName;
     private $_email;
     private $_passHash;
     private $_errors;
-    private $_access;       //1 if account exists
+    private $_access;
     private $_login;
     private $_token;
     private $_tokenGen;
@@ -29,7 +48,25 @@ class Accounts extends DatabaseObject
     private $_roomID;
     private $_screenName;
 
-    public function __construct($accountID, $email = null, $fName = null, $lName = null, $passHash = null, $token, $_tokenGen, $lastLogin, $joinDate)
+    /**
+     * This Constructor is used to create a new account based on data that is retrieved from the user at
+     * the point of creation. This will include
+     * First Name
+     * Last Name
+     * Email
+     * Password
+     * The Class will then retrieve/generate
+     * AccountID
+     * Password Hash
+     * Token
+     * Token Gen
+     * Last Login
+     * Join Date
+     * These elements make up the new account in the database and will persist until removed on command
+     * by the Delete Account function.
+    */
+    public function __construct($accountID, $email = null, $fName = null, $lName = null, $passHash = null
+        , $token = null, $_tokenGen = null, $lastLogin = null , $joinDate = null)
     {
         $this->_accountID = $accountID;
         $this->_email = $email;
@@ -65,6 +102,19 @@ class Accounts extends DatabaseObject
 //        }
     }
 
+    /**
+     * Function CreateAccount
+     * @param $email
+     * @param $fName
+     * @param $lName
+     * @param $password
+     * @return Account
+     * @throws Exception
+     * This function is used to create a new account in the database. It will be called when a user
+     * is attempting to join a room without already having an account, or when a user opts to register
+     * a new account with the Sling Application.
+     * This Function executes the SQL DML Statement Insert to add a new account to the database.
+     */
     public static function CreateAccount($email, $fName, $lName, $password)
     {
         $passHash  = password_hash($password, PASSWORD_BCRYPT);
@@ -76,54 +126,100 @@ class Accounts extends DatabaseObject
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
 
-        if(!$statement->execute([':email' => $email, ':fName' => $fName, ':lName' => $lName, ':passHash' => $passHash, ':logTok' => $token, ':tokGen' => $currentDate, ':lastLog' => $currentDate, ':joinDate' => $currentDate]))
-        {
+        if(!$statement->execute([
+            ':email' => $email,
+            ':fName' => $fName,
+            ':lName' => $lName,
+            ':passHash' => $passHash,
+            ':logTok' => $token,
+            ':tokGen' => $currentDate,
+            ':lastLog' => $currentDate,
+            ':joinDate' => $currentDate
+        ])) {
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
         $accountID = (int)Database::connect()->lastInsertId()[0];
-
-
-        return new Accounts($accountID, $email, $fName, $lName, $passHash, $token, $currentDate, $currentDate, $currentDate);
+        return new Account($accountID, $email, $fName, $lName, $passHash
+            , $token, $currentDate, $currentDate, $currentDate);
     }
 
-    public static function login($token_email, $password = null)        //add validity checks
+    /**
+     * Function Login
+     * @param $token_email
+     * @param null $password
+     * @return Account|false
+     * This function facilitates the data lookup of a user who is attempting to log into the Sling Application.
+     * If the user has provided a password the function will return the account data through an SQL query based
+     * on the stored password.
+     * If the user has not provided a password, then the system will return a new account with a login token as
+     * the search criteria.
+     * If the username or password do not match, the system will return false
+     */
+    public static function Login($token_email, $password = null)        //add validity checks
     {
         $retval = null;
-        if($password)
-        {
+        if($password) {
             $sql = "SELECT *
                 FROM Accounts
                 WHERE Email = :email";
             $statement = Database::connect()->prepare($sql);
-            $statement->execute(array(':logtok' => $token_email));
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $statement->execute(array(':email' => $token_email));
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-            if(!password_verify($password, $result[0]['PasswordHash']))
-                $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName'], $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime'], $result[0]['LastLogin'], $result[0]['JoinDate']);
+            if(!password_verify($password, $result['PasswordHash']))
+                $retval = false;
+            else{
+                $retval = new Account($result['AccountID'], $result['Email'], $result['FirstName']
+                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
+                    , $result['LastLogin'], $result['JoinDate']);
+
+            }
+
         }
-        else
-        {
+        else {      //no password provided, lookup based on token
             $sql = "SELECT *
                 FROM Accounts
                 WHERE LoginToken = :logtok";
 
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':logtok' => $token_email));
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $retval = new Accounts($result[0]['AccountID'], $result[0]['Email'], $result[0]['FirstName'], $result[0]['LastName'], $result[0]['LoginToken'], $result[0]['TokenGenTime'], $result[0]['LastLogin'], $result[0]['JoinDate']);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            if($result){
+                $retval = new Account($result['AccountID'], $result['Email'], $result['FirstName']
+                    , $result['LastName'], $result['LoginToken'], $result['TokenGenTime']
+                    , $result['LastLogin'], $result['JoinDate']);
+            }else{
+                $retval = false;
+            }
+
         }
         return $retval;
     }
+
+    /**
+     * Function Delete
+     * This function will remove an account from the database.
+     * This function uses an SQL statement in order to find an
+     * existing account based on an account email. The returned
+     * accountID will then be used to remove any associated
+     * participants and then will remove the account itself.
+     */
+    //What if account is temp and has no email?
+    //Cound we use a unique RandomEmail generated for temp accounts to id it?
+    //Then upon participant leaving room, we can get the account Id as they leave from the participant table joined
+    //to the Accounts table, and remove the account based on the RandomEmail that is associated with it?
+
+    //NEEDED:   Delete function to remove a participant but not an Account using same method above
+    //NEEDED:   Delete function to remove temporary accounts and associated participants
     public function delete()
     {
-        $sql = "SELECT AccountID
+        $sql = "SELECT AccountID                                                                    
                     FROM Accounts
                     WHERE Email = :email";
         $statement = Database::connect()->prepare($sql);
 
-        if($statement->execute(array(':email' => $this->_email)))
-        {
+        if($statement->execute(array(':email' => $this->_email))) {
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
             #foreach($result as $row)
             #    var_dump($row);
@@ -134,8 +230,7 @@ class Accounts extends DatabaseObject
                     WHERE AccountID = $this->_accountID";
             $statement = Database::connect()->prepare($sql);
 
-            if($statement->execute())
-            {
+            if($statement->execute()) {
                 $sql = "    DELETE FROM Accounts
                     WHERE AccountID = $this->_accountID";
                 $statement = Database::connect()->prepare($sql);
@@ -144,99 +239,120 @@ class Accounts extends DatabaseObject
         }
     }
 
+    /**
+     * Function Update
+     * This function will trigger whenever a user attempts to join a room, it will attempt to insert the account
+     * data and the participant data to correlate with the new room and participant status.
+     */
+    //NEEDED:   Update function that can allow a user to edit account information
+    //NEEDED:   Update Account status based on room to join and allow linked participant to join room
+    //NEEDED:   Test that allows room to be created-> then account-> then update to move account and part. to room
     public function update()
     {
-        #echo "Updated";
         $sql = "INSERT INTO Accounts
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
-
         $statement = Database::connect()->prepare($sql);
 
-        if($statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName, ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen, ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s'))))
-        {
+        if($statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName
+        , ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen
+        , ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s')))) {
             $sql = "SELECT AccountID
                     FROM Accounts
                     WHERE Email = :email";
             $statement = Database::connect()->prepare($sql);
 
-            if($statement->execute(array(':email' => $this->_email)))
-            {
+            if($statement->execute(array(':email' => $this->_email))) {
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 #foreach($result as $row)
                 #    var_dump($row);
 
                 $this->_accountID = $result[0]["AccountID"];
             }
-            //Do select statement and pull accnt id after account created.
+            //Do select statement and pull account id after account created.
             $sql = "INSERT INTO Participants
                 (AccountID, RoomID, ScreenName)
                 VALUES (:accountID, :roomID, :screenName)";
             $statement = Database::connect()->prepare($sql);
-            if($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $this->_roomID, ':screenName' => $this->_screenName)))
-            {
+            if($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $this->_roomID
+            , ':screenName' => $this->_screenName))) {
                 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 #foreach($result as $row)
                 #    var_dump($row);
             }
             //create error if result is nothing
-            //FOUND OUT WHAT WAS WRONG, tests faile dbecause no room existed, ref. integrity.
+            //FOUND OUT WHAT WAS WRONG, tests failed because no room existed, ref. integrity.
             //Need REAL account info
             //NEED ACTUAL room id
-
-            echo "Inserted Acc";
         }
-        else
-        {
+        else {
             DatabaseObject::Log("AccountUpdate", "Could Not Insert");
         }
 
-        if(!$statement->execute(array(':accountID' => 19, ':roomID' => 776, ':screenName' => "Derp")))
-        {
-            echo "Uh oh";
+        if(!$statement->execute(array(':accountID' => 101, ':roomID' => 123, ':screenName' => "TEST_SCREEN_NAME"))) {
             DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
         }
-        else
-            echo "Inserted Part";
     }
-
+    /**
+     * Function getJSON
+     * @return string
+     * This function allows the Accounts type to be encoded.
+    */
     public function getJSON()
     {
         $json = [];
         $json['type'] = "Accounts";
         return json_encode($json);
     }
-
     /**
+     * Function getEmail
      * @return mixed
+     * This function allows the Current Account Email to be returned.
      */
     public function getEmail()
     {
         return $this->_email;
     }
-
-
+    /**
+     * Function Process
+     * @return int
+     * This Function initiates the Update function based on the Validation of the
+     * Data and the Token.
+     */
     public function process()
     {
         if($this->isTokenValid() && $this->isDataValid()) {
             $this->update();
         }
-
         return count($this->_errors) ? 0 : 1;   //0 if no errors
     }
-
+    /**
+     * Function isLoggedIn
+     * @return mixed
+     * This Function returns the _access variable, which determines whether the
+     * Account needs to be registered or logged into.
+     */
     public function isLoggedIn()
     {
         ($this->_login)? $this->verifyPost() : $this->verify_Session();
-
         return $this->_access;
     }
-
+    /**
+     * Function Filter
+     * @param $var
+     * @return mixed
+     * This Function uses a regular expression to assure valid user input.
+     */
     public function filter($var)
     {
         return preg_replace('/[^a-zA-Z0-9@.]/', '', $var);
     }
-
+    /**
+     * Function VerifyPost
+     * This function requires verification for user input, it
+     * will return an exception if an invalid value is passed in
+     * the Submission, Data, Username or Password fields.
+     */
     public function verifyPost()
     {
         try
@@ -249,7 +365,6 @@ class Accounts extends DatabaseObject
                 throw new Exception('Invalid Username/Password');
 
             $this->_access = 1;
-
             $this->registerSession();
         }
         catch (Exception $e)
@@ -317,4 +432,23 @@ class Accounts extends DatabaseObject
         foreach($this->_errors as $key=>$value)
             echo $value."<br>";
     }
+
+    function __set($name, $value)
+    {
+        switch (strtolower($name)){
+            case "email":
+                $this->_email = $value;
+                break;
+            case "fname":
+                $this->_fName = $value;
+                break;
+            case "lname":
+                $this->_lName = $value;
+                break;
+
+        }
+        return $value;
+    }
+
+
 }
