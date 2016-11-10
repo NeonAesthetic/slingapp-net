@@ -15,18 +15,25 @@ require_once "classes/Account.php";
  *          TEST LOGIN STATIC METHOD
  */
 {
+    mark();
     $account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
     assert($account == false, "Invalid login returns false");
+    mark("Invalid User/pass login");
 
     $account = Account::Login("test token");
 //var_dump($account);
     assert($account == false, "Invalid login returns false");
+    
+    mark("Invalid token login");
+
 }
 /**
  *          CREATE NEW ACCOUNT
  */
 {
+    mark();
     $account = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
+    mark("Create new account");
 
     $first_name = $account->getName()["First"];
     $last_name = $account->getName()["Last"];
