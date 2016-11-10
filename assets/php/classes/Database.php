@@ -20,6 +20,7 @@ class Database
             //pass
         }else{
             static::$_instance = new PDO('mysql:host=localhost;dbname=sling', "sling", '');
+            static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return static::$_instance;
     }
