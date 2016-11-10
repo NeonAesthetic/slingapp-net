@@ -25,8 +25,8 @@ abstract class DatabaseObject
 
     public abstract function getJSON($as_array = false);
 
-    public static function Log($action, $description){
-        $file = basename(__FILE__);
+    public static function Log($filename, $action, $description){
+        $file = basename($filename);
         $ip = $_SERVER["REMOTE_ADDR"];
         $sql = "INSERT INTO Logs (IP, File, Action, Description) VALUES(:ip, :file, :action, :desc)";
         Database::connect()->prepare($sql)->execute([

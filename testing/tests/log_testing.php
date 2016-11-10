@@ -11,7 +11,7 @@
 require_once "interfaces/DatabaseObject.php";
 require_once "classes/Database.php";
 
-DatabaseObject::Log("Testing", "Test Description");
+DatabaseObject::Log(__FILE__, "Testing", "Test Description");
 
 $stmt = Database::connect()->query("SELECT * FROM logs WHERE Action='Testing'");
 $results = $stmt->execute();
