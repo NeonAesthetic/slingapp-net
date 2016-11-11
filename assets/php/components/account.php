@@ -26,7 +26,7 @@ switch ($p['action'])
         }
         else
         {
-            DatabaseObject::Log("Register Account", "Account could not be created");
+            DatabaseObject::Log(__FILE__,"Register Account", "Account could not be created");
             echo "Registration was unsuccessful";
         }
     break;
