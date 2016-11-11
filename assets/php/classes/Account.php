@@ -37,9 +37,6 @@ class Account extends DatabaseObject
     private $_lName;
     private $_email;
     private $_passHash;
-    private $_errors;
-    private $_access;
-    private $_login;
     private $_token;
     private $_tokenGen;
     private $_lastLogin;
@@ -65,8 +62,8 @@ class Account extends DatabaseObject
      * These elements make up the new account in the database and will persist until removed on command
      * by the Delete Account function.
     */
-    public function __construct($accountID, $token, $email = null, $fName = null, $lName = null, $passHash = null
-        ,  $_tokenGen = null, $lastLogin = null , $joinDate = null)
+    public function __construct($accountID, $token, $_tokenGen, $email = null, $fName = null, $lName = null, $passHash = null
+        , $lastLogin = null , $joinDate = null)
     {
         $this->_accountID = $accountID;
         $this->_email = $email;
@@ -77,29 +74,6 @@ class Account extends DatabaseObject
         $this->_tokenGen = $_tokenGen;
         $this->_lastLogin = $lastLogin;
         $this->_joinDate = $joinDate;
-
-//        $this->_errors = array();
-//        $this->_token = $_POST['token'];
-//        $this->_tokenGen = $_POST['tokgen'];
-//
-//        if($reg == 0)
-//        {
-//            $this->_login = isset($_POST['login']) ? 1 : 0;
-//            $this->_access = 0;
-//            //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
-//            $this->_email = ($this->_login) ? $this->filter($_POST['email']) : $_SESSION['email'];
-//            //If user presses submit, pull password from POST otherwise leave blank
-//            $this->_password = ($this->_login) ? $this->filter($_POST['password']) : '';
-//            //$this->_passHash = ($this->_login) ? crypt($this->_password) : $_SESSION['password'];
-//        }
-//        else
-//        {
-//            $this->_email = $this->filter($_POST['email']);
-//            $this->_password = $this->filter($_POST['password']);
-//            $this->_passHash  = crypt($this->_password);
-//            $this->_fName = $_POST['fName'];
-//            $this->_lName = $_POST['lName'];
-//        }
     }
 
     /**
@@ -140,8 +114,8 @@ class Account extends DatabaseObject
             throw new Exception("Could not create account");
         }
         $accountID = (int)Database::connect()->lastInsertId()[0];
-        return new Account($accountID, $email, $fName, $lName, $passHash
-            , $token, $currentDate, $currentDate, $currentDate);
+        return new Account($accountID, $email, $token, $currentDate, $fName, $lName, $passHash
+            , $currentDate, $currentDate);
     }
 
     /**
@@ -192,7 +166,6 @@ class Account extends DatabaseObject
             }else{
                 $retval = false;
             }
-
         }
         return $retval;
     }
@@ -201,25 +174,22 @@ class Account extends DatabaseObject
      * Function Delete
      * This function will remove an account from the database.
      * This function uses an SQL statement in order to find an
-     * existing account based on an account email. The returned
+     * existing account based on an account's token. The returned
      * accountID will then be used to remove any associated
      * participants and then will remove the account itself.
+     * This function can be used to either have an account
+     * explicity deleted by the user or automatically for
+     * temporary accounts
      */
-    //What if account is temp and has no email?
-    //Cound we use a unique RandomEmail generated for temp accounts to id it?
-    //Then upon participant leaving room, we can get the account Id as they leave from the participant table joined
-    //to the Accounts table, and remove the account based on the RandomEmail that is associated with it?
 
-    //NEEDED:   Delete function to remove a participant but not an Account using same method above
-    //NEEDED:   Delete function to remove temporary accounts and associated participants
     public function delete()
     {
         $sql = "SELECT AccountID                                                                    
                     FROM Accounts
-                    WHERE Email = :email";
+                    WHERE LoginToken = :logtok";
         $statement = Database::connect()->prepare($sql);
 
-        if($statement->execute(array(':email' => $this->_email))) {
+        if($statement->execute(array(':logtok' => $this->_token))) {
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
             #foreach($result as $row)
             #    var_dump($row);
@@ -239,6 +209,19 @@ class Account extends DatabaseObject
         }
     }
 
+    public function deleteParticipant()
+    {
+        $sql = "DELETE FROM Participants AS p
+                            JOIN Accounts AS a
+                              ON p.AccountID = a.AccountID
+                WHERE p.AccountID = :accountID";
+
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute(array(':accountID' => $this->_accountID));
+
+        $this->_roomID = null;
+        $this->_screenName = null;
+    }
     /**
      * Function Update
      * This function will trigger whenever a user attempts to join a room, it will attempt to insert the account
@@ -249,26 +232,29 @@ class Account extends DatabaseObject
     //NEEDED:   Test that allows room to be created-> then account-> then update to move account and part. to room
     public function update()
     {
-        $sql = "INSERT INTO Accounts
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+        $sql = "UPDATE Accounts
+                SET Email = :email,
+                    FirstName = :fName,
+                    LastName = :lName,
+                    PasswordHash = :passHash,
+                    LoginToken = :logTok,
+                    TokenGenTime = :tokGen,
+                    LastLogin = :lastLog,
+                    JoinDate = :joinDate
+                WHERE AccountID = :accountID";
         $statement = Database::connect()->prepare($sql);
 
-        if($statement->execute(array(':email' => $this->_email, ':fName' => $this->_fName, ':lName' => $this->_lName
-        , ':passHash' => $this->_passHash, ':logTok' => $this->_token, ':tokGen' => $this->_tokenGen
-        , ':lastLog' => date('Y-m-d H:i:s'), ':joinDate' => date('Y-m-d H:i:s')))) {
-            $sql = "SELECT AccountID
-                    FROM Accounts
-                    WHERE Email = :email";
-            $statement = Database::connect()->prepare($sql);
+        if($statement->execute(array(':email' => $this->_email,
+                                     ':fName' => $this->_fName,
+                                     ':lName' => $this->_lName,
+                                     ':passHash' => $this->_passHash,
+                                     ':logTok' => $this->_token,
+                                     ':tokGen' => $this->_tokenGen,
+                                     ':lastLog' => $this->_lastLogin,
+                                     ':joinDate' => $this->_joinDate,
+                                     ':accountID' => $this->_accountID)))
+        {
 
-            if($statement->execute(array(':email' => $this->_email))) {
-                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-                #foreach($result as $row)
-                #    var_dump($row);
-
-                $this->_accountID = $result[0]["AccountID"];
-            }
             //Do select statement and pull account id after account created.
             $sql = "INSERT INTO Participants
                 (AccountID, RoomID, ScreenName)
@@ -293,6 +279,14 @@ class Account extends DatabaseObject
             DatabaseObject::Log("ParticipantsUpdate", "Could Not Insert");
         }
     }
+
+    /**
+     * @return mixed
+     */
+    public function getToken()
+    {
+        return $this->_token;
+    }
     /**
      * Function getJSON
      * @return string
@@ -315,142 +309,48 @@ class Account extends DatabaseObject
     {
         return $this->_email;
     }
-    /**
-     * Function Process
-     * @return int
-     * This Function initiates the Update function based on the Validation of the
-     * Data and the Token.
-     */
-    public function process()
-    {
-        if($this->isTokenValid() && $this->isDataValid()) {
-            $this->update();
-        }
-        return count($this->_errors) ? 0 : 1;   //0 if no errors
-    }
-    /**
-     * Function isLoggedIn
-     * @return mixed
-     * This Function returns the _access variable, which determines whether the
-     * Account needs to be registered or logged into.
-     */
-    public function isLoggedIn()
-    {
-        ($this->_login)? $this->verifyPost() : $this->verify_Session();
-        return $this->_access;
-    }
-    /**
-     * Function Filter
-     * @param $var
-     * @return mixed
-     * This Function uses a regular expression to assure valid user input.
-     */
-    public function filter($var)
-    {
-        return preg_replace('/[^a-zA-Z0-9@.]/', '', $var);
-    }
-    /**
-     * Function VerifyPost
-     * This function requires verification for user input, it
-     * will return an exception if an invalid value is passed in
-     * the Submission, Data, Username or Password fields.
-     */
-    public function verifyPost()
-    {
-        try
-        {
-            if(!$this->isTokenValid())
-                throw new Exception('Invalid Form Submission');
-            if(!$this->isDataValid())
-                throw new Exception('Invalid Form Data');
-            if(!$this->verifyDatabase())
-                throw new Exception('Invalid Username/Password');
-
-            $this->_access = 1;
-            $this->registerSession();
-        }
-        catch (Exception $e)
-        {
-            $this->_errors[] = $e->getMessage();
-        }
-    }
-
-    public function verify_Session()
-    {
-        if($this->sessionExist() && $this->verifyDatabase())
-            $this->_access = 1;
-    }
-
-    public function verifyDatabase()
-    {
-        $verify = false;
-
-        $sql = "SELECT Email, PasswordHash
-                FROM Accounts
-                WHERE Email = :email";
-
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute(array(':email' => $this->_email));
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        #foreach($result as $row)
-        #   var_dump($row);
-
-        if($this->_email == $result[0]["Email"] && password_verify($this->_password, $result[0]["PasswordHash"]))
-            $verify = true;
-
-        return $verify;
-    }
-
-    public function isDataValid()
-    {
-        $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z]+/";
-        $passExp =  "/[a-zA-Z0-9_.+]/";
-
-        //add validation for first and last name?
-        return (preg_match($emailExp, $this->_email) && preg_match($passExp, $this->_password)) ? 1 : 0;
-    }
-
-    public function isTokenValid()
-    {
-        return (!isset($_SESSION['token']) || $this->_token != $_SESSION['token']) ? 0 : 1;
-    }
-
-    public function registerSession()
-    {
-        $_SESSION['email'] = $this->_email;
-        $_SESSION['password'] = $this->_password;   //change to passhash
-
-        #var_dump($_SESSION);
-    }
-
-    public function sessionExist()
-    {
-        return (isset($_SESSION['email']) && isset($_SESSION['password'])) ? 1:0;   //change to passhash
-    }
-
-    public function showErrors()
-    {
-        foreach($this->_errors as $key=>$value)
-            echo $value."<br>";
-    }
 
     function __set($name, $value)
     {
         switch (strtolower($name)){
             case "email":
+                $temp = $this->_email;
                 $this->_email = $value;
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n Updated Email From: $temp to: $value");
                 break;
             case "fname":
+                $temp = $this->_fName;
                 $this->_fName = $value;
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n Updated First Name From: $temp to: $value");
                 break;
             case "lname":
+                $temp = $this->_lName;
                 $this->_lName = $value;
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n Updated Last Name From: $temp to: $value");
                 break;
-
+            case "passHash":
+                $this->_passHash = password_hash($value, PASSWORD_BCRYPT);
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n updated password");  //should we log this?
+                break;
+            case "token":
+                $this->_token = $value;
+                $this->_tokenGen = date('Y-m-d H:i:s');
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n Updated token");
+                break;
+            case "lastLogin":
+                $this->_lastLogin = $value;
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n Last Login: $this->_lastLogin");
+                break;
+            default:
+                DatabaseObject::Log("Updated Account",
+                    "Account: $this->_accountID \n set method using: $name wasn't valid");
         }
         return $value;
     }
-
-
 }
