@@ -117,7 +117,7 @@ class Account extends DatabaseObject
             throw new Exception("Could not create account");
         }
 
-        $accountID = (int)Database::connect()->lastInsertId()[0];
+        $accountID = (int)Database::connect()->lastInsertId();
 
         return new Account($accountID, $token, $currentDate, $email, $fName, $lName, $passHash
             , $currentDate, $currentDate);
@@ -192,6 +192,8 @@ class Account extends DatabaseObject
 
     public function delete()
     {
+        $retval = false;
+
         $sql = "SELECT AccountID                                                                    
                     FROM Accounts
                     WHERE LoginToken = :logtok";
@@ -199,22 +201,23 @@ class Account extends DatabaseObject
 
         if($statement->execute(array(':logtok' => $this->_token))) {
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            #foreach($result as $row)
-            #    var_dump($row);
 
             $this->_accountID = $result[0]["AccountID"];
 
-            $sql = "DELETE FROM Particpants
+            if($this->_roomID) {
+                $sql = "DELETE FROM Particpants
                     WHERE AccountID = $this->_accountID";
-            $statement = Database::connect()->prepare($sql);
-
-            if($statement->execute()) {
+                $statement = Database::connect()->prepare($sql);
+                $retval = $statement->execute();
+            }
+            if($retval || !$this->_roomID) {
                 $sql = "DELETE FROM Accounts
                         WHERE AccountID = $this->_accountID";
                 $statement = Database::connect()->prepare($sql);
-                $statement->execute();
+                $retval = ($statement->execute()) ? true : false;
             }
         }
+        return $retval;
     }
 
     public function deleteParticipant()
@@ -241,12 +244,37 @@ class Account extends DatabaseObject
     public function update()
     {
         $sql = "UPDATE Accounts
-                SET Email = '$this->_email'
-                WHERE (AccountID = '$this->_accountID')";
+                SET Email = :email,
+                    FirstName = :fName,
+                    LastName = :lName,
+                    PasswordHash = :passHash,
+                    LoginToken = :logTok,
+                    TokenGenTime = :tokGen,
+                    LastLogin = :lastLog,
+                    JoinDate = :joinDate
+                WHERE AccountID = :accountID";
+
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute(array(':email' => $this->_email,
+            ':fName' => $this->_fName,
+            ':lName' => $this->_lName,
+            ':passHash' => $this->_passHash,
+            ':logTok' => $this->_token,
+            ':tokGen' => $this->_tokenGen,
+            ':lastLog' => $this->_lastLogin,
+            ':joinDate' => $this->_joinDate,
+            ':accountID' => $this->_accountID));
+
+        $sql = "SELECT *
+                FROM Accounts
+                WHERE FirstName = :name";
         $statement = Database::connect()->prepare($sql);
 
-        if($statement->execute())
+        if($statement->execute(array(':name' => "Bob")))
         {
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            #var_dump($result);
             if($this->_roomID != null)
             {
                 //Do select statement and pull account id after account created.
@@ -271,6 +299,9 @@ class Account extends DatabaseObject
             echo "failed to insert";
             DatabaseObject::Log(__FILE__, "AccountUpdate", "Could Not Insert");
         }
+
+
+
 
 //        if(!$statement->execute(array(':accountID' => 101, ':roomID' => 123, ':screenName' => "TEST_SCREEN_NAME"))) {
 //            DatabaseObject::Log(__FILE__, "ParticipantsUpdate", "Could Not Insert");
@@ -310,6 +341,15 @@ class Account extends DatabaseObject
             return $json;
         return json_encode($json);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getScreenName()
+    {
+        return $this->_screenName;
+    }
+
     /**
      * Function getEmail
      * @return mixed
@@ -342,8 +382,10 @@ class Account extends DatabaseObject
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n Updated Last Name From: $temp to: $value");
                 break;
-            case "passHash":
-                $this->_passHash = password_hash($value, PASSWORD_BCRYPT);
+            case "passhash":
+                $hashedpass = password_hash($value, PASSWORD_BCRYPT);
+
+                $this->_passHash = $hashedpass;
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n updated password");  //should we log this?
                 break;

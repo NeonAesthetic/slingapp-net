@@ -88,49 +88,60 @@ require_once "classes/Account.php";
  *          Set Account
  */
 {
+    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
 
-//    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-//    $email = $account->getEmail();
-//
-//    $account->email = "replace@test.com";
-//    $account->fname = "ozzy";
-//    $account->lname = "osbourne";
-//    $account->passhash = "newpass";
-//    $account->token = 'new';    //doesn't matter what you pass it
-//
-//    $sql = ("SELECT *
-//             FROM Accounts
-//             WHERE Email='replace@test.com'");
-//
-//    $statement = Database::connect()->prepare($sql);
-//    $statement->execute();
-//    $result = $statement->fetch(PDO::FETCH_ASSOC);
-//
-//    var_dump($result);
-//    $account = Account::Login("replace@test.com", "newpass");
-//
-//    assert($email == "replace@test.com", "email changed to replace@test.com");
-//    assert($account)
-//    $statement = Database::connect()->query("SELECT PasswordHash FROM Accounts WHERE Email='email@test.com'");
-//    $statement->execute();
-//    $result = $statement->fetch(PDO::FETCH_ASSOC);
-//
-//    $passhash = $account->getPassHash();
-//    var_dump($email);
+    mark();
+    $account->email = "replace@test.com";
+    mark("update email");
+    $account->fname = "ozzy";
+    $account->lname = "osbourne";
+    mark();
+    $account->passhash = "newpass";
+    mark("update password");
+    $account->token = 'new';    //doesn't matter what you pass it
+
+    $account = Account::Login("replace@test.com", "newpass");
+    assert($account != null, "login success with updated credentials");
+
+    cleanup();
 }
 
 /**
  *          Get Account
  */
+{
+    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+    $email = $account->getEmail();
+    $fname = $account->getName()['First'];
+    $lname = $account->getName()['Last'];
+    $screenname = $account->getScreenName();
+    $token = $account->getToken();
+    $accountID = $account->getAccountID();
+    $json = $account->getJSON(true);
 
+    #var_dump($json);
+
+    assert($accountID == $json['ID'], "json ID is equal to account's id");
+    assert($email == $json['Email'], "json email is equal to account's email");
+    assert($fname == $json['FirstName'], "json first name is equal to account's");
+    assert($lname == $json['LastName'], "json last name is equal to account's");
+    assert($token == $json['LoginToken'], "json token is equal to account's");
+
+    cleanup();
+}
 /**
  *          Update Account
  */
 
+//same as set account
+
 /**
  *          Delete Account
  */
-
+    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+    mark();
+    assert($account->delete(), "Account deleted successfully");
+    mark("Account deletion");
 /**
  *          Create Participant
  */
@@ -159,6 +170,7 @@ function cleanup(){
                                     WHERE (Email = 'testemail@test.com')
                                     OR (Email = 'email@test.com')
                                     OR (Email = 'replace@test.com')
-                                    OR (Email = 'testnewemail@test.com')");
+                                    OR (Email = 'testnewemail@test.com')
+                                    OR (Email = 'newer@gmail.com')");
     }catch (Exception $e){}
 }
