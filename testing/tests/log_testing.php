@@ -11,9 +11,10 @@
 require_once "interfaces/DatabaseObject.php";
 require_once "classes/Database.php";
 
-DatabaseObject::Log("Testing", "Test Description");
+DatabaseObject::Log(__FILE__, "Testing", "Test Description");
 
-$stmt = Database::connect()->query("SELECT * FROM logs WHERE Action='Testing'");
+$stmt = Database::connect()->query("SELECT * FROM Logs WHERE Action='Testing'");
+if(!$stmt) var_dump(Database::connect()->errorInfo());
 $results = $stmt->execute();
 $results = $stmt->fetch(PDO::FETCH_ASSOC);
 foreach ($results as $k=>$v){
@@ -21,5 +22,9 @@ foreach ($results as $k=>$v){
 }
 
 function cleanup(){
-    Database::connect()->exec("DELETE FROM logs WHERE Action = 'Testing'");
+    try{
+        Database::connect()->exec("DELETE FROM Logs WHERE Action = 'Testing'");
+    }catch(Exception $e){
+
+    }
 }

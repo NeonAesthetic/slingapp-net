@@ -58,6 +58,7 @@ switch ($p['action'])
             }
             else
                 echo "Unable to login through token";
+
         break;
   //pass in token and return JSON account object
     case "getcookie": {

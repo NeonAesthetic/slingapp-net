@@ -91,13 +91,16 @@ class Account extends DatabaseObject
      */
     public static function CreateAccount($email, $fName, $lName, $password)
     {
+
         $passHash  = password_hash($password, PASSWORD_BCRYPT);
         $token = md5(uniqid(mt_rand(),true));
-        $currentDate = date('Y-m-d H:i:s:u');
+        $currentDate = date("Y-m-d H:i:s");
 
-        $sql = "INSERT INTO Accounts 
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+//        $sql = "INSERT INTO Accounts 
+//                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+//                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+        
+        $sql = "CALL AddUser(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
 
         if(!$statement->execute([
@@ -113,9 +116,12 @@ class Account extends DatabaseObject
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
+
         $accountID = (int)Database::connect()->lastInsertId()[0];
-        return new Account($accountID, $email, $token, $currentDate, $fName, $lName, $passHash
+
+        return new Account($accountID, $token, $currentDate, $email, $fName, $lName, $passHash
             , $currentDate, $currentDate);
+
     }
 
     /**
@@ -295,7 +301,12 @@ class Account extends DatabaseObject
     public function getJSON($as_array = false)
     {
         $json = [];
-        $json['type'] = "Accounts";
+        $json['Type'] = "Account";
+        $json['Email'] = $this->_email;
+        $json["FirstName"] = $this->_fName;
+        $json["LastName"] = $this->_lName;
+        $json["LoginToken"] = $this->_token;
+        $json['ID'] = $this->_accountID;
         if($as_array)
             return $json;
         return json_encode($json);

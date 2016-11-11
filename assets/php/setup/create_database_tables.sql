@@ -1,6 +1,9 @@
+DROP USER 'sling'@'localhost';
+DROP DATABASE if exists sling;
+
 CREATE USER 'sling'@'localhost';
 
-CREATE DATABASE sling;
+CREATE DATABASE sling CHARACTER SET utf8 COLLATE utf8_bin;
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
