@@ -64,7 +64,7 @@ class RoomCode extends DatabaseObject
         $statement->execute([":roomid" => $this->_roomid, ":created_by"=>$this->_creator, ":exp"=>$this->_expire_date]);
     }
 
-    public function getJSON()
+    public function getJSON($as_array = false)
     {
         $json = [];
         $json['type'] = "RoomCode";
@@ -75,11 +75,4 @@ class RoomCode extends DatabaseObject
     public function getCode(){
         return $this->_code;
     }
-
-    public function __toString()
-    {
-        return $this->_code;
-    }
-
-
 }

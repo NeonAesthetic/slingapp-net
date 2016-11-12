@@ -10,10 +10,11 @@
  */
 
 require_once "classes/Account.php";
+require_once "classes/Room.php";
 
-/**
+/***********************************************************************************************************************
  *          TEST LOGIN STATIC METHOD
- */
+ **********************************************************************************************************************/
 {   //login with invalid credentials
     mark();
     $account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
@@ -61,9 +62,9 @@ require_once "classes/Account.php";
 
     cleanup();
 }
-/**
+/***********************************************************************************************************************
  *          CREATE NEW ACCOUNT
- */
+ **********************************************************************************************************************/
 {
     mark();
     $account = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
@@ -79,14 +80,13 @@ require_once "classes/Account.php";
 
     assert($account->getEmail() == "email@test.com", "email is email@test.com, Create Account section");
 
-//    assert();
     cleanup();
 }
 
 
-/**
+/***********************************************************************************************************************
  *          Set Account
- */
+ **********************************************************************************************************************/
 {
     //set all valid values
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
@@ -97,10 +97,10 @@ require_once "classes/Account.php";
     $account->_fName = "ozzy";
     $account->_lName = "osbourne";
     mark();
-    $account->_passHash = "newpass";
+    $account->updatePass("newpass");
     mark("update password with 7 characters");
     mark();
-    $account->_passHash = "thisisaverylongpasswordtesting";
+    $account->updatePass("thisisaverylongpasswordtesting");
     mark("update password with 30 characters");
     $account->_token = 'new';    //doesn't matter what you pass it
 
@@ -111,7 +111,7 @@ require_once "classes/Account.php";
     $error = false;
 
     try {
-        $account->_passHash = "short";
+        $account->updatePass("short");
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -119,7 +119,7 @@ require_once "classes/Account.php";
 
     $error = false;
     try {
-        $account->_passHash = "thispasswordistoolongitshouldfail";
+        $account->updatePass("thispasswordistoolongitshouldfail");
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -149,9 +149,9 @@ require_once "classes/Account.php";
     cleanup();
 }
 
-/**
+/***********************************************************************************************************************
  *          Get Account
- */
+ **********************************************************************************************************************/
 {
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     $email = $account->getEmail();
@@ -172,38 +172,47 @@ require_once "classes/Account.php";
 
     cleanup();
 }
-/**
+/***********************************************************************************************************************
  *          Update Account
- */
-
+ **********************************************************************************************************************/
 //same as set account
 
-/**
+/***********************************************************************************************************************
  *          Delete Account
- */
-$account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-mark();
-assert($account->delete(), "Account deleted successfully");
-mark("Account deletion");
-/**
+ **********************************************************************************************************************/
+{
+    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+    mark();
+    assert($account->delete(), "Account deleted successfully");
+    mark("Account deletion");
+
+    cleanup();
+}
+/***********************************************************************************************************************
  *          Create Participant
- */
+ **********************************************************************************************************************/
+{
+    $room = Room::createRoom("room1");
+    $account = Account::LoginThroughID("");
+//    mark();
 
-/**
+
+    }
+/***********************************************************************************************************************
  *          Set Participant
- */
+ **********************************************************************************************************************/
 
-/**
+/***********************************************************************************************************************
  *          Get Participant
- */
+ **********************************************************************************************************************/
 
-/**
+/***********************************************************************************************************************
  *          Update Participant
- */
+ **********************************************************************************************************************/
 
-/**
+/***********************************************************************************************************************
  *          Delete Participant
- */
+ **********************************************************************************************************************/
 
 //NEED BETTER CLEANUP
 function cleanup()
