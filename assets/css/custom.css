@@ -11,7 +11,7 @@
     float: left;
     min-width: 256px;
     width: 512px;
-    max-width: calc(100% - 6px);;
+    max-width: calc(100% - 6px);
 }
 
 .btn-main{
@@ -100,3 +100,40 @@
     content: '';
 }
 
+.login-button{
+    position: absolute;
+    z-index: 9999999;
+    right: 100px;
+    top: 100px;
+    border: 2px solid black;
+    border-radius: 50px;
+    background-color: white;
+    transition-duration: 1s;
+    transition-property: max-width, max-height, margin-top, margin-right, color;
+    width: 500vw;
+    height: 500vw;
+    max-width: 100px;
+    max-height: 40px;
+    font-size: 1.5em;
+    margin-top: -50px;
+    margin-right: -50px;
+}
+
+
+.login-button:active{
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5) inset;
+}
+
+.open{
+    max-height: 300vw;
+    max-width: 300vw;
+    margin-right: -150vw;
+    margin-top: -150vw;
+    border-radius: 100%;
+    color: transparent;
+    background-color: #4286f4;
+}
+
+.form-control{
+    margin: 10px;
+}

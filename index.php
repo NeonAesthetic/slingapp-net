@@ -17,7 +17,18 @@
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
 <body style="background-color: #4286f4;">
+    <div id="login-cont" style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;">
+        <center>
+        <form id="loginForm" style="max-width: 300px; margin: 0 auto; margin-top: 100px">
+            <h1>Login</h1>
+            <input name="email" class="form-control" placeholder="email" type="email">
+            <input name="password" class="form-control" placeholder="password" type="password">
+            <button type="button" onclick="submitLogin(this)">Submit</button>
+        </form>
+        </center>
+    </div>
     <div class="container-fluid" style="background-color: rgba(255,255,255,1); text-align: center; padding-bottom: 30px; min-height: 50vh">
+        <button id="login-button" class="login-button" onclick="showLogin()">Login</button>
         <h1 style="width:100%; text-align: center;">Sharing so easy you'll never go back</h1>
         <div class="wrapper">
             <div class="screenshot">
@@ -63,6 +74,26 @@
         var room = f["room"].value;
         window.location = "/room/"+room;
         return false;
+    }
+    
+    function showLogin(){
+        var button = document.getElementById("login-button");
+        
+        button.className += " open";
+
+        setTimeout(function () {
+            var loginarea = document.getElementById("login-cont");
+            loginarea.style.visibility = "visible";
+            console.log(loginarea);
+        },700);
+    }
+
+    function submitLogin(e){
+        var form = document.getElementById("loginForm");
+        var email = form.elements["email"].value;
+        var password = form.elements["password"].value;
+        
+        
     }
 </script>
 </html>
