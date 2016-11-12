@@ -8,23 +8,7 @@
  * Description: Logs into the system assuming there is a valid account
  */
 
-//set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-//require_once 'classes/Account.php';
-//session_start();
-//
-//
-//if(isset($_POST['login']))
-//{
-//    $login = new Accounts(0);  //0 used for logging in, 1 for registering
-//
-//    if($login->isLoggedIn())
-//        echo "Success!";
-//    else
-//        $login->showErrors();
-//}
-//
-//$token = $_SESSION['token'] = md5(uniqid(mt_rand(),true));
-//?>
+?>
 
 <form action="/assets/php/components/account.php" method="POST">
     <table>

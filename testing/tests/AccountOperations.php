@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ian
+ * User: ian, Isaac
  * Date: 11/10/16
  * Time: 9:17 AM
  *
@@ -34,7 +34,7 @@ require_once "classes/Account.php";
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
                 VALUES('testemail@test.com', 'first', 'last', :pass, :token, '2016-11-10 07:47:06', '2016-11-10 07:47:06', '2016-11-10 07:47:06')";
     $statement = Database::connect()->prepare($sql);
-    if(!$statement) var_dump(Database::connect()->errorInfo());
+    if (!$statement) var_dump(Database::connect()->errorInfo());
 
     $statement->execute(array(':pass' => $password, ':token' => $token));
 
@@ -75,9 +75,9 @@ require_once "classes/Account.php";
     assert($first_name == "Bob", "First name is Bob");
     assert($last_name == "Marley", "Last name is Marley");
 
-    $account->email = "email@test.com";
+    $account->_email = "email@test.com";
 
-    assert($account->getEmail() == "email@test.com", "email@test.com is 'test'");
+    assert($account->getEmail() == "email@test.com", "email is email@test.com, Create Account section");
 
 //    assert();
     cleanup();
@@ -88,21 +88,64 @@ require_once "classes/Account.php";
  *          Set Account
  */
 {
+    //set all valid values
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
 
     mark();
-    $account->email = "replace@test.com";
+    $account->_email = "replace@test.com";
     mark("update email");
-    $account->fname = "ozzy";
-    $account->lname = "osbourne";
+    $account->_fName = "ozzy";
+    $account->_lName = "osbourne";
     mark();
-    $account->passhash = "newpass";
-    mark("update password");
-    $account->token = 'new';    //doesn't matter what you pass it
+    $account->_passHash = "newpass";
+    mark("update password with 7 characters");
+    mark();
+    $account->_passHash = "thisisaverylongpasswordtesting";
+    mark("update password with 30 characters");
+    $account->_token = 'new';    //doesn't matter what you pass it
 
-    $account = Account::Login("replace@test.com", "newpass");
+    $account = Account::Login("replace@test.com", "thisisaverylongpasswordtesting");
     assert($account != null, "login success with updated credentials");
 
+    //set all invalid values
+    $error = false;
+
+    try {
+        $account->_passHash = "short";
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    assert($error == "Password must be between 6 - 30 characters", "Password is too short");
+
+    $error = false;
+    try {
+        $account->_passHash = "thispasswordistoolongitshouldfail";
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    assert($error == "Password must be between 6 - 30 characters", "Password is too long");
+
+    try {
+        $account->_email = "badEmail";
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    assert($error == "Email is not valid, please try again.", "Invalid email");
+
+
+    try {
+        $account->_fName = "%&#$";
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    assert($error == "First name is not valid, please try again.", "Invalid first name");
+
+    try {
+        $account->_lName = "%^&*";
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    assert($error == "Last name is not valid, please try again.");
     cleanup();
 }
 
@@ -138,10 +181,10 @@ require_once "classes/Account.php";
 /**
  *          Delete Account
  */
-    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-    mark();
-    assert($account->delete(), "Account deleted successfully");
-    mark("Account deletion");
+$account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+mark();
+assert($account->delete(), "Account deleted successfully");
+mark("Account deletion");
 /**
  *          Create Participant
  */
@@ -163,8 +206,9 @@ require_once "classes/Account.php";
  */
 
 //NEED BETTER CLEANUP
-function cleanup(){
-    try{
+function cleanup()
+{
+    try {
         Database::connect()->query("DELETE 
                                     FROM Accounts
                                     WHERE (Email = 'testemail@test.com')
@@ -172,5 +216,6 @@ function cleanup(){
                                     OR (Email = 'replace@test.com')
                                     OR (Email = 'testnewemail@test.com')
                                     OR (Email = 'newer@gmail.com')");
-    }catch (Exception $e){}
+    } catch (Exception $e) {
+    }
 }

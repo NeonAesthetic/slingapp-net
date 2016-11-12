@@ -17,6 +17,8 @@
 
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
 
+session_start();
+
 function GetParams(...$params){
     $parameters = [];
     foreach ($params as $pname){

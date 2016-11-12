@@ -9,32 +9,15 @@
  * Description: Echos form data
  */
 
-//session_start();
-//
-//set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
-//require_once 'classes/Account.php';
-//
-//if(isset($_POST['register']))
-//{
-//    #include('../../assets/php/classes/Account.php');
-//
-//    $login = new Accounts(1);
-//
-//    if($login->process())
-//        echo "Success!";
-//    else
-//        $login->showErrors();
-//}
-//
-//$token = $_SESSION['token'] = md5(uniqid(mt_rand(),true));
-//?>
+?>
 
 <form action="/assets/php/components/account.php" method="POST">
     <table>
         <tr><td>FirstName:</td><td><input type="text" name="fname" placeholder="First Name" /></td></tr>
         <tr><td>LastName:</td><td><input type="text" name="lname" placeholder="Last Name"/></td></tr>
         <tr><td>Email:</td><td><input type="email" name="email" placeholder="Email"/></td></tr>
-        <tr><td>Password:</td><td><input type="password" name="password" placeholder="Password"/></td></tr>
+        <tr><td>Password:</td><td><input type="password" name="pass1" placeholder="Password"/></td></tr>
+        <tr><td>Confirm Password:</td><td><input type="password" name="pass2" placeholder="Password"/></td></tr>
     </table>
-    <p><input type="submit" name="action" value="Sign Up" /></p>
+    <p><input type="submit" name="action" value="register" /></p>
 </form>

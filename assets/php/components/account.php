@@ -9,16 +9,14 @@
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Account.php";
 
-$p = GetParams("action", "email", "fname", "lname", "password");
-
-session_start();
+$p = GetParams("action", "email", "fname", "lname", "pass1", "pass2");
 
 $GLOBALS['access'] = 0;
 $GLOBALS['login'] = 0;
 
 switch ($p['action'])
 {
-    case "Sign Up":     //value must equal the name of the button to register (case sensitive)
+    case "register":     //value must equal the name(value) of the submit button from the HTML FORM to register
         if ($account = process($p))
         {
             $_SESSION['token'] = $account->getToken();
@@ -36,11 +34,11 @@ switch ($p['action'])
         //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
             $p['email'] = ($p['action'] == 'login') ? $_POST['email'] : $_SESSION['email'];
         //If user presses submit, pull password from POST otherwise leave blank
-            $p['password'] = ($GLOBALS['login']) ? $p['password'] : '';
+            $p['pass1'] = ($GLOBALS['login']) ? $p['pass1'] : '';
 
-        if($GLOBALS['login'] == 1 && $p['password'])
+        if($GLOBALS['login'] == 1 && $p['pass1'])
         {
-            $account = Account::Login($p['email'], $p['password']);
+            $account = Account::Login($p['email'], $p['pass1']);
 
             if($account && isLoggedIn($p))
             {
@@ -60,13 +58,36 @@ switch ($p['action'])
                 echo "Unable to login through token";
 
         break;
+    case "changepass": {
+
+    }
+        break;
   //pass in token and return JSON account object
+    case "delete":{
+
+    }
+    break;
+    case "logout":{
+        var_dump($_SESSION['token']); //session doesn't last during unit test...
+
+//        $account = Account::Login($_SESSION['token']);
+//
+//        session_destroy();
+//        $GLOBALS['access'] = 0;
+//        $GLOBALS['login'] = 0;
+//
+//        echo "Logged out";
+    }
+    break;
     case "getcookie": {
-        break;
     }
+    break;
     case "newtoken": {
-        break;
     }
+    break;
+    default:
+        DatabaseObject::Log(__FILE__, "action not valid",
+            "action wasn't valid");
 }
 
 /**
@@ -80,7 +101,7 @@ function process($p)
 {
     $retval = false;
 
-    if(isTokenValid($p['token']) && isEmailValid($p['email']))
+    if(isTokenValid($p['token']) && isDataValid($p))
         $retval = Account::CreateAccount($p['email'], $p['fname'], $p["lname"], $p["password"]);
 
     return $retval;
@@ -110,7 +131,7 @@ function verifyPost($p)
     {
         if(!isTokenValid($p['token']))
             throw new Exception('Invalid Form Submission');
-        if(!isEmailValid($p['email']))
+        if(!(filter_var($p['email'], FILTER_VALIDATE_EMAIL)))
             throw new Exception('Invalid Form Data');
         if(!verifyDatabase($p))
             throw new Exception('Invalid Username/Password');
@@ -149,16 +170,16 @@ function verifyDatabase($p)
     $statement->execute(array(':email' => $p['email']));
     $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    if($p['email'] == $result[0]["Email"] && password_verify($p['password'], $result[0]["PasswordHash"]))
+    if($p['email'] == $result[0]["Email"] && password_verify($p['pass1'], $result[0]["PasswordHash"]))
         $verify = true;
 
     return $verify;
 }
 
-function isEmailValid($email)
+function isDataValid($p)
 {
     $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z]+/";
-    return preg_match($emailExp, $email) ? 1 : 0;
+    return preg_match($emailExp, $p['email']) && $p['pass1'] == $p['pass2'] ? 1 : 0;
 }
 
 function isTokenValid($token)
@@ -169,10 +190,10 @@ function isTokenValid($token)
 function registerSession($p)
 {
     $_SESSION['email'] = $p['email'];
-    $_SESSION['password'] = $p['password'];
+    $_SESSION['pass1'] = $p['pass1'];
 }
 
 function sessionExist()
 {
-    return (isset($_SESSION['email']) && isset($_SESSION['password'])) ? 1:0;
+    return (isset($_SESSION['email']) && isset($_SESSION['pass1'])) ? 1:0;
 }
