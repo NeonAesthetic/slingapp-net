@@ -206,9 +206,10 @@ class Account extends DatabaseObject
                 $sql = "DELETE FROM Particpants
                     WHERE AccountID = $this->_accountID";
                 $statement = Database::connect()->prepare($sql);
-                $retval = $statement->execute();
-                $this->_roomID = null;
-                $this->_screenName = null;
+                if($retval = $statement->execute()){
+                    $this->_roomID = null;
+                    $this->_screenName = null;
+                }
 
             }//if participant was deleted successfully or if it didn't exist, delete account
             if (!$this->_roomID) {
