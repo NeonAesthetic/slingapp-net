@@ -9,43 +9,42 @@
 class RoomCode extends DatabaseObject
 {
     private $_code;
-    private $_roomid;
-    private $_creator;
+    private $_roomID;
+    private $_participantID;
     private $_expire_date;
     private $_uses;
 
-    public function __construct($code, $roomid, $screenName, $uses = null, $expires_in = null)
+    public function __construct($code, $roomID, $participantID, $uses = null, $expires_in = null)
     {
         $this->_code = $code;
-        $this->_roomid = $roomid;
-        $this->_creator = $screenName;
+        $this->_roomID = $roomID;
+        $this->_participantID = $participantID;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
     }
 
-    public static function createRoomCode($roomid, $accountID, $uses = null, $expires_in = null)
+    public static function createRoomCode($roomID, $participantID, $uses = null, $expires_in = null)
     {
-
         $sql = "    INSERT INTO RoomCodes (RoomCode, RoomID, CreatedBy, ExpirationDate, RemainingUses)
-                    VALUES (:code, :rid, :accountID, :exp_date, :rem_uses)";
+                    VALUES (:code, :rid, :participantID, :exp_date, :rem_uses)";
         $statement = Database::connect()->prepare($sql);
         $code = self::generate_code();
 
-        echo $accountID;
+        #echo "Code: ", $code, "<br>", "roomID: ", $roomID, "<br>", "ParticipantID: ", $participantID, "<br>";
 
         if ($statement->execute([
             ":code" => $code,
-            ":rid" => $roomid,
-            ":accountID" => $accountID,
+            ":rid" => $roomID,
+            ":participantID" => $participantID,
             ":exp_date" => $expires_in,
             ":rem_uses" => $uses
         ])
         ) {
-            DatabaseObject::Log(__FILE__, "Create", "Participant with ID $accountID created Code $code");
+            DatabaseObject::Log(__FILE__, "Create", "Participant with ID $participantID created Code $code");
         } else {
             throw new PDOException($statement->errorInfo()[2]);
         }
-        return new RoomCode($code, $roomid, $accountID);
+        return new RoomCode($code, $roomID, $participantID);
     }
 
     public static function generate_code()
@@ -58,7 +57,7 @@ class RoomCode extends DatabaseObject
     public function delete()
     {
         $sql = "    DELETE FROM RoomCodes
-                    WHERE RoomID = $this->_roomid";
+                    WHERE RoomID = $this->_roomID";
         $statement = Database::connect()->prepare($sql);
         $statement->execute();
     }
@@ -67,9 +66,9 @@ class RoomCode extends DatabaseObject
     public function update()
     {
         $sql = "INSERT INTO RoomCodes (RoomID, CreatedBy, ExpirationDate, RemainingUses)
-                    VALUES(':roomid', ':created_by', ':exp', ':rem')";
+                    VALUES(':roomID', ':created_by', ':exp', ':rem')";
         $statement = Database::connect()->prepare($sql);
-        $statement->execute([":roomid" => $this->_roomid, ":created_by" => $this->_creator, ":exp" => $this->_expire_date]);
+        $statement->execute([":roomID" => $this->_roomID, ":created_by" => $this->_participantID, ":exp" => $this->_expire_date]);
     }
 
     public function getJSON($as_array = false)

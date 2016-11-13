@@ -6,6 +6,8 @@
  * Date: 11/6/2016
  * Time: 9:21 AM
  */
+
+//add upgrade account from temp function
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
@@ -29,14 +31,6 @@ $maxLength = 30;
 class Account extends DatabaseObject
 {
     /**
-     * @return string[]
-     */
-    public function getName()
-    {
-        return ["First" => $this->_fName, "Last" => $this->_lName];
-    }
-
-    /**
      * @return null
      */
     private $_fName;
@@ -49,6 +43,7 @@ class Account extends DatabaseObject
     private $_accountID;
     private $_roomID;
     private $_screenName;
+    private $_participantID;
 
     /**
      * This Constructor is used to create a new account based on data that is retrieved from the user at
@@ -70,6 +65,7 @@ class Account extends DatabaseObject
     public function __construct($accountID, $token, $_tokenGen, $email = null, $fName = null, $lName = null, $passHash = null
         , $lastLogin = null, $joinDate = null)
     {
+//        echo "AccountID IN CONSTRUCT:::::::: $accountID";
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;
@@ -78,6 +74,8 @@ class Account extends DatabaseObject
         $this->_tokenGen = $_tokenGen;
         $this->_lastLogin = $lastLogin;
         $this->_joinDate = $joinDate;
+        $this->_roomID = null;
+        $this->_screenName = null;
     }
 
     /**
@@ -93,7 +91,7 @@ class Account extends DatabaseObject
      * a new account with the Sling Application.
      * This Function executes the SQL DML Statement Insert to add a new account to the database.
      */
-    public static function CreateAccount($email, $fName, $lName, $password)
+    public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null)
     {
         $tempPassHash = password_hash($password, PASSWORD_BCRYPT);
         $token = md5(uniqid(mt_rand(), true));
@@ -121,11 +119,10 @@ class Account extends DatabaseObject
             throw new Exception("Could not create account");
         }
 
-        $accountID = (int)Database::connect()->lastInsertId();
+        $accountID = Database::connect()->lastInsertId();
 
         return new Account($accountID, $token, $currentDate, $email, $fName, $lName,
             $currentDate, $currentDate);
-
     }
 
     /**
@@ -141,6 +138,7 @@ class Account extends DatabaseObject
      */
     public static function Login($token_email, $password = null)        //add validity checks
     {
+//        echo "Password:: $password";
         $retval = null;
         $currentDate = gmdate("Y-m-d H:i:s");
         if ($password) {
@@ -171,6 +169,9 @@ class Account extends DatabaseObject
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':logtok' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+//            echo "AccountID After Login:::: ";
+//            var_dump($result['AccountID']);
             if ($result) {
                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                     $result['Email'], $result['FirstName'], $result['LastName'], $result['LastLogin'], $result['JoinDate']);
@@ -178,6 +179,7 @@ class Account extends DatabaseObject
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE LoginToken = :token";
+                //if account last login doesn't update don't return account
                 if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':token' => $token_email)))
                     $retval = null;
 
@@ -202,15 +204,57 @@ class Account extends DatabaseObject
         $retval = $statement->execute(array(':accountID' => $AccountID));
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if($retval) {
+        if ($retval) {
             $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                 $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
 
             $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE AccountID = :accountID";
-            if(!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':accountID' => $AccountID)))
+            //if account last login doesn't update don't return account
+            if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':accountID' => $AccountID)))
                 $retval = null;
+        }
+        return $retval;
+    }
+
+    public static function createTempAccount($roomID, $screenName)
+    {
+        $retval = null;
+        $token = md5(uniqid(mt_rand(), true));
+        $currentDate = gmdate("Y-m-d H:i:s");
+
+        $sql = "INSERT INTO Accounts
+                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+
+        $statement = Database::connect()->prepare($sql);
+
+        if ($statement->execute([
+            ':email' => null,
+            ':fName' => null,
+            ':lName' => null,
+            ':passHash' => null,
+            ':logTok' => $token,
+            ':tokGen' => $currentDate,
+            ':lastLog' => $currentDate,
+            ':joinDate' => $currentDate,
+        ])
+        ) {
+            $accountID = Database::connect()->lastInsertId();
+
+            $sql = "SELECT *
+                    FROM Accounts AS a
+                      JOIN Participants AS p
+                        ON a.AccountID = p.AccountID
+                    WHERE Email IS NULL";
+
+            Database::connect()->prepare($sql)->execute();
+
+            $account = new Account($accountID, $token, $currentDate);
+
+            #$account->addParticipant($roomID, $screenName);
+            $retval = $account;
         }
         return $retval;
     }
@@ -262,29 +306,6 @@ class Account extends DatabaseObject
         return $retval;
     }
 
-    /**
-     * Function deleteParticipant
-     * @return boolean
-     * This function will remove the account's participant from the database.
-     * This function uses an SQL statement in order to find an
-     * existing participant based on an account's ID. If it succeeds in finding
-     * and deleting the participant, it will return 'true'.
-     * This function should be called when a room expires.
-     */
-    public function deleteParticipant()
-    {
-        $sql = "DELETE FROM Participants AS p
-                            JOIN Accounts AS a
-                              ON p.AccountID = a.AccountID
-                WHERE p.AccountID = :accountID";
-
-        if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $this->_accountID))) {
-            $this->_roomID = null;
-            $this->_screenName = null;
-        }
-
-        return $retval;
-    }
     /**
      * Function Update
      * This function will trigger whenever a setter is used or a user attempts to join a room,
@@ -353,26 +374,20 @@ class Account extends DatabaseObject
      */
     public function addParticipant($roomID, $screenName)
     {
+//        echo "ROOM ID AFTER: ", $roomID;
         //Do select statement and pull account id after account created.
         $sql = "INSERT INTO Participants
                 (AccountID, RoomID, ScreenName)
                 VALUES (:accountID, :roomID, :screenName)";
         $statement = Database::connect()->prepare($sql);
-        if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $roomID
-        , ':screenName' => $screenName))
+
+//        echo "AccountID::::: $this->_accountID";
+        if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $roomID, ':screenName' => $screenName))
         ) {
+            $this->_participantID = Database::connect()->lastInsertId();
             $this->_roomID = $roomID;
             $this->_screenName = $screenName;
         }
-        //create error if result is nothing
-        //FOUND OUT WHAT WAS WRONG, tests failed because no room existed, ref. integrity.
-        //Need REAL account info
-        //NEED ACTUAL room id
-
-//        if(!$statement->execute(array(':accountID' => 101, ':roomID' => 123, ':screenName' => "TEST_SCREEN_NAME"))) {
-//            DatabaseObject::Log(__FILE__, "ParticipantsUpdate", "Could Not Insert");
-//        }
-
     }
 
     public function updatePass($pass)
@@ -387,7 +402,6 @@ class Account extends DatabaseObject
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n updated password");
             }
-
 
         } else
             throw new Exception("Password must be between 6 - 30 characters");
@@ -419,9 +433,26 @@ class Account extends DatabaseObject
     /**
      * @return mixed
      */
+    public function getParticipantID()
+    {
+        return $this->_participantID;
+    }
+
+
+    /**
+     * @return mixed
+     */
     public function getRoomID()
     {
         return $this->_roomID;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getName()
+    {
+        return ["First" => $this->_fName, "Last" => $this->_lName];
     }
 
     /**
