@@ -159,7 +159,7 @@ class Account extends DatabaseObject
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE Email = :email";
-                if(!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':email' => $token_email)))
+                if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':email' => $token_email)))
                     $retval = null;
             }
 
@@ -178,7 +178,7 @@ class Account extends DatabaseObject
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE LoginToken = :token";
-                if(!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':token' => $token_email)))
+                if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':token' => $token_email)))
                     $retval = null;
 
             } else {
@@ -192,6 +192,8 @@ class Account extends DatabaseObject
     public static function LoginThroughID($AccountID)
     {
         $retval = null;
+
+        $currentDate = gmdate("Y-m-d H:i:s");
 
         $sql = "SELECT *
             FROM Accounts
@@ -212,6 +214,7 @@ class Account extends DatabaseObject
         }
         return $retval;
     }
+
     /**
      * Function Delete
      * @return boolean
@@ -243,7 +246,7 @@ class Account extends DatabaseObject
                 $sql = "DELETE FROM Particpants
                     WHERE AccountID = $this->_accountID";
                 $statement = Database::connect()->prepare($sql);
-                if($retval = $statement->execute()){
+                if ($retval = $statement->execute()) {
                     $this->_roomID = null;
                     $this->_screenName = null;
                 }
@@ -292,38 +295,6 @@ class Account extends DatabaseObject
     //NEEDED:   Test that allows room to be created-> then account-> then update to move account and part. to room
     public function update()
     {
-        if ($this->_roomID != null) {
-            //Do select statement and pull account id after account created.
-            $sql = "INSERT INTO Participants
-                (AccountID, RoomID, ScreenName)
-                VALUES (:accountID, :roomID, :screenName)";
-            $statement = Database::connect()->prepare($sql);
-            if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $this->_roomID
-            , ':screenName' => $this->_screenName))
-            ) {
-                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-                #foreach($result as $row)
-                #    var_dump($row);
-            }
-        }
-        //create error if result is nothing
-        //FOUND OUT WHAT WAS WRONG, tests failed because no room existed, ref. integrity.
-        //Need REAL account info
-        //NEED ACTUAL room id
-
-//        if(!$statement->execute(array(':accountID' => 101, ':roomID' => 123, ':screenName' => "TEST_SCREEN_NAME"))) {
-//            DatabaseObject::Log(__FILE__, "ParticipantsUpdate", "Could Not Insert");
-//        }
-    }
-
-    /**
-     * Function updateAfterSetter
-     * This function will trigger whenever a setter is used and will attempt to insert the
-     * updated account/participant data. Data must pass validity checks before this function
-     * is called. Validity checks are in the __set() function
-     */
-    private function updateAfterSetter()
-    {
         if ($this->_roomID) {            //account has participant
             $sql = "UPDATE Accounts AS a 
                       JOIN Participants AS p
@@ -335,8 +306,8 @@ class Account extends DatabaseObject
                     TokenGenTime = :tokGen,
                     LastLogin = :lastLog,
                     JoinDate = :joinDate,
-                    ScreenName = :screenName,
-                    
+                    RoomID = :roomID,
+                    ScreenName = :screenName
                 WHERE a.AccountID = :accountID";
 
             $statement = Database::connect()->prepare($sql);
@@ -348,6 +319,7 @@ class Account extends DatabaseObject
                 ':lastLog' => $this->_lastLogin,
                 ':joinDate' => $this->_joinDate,
                 ':accountID' => $this->_accountID,
+                ':roomID' => $this->_roomID,
                 ':screenName' => $this->_screenName));
         } else {    //account doesn't have a participant
             $sql = "UPDATE Accounts
@@ -373,23 +345,53 @@ class Account extends DatabaseObject
         }
     }
 
+    /**
+     * Function updateAfterSetter
+     * This function will trigger whenever a setter is used and will attempt to insert the
+     * updated account/participant data. Data must pass validity checks before this function
+     * is called. Validity checks are in the __set() function
+     */
+    public function addParticipant($roomID, $screenName)
+    {
+        //Do select statement and pull account id after account created.
+        $sql = "INSERT INTO Participants
+                (AccountID, RoomID, ScreenName)
+                VALUES (:accountID, :roomID, :screenName)";
+        $statement = Database::connect()->prepare($sql);
+        if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $roomID
+        , ':screenName' => $screenName))
+        ) {
+            $this->_roomID = $roomID;
+            $this->_screenName = $screenName;
+        }
+        //create error if result is nothing
+        //FOUND OUT WHAT WAS WRONG, tests failed because no room existed, ref. integrity.
+        //Need REAL account info
+        //NEED ACTUAL room id
+
+//        if(!$statement->execute(array(':accountID' => 101, ':roomID' => 123, ':screenName' => "TEST_SCREEN_NAME"))) {
+//            DatabaseObject::Log(__FILE__, "ParticipantsUpdate", "Could Not Insert");
+//        }
+
+    }
+
     public function updatePass($pass)
     {
         if (strlen($pass) >= $GLOBALS['minLength'] && strlen($pass) <= $GLOBALS['maxLength']) {
             $hashedPass = password_hash($pass, PASSWORD_BCRYPT);
 
-        $sql = "UPDATE Accounts
+            $sql = "UPDATE Accounts
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
-        if(Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
-            DatabaseObject::Log(__FILE__, "Updated Account",
-                "Account: $this->_accountID \n updated password");
-        }
+            if (Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
+                DatabaseObject::Log(__FILE__, "Updated Account",
+                    "Account: $this->_accountID \n updated password");
+            }
 
 
         } else
             throw new Exception("Password must be between 6 - 30 characters");
-        return ;
+        return;
     }
 
     private function isNameValid($name)
@@ -412,6 +414,14 @@ class Account extends DatabaseObject
     public function getToken()
     {
         return $this->_token;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRoomID()
+    {
+        return $this->_roomID;
     }
 
     /**
@@ -493,6 +503,12 @@ class Account extends DatabaseObject
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n Updated token");
                 break;
+            case "_roomid":
+                $temp = $this->_roomID;
+                $this->_roomID = $value;
+                DatabaseObject::Log(__FILE__, "Updated Account",
+                    "Account: $this->_accountID \n Updated roomID from: $temp to: $value");
+                break;
             case "_screenname":             //add validation check
                 $temp = $this->_screenName;
                 $this->_screenName = $value;
@@ -504,7 +520,7 @@ class Account extends DatabaseObject
                     "Account: $this->_accountID \n set method using: $name wasn't valid");
         }
 
-        $this->updateAfterSetter();
+        $this->update();
 
         return $value;
     }

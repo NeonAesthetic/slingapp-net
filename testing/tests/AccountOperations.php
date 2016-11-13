@@ -192,12 +192,11 @@ require_once "classes/Room.php";
  *          Create Participant
  **********************************************************************************************************************/
 {
-    $room = Room::createRoom("room1");
-    $account = Account::LoginThroughID("");
+//    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+//    //how to pass $account object and allow to call methods after passing to function?
+//    $room = Room::createRoom("room1", $account->getToken(), "screenName");
 //    mark();
-
-
-    }
+}
 /***********************************************************************************************************************
  *          Set Participant
  **********************************************************************************************************************/
@@ -218,13 +217,37 @@ require_once "classes/Room.php";
 function cleanup()
 {
     try {
-        Database::connect()->query("DELETE 
-                                    FROM Accounts
+        $sql = "SELECT RoomID, a.AccountID
+                                    FROM Accounts AS a
+                                    LEFT JOIN Participants AS p 
+                                        ON a.AccountID = p.AccountID
                                     WHERE (Email = 'testemail@test.com')
                                     OR (Email = 'email@test.com')
                                     OR (Email = 'replace@test.com')
                                     OR (Email = 'testnewemail@test.com')
-                                    OR (Email = 'newer@gmail.com')");
-    } catch (Exception $e) {
-    }
+                                    OR (Email = 'newer@gmail.com')";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "DELETE
+                FROM RoomCodes
+                WHERE RoomID = :roomID";
+        Database::connect()->prepare($sql)->execute(array(':roomID' => $result['RoomID']));
+        $sql = "DELETE
+                FROM Participants
+                WHERE RoomID = :roomID";
+        Database::connect()->prepare($sql)->execute(array(':roomID' => $result['RoomID']));
+        $sql = "DELETE 
+                FROM Rooms
+                WHERE RoomID = :roomID";
+        Database::connect()->prepare($sql)->execute(array(':roomID' => $result['RoomID']));
+
+        $sql = "DELETE
+                FROM Accounts
+                WHERE AccountID = :accountID";
+        Database::connect()->prepare($sql)->execute(array(':accountID' => $result['AccountID']));
+} catch
+(Exception $e) {
+}
 }

@@ -17,7 +17,7 @@ require_once "classes/Account.php";
     Account::CreateAccount("ozzy.osbourne@gmail.com", "ozzy", "osbourne", "pass");
 
     $url = 'http://localhost/assets/php/components/account.php';
-    $data = array('action' => 'login', 'email' => 'ozzy.osbourne@gmail.com', 'pass1' => 'pass', 'pass2' => 'pass');
+    $data = array('action' => 'login', 'email' => 'ozzy.osbourne@gmail.com', 'pass1' => 'pass');
 
     $options = array(
         'http' => array(
@@ -29,8 +29,8 @@ require_once "classes/Account.php";
 
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-    if ($result === FALSE) { /* Handle error */ }
-    assert($result == "Successfully logged in using password!", "Account logged in");
+
+    assert($result != null);
 
     cleanup();
 }
@@ -93,9 +93,8 @@ require_once "classes/Account.php";
 
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-    if ($result === FALSE) { /* Handle error */ }
-
-    assert($result == "Registration was successful!", "Account registered");
+    
+    assert($result == true, "Register method");
 
     cleanup();
 }

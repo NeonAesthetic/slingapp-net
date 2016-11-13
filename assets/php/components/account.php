@@ -16,15 +16,16 @@ $GLOBALS['login'] = 0;
 
 switch ($p['action']) {
     case "register":     //value must equal the name(value) of the submit button from the HTML FORM to register
+        $retval = false;
         if ($account = process($p)) {
             $_SESSION['token'] = $account->getToken();
-            #echo "Registration was successful!";
-            return true;
+            $retval = true;
         } else {
             DatabaseObject::Log(__FILE__, "Register Account", "Account could not be created");
             #echo "Registration was unsuccessful";
-            return false;
         }
+
+        echo $retval;
         break;
     case "login":
         $retval = json_encode(null);

@@ -13,38 +13,46 @@ class RoomCode extends DatabaseObject
     private $_creator;
     private $_expire_date;
     private $_uses;
-    
-    public function __construct($code, $roomid, $creator, $uses = null, $expires_in = null){
+
+    public function __construct($code, $roomid, $screenName, $uses = null, $expires_in = null)
+    {
         $this->_code = $code;
         $this->_roomid = $roomid;
-        $this->_creator = $creator;
+        $this->_creator = $screenName;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
     }
 
-    public static function createRoomCode($roomid, $creator, $uses = null, $expires_in = null){
+    public static function createRoomCode($roomid, $accountID, $uses = null, $expires_in = null)
+    {
+
         $sql = "    INSERT INTO RoomCodes (RoomCode, RoomID, CreatedBy, ExpirationDate, RemainingUses)
-                    VALUES (:code, :rid, :createdby, :exp_date, :rem_uses)";
+                    VALUES (:code, :rid, :accountID, :exp_date, :rem_uses)";
         $statement = Database::connect()->prepare($sql);
         $code = self::generate_code();
-        if(!$statement->execute([
-            ":code"=>$code,
+
+        echo $accountID;
+
+        if ($statement->execute([
+            ":code" => $code,
             ":rid" => $roomid,
-            ":createdby"=>$creator,
-            ":exp_date"=>$expires_in,
-            ":rem_uses"=>$uses
-        ])){
+            ":accountID" => $accountID,
+            ":exp_date" => $expires_in,
+            ":rem_uses" => $uses
+        ])
+        ) {
+            DatabaseObject::Log(__FILE__, "Create", "Participant with ID $accountID created Code $code");
+        } else {
             throw new PDOException($statement->errorInfo()[2]);
-        }else{
-            DatabaseObject::Log("Create", "Participant with ID $creator created Code $code");
         }
-        return new RoomCode($code, $roomid, $creator);
+        return new RoomCode($code, $roomid, $accountID);
     }
 
-    public static function generate_code(){
+    public static function generate_code()
+    {
         $chars = str_split("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
-        $max = count($chars) -1;
-        return $chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)];
+        $max = count($chars) - 1;
+        return $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)];
     }
 
     public function delete()
@@ -55,13 +63,13 @@ class RoomCode extends DatabaseObject
         $statement->execute();
     }
 
-    
+
     public function update()
     {
         $sql = "INSERT INTO RoomCodes (RoomID, CreatedBy, ExpirationDate, RemainingUses)
                     VALUES(':roomid', ':created_by', ':exp', ':rem')";
         $statement = Database::connect()->prepare($sql);
-        $statement->execute([":roomid" => $this->_roomid, ":created_by"=>$this->_creator, ":exp"=>$this->_expire_date]);
+        $statement->execute([":roomid" => $this->_roomid, ":created_by" => $this->_creator, ":exp" => $this->_expire_date]);
     }
 
     public function getJSON($as_array = false)
@@ -72,7 +80,8 @@ class RoomCode extends DatabaseObject
         return json_encode($json);
     }
 
-    public function getCode(){
+    public function getCode()
+    {
         return $this->_code;
     }
 }

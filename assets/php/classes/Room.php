@@ -10,6 +10,7 @@ set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "interfaces/DatabaseObject.php";
 #require_once "classes/Participant.php";
 require_once "classes/RoomCode.php";
+require_once "classes/Account.php";
 
 class Room extends DatabaseObject
 {
@@ -21,15 +22,15 @@ class Room extends DatabaseObject
     private $_room_id;
     private $_room_name;
 
-    public function __construct($roomID = null, $screenName)
+    public function __construct($roomID, $token, $screenName)
     {
-        $roomCodeObject = $this->addRoomCode($screenName);
+        $this->_room_id = $roomID;
+        $accountID = $this->addParticipant($token, $screenName);
+        $roomCodeObject = $this->addRoomCode($accountID);
         $roomCode = $this->_room_codes[] = $roomCodeObject->getCode();
 
         //what happens when roomID is null?
-        if ($roomID != null) {
-            echo "Room Code Lookup on: $roomCode <br>";
-            $sql = "SELECT DISTINCT * FROM Rooms
+        $sql = "SELECT DISTINCT * FROM Rooms
                     LEFT JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
                     LEFT JOIN RoomCodes rc
@@ -38,21 +39,12 @@ class Room extends DatabaseObject
                                           FROM RoomCodes
                                           WHERE RoomCode = :roomCode
                                           )";
-
-        } else if ($roomID !== null) {
-//            echo "RoomID lookup: ".$room_id."<br>";
-            $sql = "SELECT * FROM Rooms
-                    WHERE Rooms.RoomID = :roomCode";
-        }
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":roomCode" => $roomCode]);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-//        var_dump($result);
-//        echo
 
         if ($result != false) {
             $this->_room_id = $result[0]["RoomID"];
-//            echo $this->_room_id . "-------";
             $this->_room_name = $result[0]["RoomName"];
             if ($roomCode != null) {
 
@@ -61,15 +53,25 @@ class Room extends DatabaseObject
                     if ($row["RoomCode"] != null)
                         $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 }
-                $this->_room_codes = array_unique($this->_room_codes);
-                $this->_accounts[] = array_unique($this->_accounts);
+
+                #var_dump($this->_accounts);
+//                $this->_room_codes = array_unique($this->_room_codes);
+//                $this->_accounts[] = array_unique($this->_accounts);
             }
         } else {
             throw new Exception("A Room with that code could not be found");
         }
     }
 
-    public static function createRoom($roomName, $screenName)
+    /**
+     * Function createRoom
+     * @param $roomName
+     * @param $token
+     * @param $screenName
+     * @throws Exception
+     * @return Room
+     */
+    public static function createRoom($roomName, $token, $screenName)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
@@ -77,16 +79,9 @@ class Room extends DatabaseObject
             throw new Exception("Could not create room");
         }
         $id = Database::connect()->lastInsertId();
-//        echo "Last Inserted: " . $id . "<br>";
-        return new Room($id, $screenName);
-    }
 
-//    public static function createNewRoomCode($screenName, $roomID)
-//    {        //$creator is participant's
-//        $roomCode = $this->addRoomCode($screenName);
-//        var_dump($roomCode);
-//        $this->_room_codes[] = new RoomCode($roomCode, $roomID, $screenName);
-//    }
+        return new Room($id, $token, $screenName);
+    }
 
     public function getRoomID()
     {
@@ -104,20 +99,19 @@ class Room extends DatabaseObject
         $this->_has_changed = true;
     }
 
+    /**
+     * Function Login
+     * @param $token
+     * @param $screenName
+     * @return integer
+     */
     public function addParticipant($token, $screenName)
     {
         $account = Account::Login($token);
-        $account->_roomID = $this->getRoomID();
-        $account->_screenName = $screenName;
-        $this->_accounts[] = $token;
+        $account->addParticipant($this->getRoomID(), $screenName);
+        $this->_accounts[] = $account;
         return $account->getAccountID();
     }
-
-//    public function addParticipant($fingerprint){
-//        $new_part = new DummyParticipant($this->_room_id, $fingerprint);
-//        $this->_participants[] = $new_part;
-//        return $new_part->getID();
-//    }
 
     private function deleteRoom()
     {
@@ -166,16 +160,9 @@ class Room extends DatabaseObject
         $statement->execute([":roomname" => $this->_room_name]);
     }
 
-//    public function addRoomCode($creator, $uses = null, $expires = null)
-//    {
-//        $new_code = RoomCode::createRoomCode($this->_room_id, $creator, $uses, $expires);
-//        $this->_room_codes[] = $new_code;
-//        return $new_code->getCode();
-//    }
-
-    public function addRoomCode($creator, $uses = null, $expires = null)
+    public function addRoomCode($accountID, $uses = null, $expires = null)
     {
-        return RoomCode::createRoomCode($this->_room_id, $creator, $uses, $expires);
+        return RoomCode::createRoomCode($this->_room_id, $accountID, $uses, $expires);
     }
 
     public function getJSON($as_array = true)
