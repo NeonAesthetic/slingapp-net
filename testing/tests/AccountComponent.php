@@ -16,7 +16,7 @@ require_once "classes/Account.php";
 {
     Account::CreateAccount("ozzy.osbourne@gmail.com", "ozzy", "osbourne", "pass");
 
-    $url = 'http://sling/assets/php/components/account.php';
+    $url = 'http://localhost/assets/php/components/account.php';
     $data = array('action' => 'login', 'email' => 'ozzy.osbourne@gmail.com', 'pass1' => 'pass', 'pass2' => 'pass');
 
     $options = array(
@@ -41,7 +41,7 @@ require_once "classes/Account.php";
  */
 
 // setup account first (must be done this way to create session)
-//    $url = 'http://sling/assets/php/components/account.php';
+//    $url = 'http://localhost/assets/php/components/account.php';
 //    $data = array('action' => 'register', 'email' => 'ozzy.osbourne@gmail.com', 'fname' => 'ozzy', 'lname' => 'osbourne', 'pass1' => 'pass', 'pass2' => 'pass');
 //
 //    $options = array(
@@ -80,7 +80,7 @@ require_once "classes/Account.php";
  *          TEST REGISTER METHOD
  */
 {
-    $url = 'http://sling/assets/php/components/account.php';
+    $url = 'http://localhost/assets/php/components/account.php';
     $data = array('action' => 'register', 'email' => 'ozzy.osbourne@gmail.com', 'fname' => 'ozzy', 'lname' => 'osbourne', 'pass1' => 'pass', 'pass2' => 'pass');
 
     $options = array(

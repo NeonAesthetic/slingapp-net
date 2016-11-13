@@ -14,60 +14,58 @@ $p = GetParams("action", "email", "fname", "lname", "pass1", "pass2");
 $GLOBALS['access'] = 0;
 $GLOBALS['login'] = 0;
 
-switch ($p['action'])
-{
+switch ($p['action']) {
     case "register":     //value must equal the name(value) of the submit button from the HTML FORM to register
-        if ($account = process($p))
-        {
+        if ($account = process($p)) {
             $_SESSION['token'] = $account->getToken();
-            echo "Registration was successful!";
+            #echo "Registration was successful!";
+            return true;
+        } else {
+            DatabaseObject::Log(__FILE__, "Register Account", "Account could not be created");
+            #echo "Registration was unsuccessful";
+            return false;
         }
-        else
-        {
-            DatabaseObject::Log(__FILE__,"Register Account", "Account could not be created");
-            echo "Registration was unsuccessful";
-        }
-    break;
+        break;
     case "login":
+        $retval = json_encode(null);
         //if user pressed submit button, login is set to true, otherwise set to 0 (if they press back)
         $GLOBALS['login'] = ($p['action'] == 'login') ? 1 : 0;
-        //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
-            $p['email'] = ($p['action'] == 'login') ? $_POST['email'] : $_SESSION['email'];
-        //If user presses submit, pull password from POST otherwise leave blank
-            $p['pass1'] = ($GLOBALS['login']) ? $p['pass1'] : '';
 
-        if($GLOBALS['login'] == 1 && $p['pass1'])
-        {
+        //if user presses submit, pull email from POST, if user presses back button, pull from SESSION
+        $p['email'] = ($p['action'] == 'login') ? $p['email'] : $_SESSION['email'];
+        //If user presses submit, pull password from POST otherwise leave blank
+        $p['pass1'] = ($GLOBALS['login']) ? $p['pass1'] : '';
+
+        if ($GLOBALS['login'] == 1 && $p['pass1']) {
             $account = Account::Login($p['email'], $p['pass1']);
 
-            if($account && isLoggedIn($p))
-            {
+            if ($account && isLoggedIn($p)) {
                 $_SESSION['token'] = $account->getToken();
-                echo "Successfully logged in using password!";
+                #echo "Successfully logged in using password!";
+                $retval = $account->getJSON();
+            } else {
             }
-            else
-                echo "unsuccessfully logged in using password";
-        }
-        else    //no password = use token to login
-            if(Account::Login($p['token']))
-            {
-                echo "Successfully logged in using token!";
+        } else {   //no password = use token to login
+            if ($account = Account::Login($p['token'])) {
+                #echo "Successfully logged in using token!";
                 $_SESSION['token'] = $p['token'];
+                $retval = $account->getJSON();
+            } else {
+                #echo "Unable to login through token";
             }
-            else
-                echo "Unable to login through token";
-
+        }
+        echo $retval;   //ajax expects echo not return
         break;
     case "changepass": {
 
     }
         break;
-  //pass in token and return JSON account object
-    case "delete":{
+    //pass in token and return JSON account object
+    case "delete": {
 
     }
-    break;
-    case "logout":{
+        break;
+    case "logout": {
         var_dump($_SESSION['token']); //session doesn't last during unit test...
 
 //        $account = Account::Login($_SESSION['token']);
@@ -78,13 +76,13 @@ switch ($p['action'])
 //
 //        echo "Logged out";
     }
-    break;
+        break;
     case "getcookie": {
     }
-    break;
+        break;
     case "newtoken": {
     }
-    break;
+        break;
     default:
         DatabaseObject::Log(__FILE__, "action not valid",
             "action wasn't valid");
@@ -92,7 +90,7 @@ switch ($p['action'])
 
 /**
  * Function Process
- * @param array[string]string
+ * @param array [string]string
  * @return Account|false
  * This Function initiates the Update function based on the Validation of the
  * Data and the Token.
@@ -101,14 +99,15 @@ function process($p)
 {
     $retval = false;
 
-    if(isTokenValid($p['token']) && isDataValid($p))
-        $retval = Account::CreateAccount($p['email'], $p['fname'], $p["lname"], $p["password"]);
+    if (isTokenValid($p['token']) && isDataValid($p))
+        $retval = Account::CreateAccount($p['email'], $p['fname'], $p["lname"], $p["pass1"]);
 
     return $retval;
 }
+
 /**
  * Function isLoggedIn
- * @param array[string]string
+ * @param array [string]string
  * @return boolean
  * This Function returns the _access variable, which determines whether the
  * Account needs to be registered or logged into.
@@ -118,43 +117,41 @@ function isLoggedIn($p)
     ($GLOBALS['login']) ? verifyPost($p) : verifySession($p);
     return $GLOBALS['access'];
 }
+
 /**
  * Function VerifyPost
- * @param array[string]string
+ * @param array [string]string
  * This function requires verification for user input, it
  * will return an exception if an invalid value is passed in
  * the Submission, Data, Username or Password fields.
  */
 function verifyPost($p)
 {
-    try
-    {
-        if(!isTokenValid($p['token']))
+    try {
+        if (!isTokenValid($p['token']))
             throw new Exception('Invalid Form Submission');
-        if(!(filter_var($p['email'], FILTER_VALIDATE_EMAIL)))
+        if (!(filter_var($p['email'], FILTER_VALIDATE_EMAIL)))
             throw new Exception('Invalid Form Data');
-        if(!verifyDatabase($p))
+        if (!verifyDatabase($p))
             throw new Exception('Invalid Username/Password');
 
         $GLOBALS['access'] = 1;
         registerSession($p);
-    }
-    catch (Exception $e)
-    {
+    } catch (Exception $e) {
         echo $e;
     }
 }
 
 /**
  * Function verifySession
- * @param array[string]string
+ * @param array [string]string
  * This function requires verification for user input, it
  * will return an exception if an invalid value is passed in
  * the Submission, Data, Username or Password fields.
  */
 function verifySession($p)
 {
-    if(sessionExist() && verifyDatabase($p))
+    if (sessionExist() && verifyDatabase($p))
         $GLOBALS['access'] = 1;
 }
 
@@ -170,7 +167,7 @@ function verifyDatabase($p)
     $statement->execute(array(':email' => $p['email']));
     $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    if($p['email'] == $result[0]["Email"] && password_verify($p['pass1'], $result[0]["PasswordHash"]))
+    if ($p['email'] == $result[0]["Email"] && password_verify($p['pass1'], $result[0]["PasswordHash"]))
         $verify = true;
 
     return $verify;
@@ -195,5 +192,5 @@ function registerSession($p)
 
 function sessionExist()
 {
-    return (isset($_SESSION['email']) && isset($_SESSION['pass1'])) ? 1:0;
+    return (isset($_SESSION['email']) && isset($_SESSION['pass1'])) ? 1 : 0;
 }

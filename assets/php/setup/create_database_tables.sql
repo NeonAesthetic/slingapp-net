@@ -55,7 +55,6 @@ CREATE TABLE Participants (
   RoomID BIGINT UNSIGNED NOT NULL,
   AccountID BIGINT UNSIGNED NULL,
   ScreenName VARCHAR(20) NOT NULL,
-  FingerPrint VARCHAR(50),
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),
