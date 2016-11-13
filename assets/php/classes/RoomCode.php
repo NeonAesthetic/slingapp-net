@@ -8,6 +8,8 @@
  */
 class RoomCode extends DatabaseObject
 {
+
+    
     private $_code;
     private $_roomID;
     private $_participantID;
@@ -21,6 +23,8 @@ class RoomCode extends DatabaseObject
         $this->_participantID = $participantID;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
+
+        self::createRoomCode($roomid, $screenName, $uses, $expires_in);
     }
 
     public static function createRoomCode($roomID, $participantID, $uses = null, $expires_in = null)
@@ -50,6 +54,23 @@ class RoomCode extends DatabaseObject
     public static function generate_code()
     {
         $chars = str_split("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+        $max = count($chars) -1;
+        $code = $chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)] .$chars[mt_rand(0,$max)];
+
+        $sql = "SELECT RoomCode
+                FROM RoomCodes
+                WHERE RoomCode = $code";
+        $statement = Database::connect()->prepare($sql);
+        if($statement->execute())
+        {
+            self::generate_code();
+        }
+        else
+        {
+            return $code;
+        }
+
+
         $max = count($chars) - 1;
         return $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)];
     }

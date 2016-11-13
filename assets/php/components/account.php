@@ -9,7 +9,8 @@
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Account.php";
 
-$p = GetParams("action", "email", "fname", "lname", "pass1", "pass2");
+
+$p = GetParams("action", "email", "fname", "lname", "password");
 
 $GLOBALS['access'] = 0;
 $GLOBALS['login'] = 0;
@@ -60,8 +61,9 @@ switch ($p['action']) {
     case "changepass": {
 
     }
+
         break;
-    //pass in token and return JSON account object
+
     case "delete": {
 
     }
