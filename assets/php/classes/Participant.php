@@ -49,7 +49,7 @@
 //            //Account Exists
 //            $sql = "INSERT INTO Participants (AccountID, FingerPrint, ParticipantID, RoomID, ScreenName)
 //            VALUES (:accountID, :fingerPrint,:pid, :roomID, :screenName)";
->>>>>>> 16293b14000baf341dacf367d449b91ac5bb605d
+
 //            $statement = Database::connect()->prepare($sql);
 //            if(!$statement->execute(array(':accountId' => $this->account_id, ':fingerPrint' => $this->finger_print, ':pid' => $this->id)));
 //            DatabaseObject::Log("CreateParticipant", "Could Not Insert");
