@@ -73,6 +73,18 @@ set_error_handler(function($errno, $errstr, $errfile, $errline){
     fail_test();
 });
 
+function mark($comment = null){
+    static $start = 0;
+    if($comment == null){
+        $start = microtime(true);
+    }else{
+        $end = microtime(true);
+        $elapsed = ($end - $start);
+        echo $comment . ": [Run Time] " . round($elapsed * 1000, 3) . " ms <br>";
+        $start = $end;
+    }
+}
+
 if(isset($_GET['test'])){
     ob_start();
     $start = microtime(true);

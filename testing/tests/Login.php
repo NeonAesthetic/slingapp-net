@@ -7,4 +7,4 @@
  */
 
 
-$ = Accounts::login("asdf@asdf.com", "first", "last", "pass");
+$login = Accounts::login("asdf@asdf.com", "first", "last", "pass");
