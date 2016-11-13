@@ -8,6 +8,8 @@
  */
 class RoomCode extends DatabaseObject
 {
+
+    
     private $_code;
     private $_roomid;
     private $_creator;
