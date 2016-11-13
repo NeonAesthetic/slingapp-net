@@ -10,15 +10,15 @@
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Account.php";
 
-$parameters = GetParams("action", "email", "fname", "lname", "password");
+$p = GetParams("action", "email", "fname", "lname", "password");
 
-switch ($parameters["action"]){
+switch ($p["action"]){
     case "register":{
-        
+        Accounts::CreateAccount($p["email"], $p["fname"], $p["lname"], $p["password"]);
         break;
     }
     case "login":{
-        break;
+        break;//pass in token and return JSON account object
     }
     case "getcookie":{
         break;
