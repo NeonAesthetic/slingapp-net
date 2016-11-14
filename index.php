@@ -5,7 +5,6 @@
  * Date: 10/14/16
  * Time: 8:09 AM
  */
-
 session_start();
 ?>
 <html>
@@ -83,10 +82,8 @@ session_start();
             e.style.color = "white";
             e.style.backgroundColor = "transparent";
         } else {
-
         }
     }
-
     function joinroom(event, f) {
         event.preventDefault();
         console.log(f);
@@ -94,24 +91,19 @@ session_start();
         window.location = "/room/" + room;
         return false;
     }
-
     function showLogin() {
         var button = document.getElementById("login-button");
-
         button.className += " open";
-
         setTimeout(function () {
             var loginarea = document.getElementById("login-cont");
             loginarea.style.visibility = "visible";
             console.log(loginarea);
         }, 700);
     }
-
     function submitLogin() {
         var form = document.getElementById("loginForm");
         var email = form.elements["email"].value;
         var password = form.elements["pass1"].value;
-
         return $.ajax({
             type: 'post',
             url: 'assets/php/components/account.php',
@@ -130,10 +122,8 @@ session_start();
             }
         });
     }
-
     function noErrors(data) {
         var loginError = document.getElementById("error");
-
         console.log(data);
         if(data) {
             loginError.innerHTML = "<br>";
@@ -142,15 +132,12 @@ session_start();
         else
             loginError.innerHTML = "Username or password is Incorrect";
     }
-
     function hideLogin(data) {
         var button = document.getElementById("login-button");
         var loginarea = document.getElementById("login-cont");
         var loginstate = document.getElementById("login-button");
         var loginFormH = document.getElementById("loginFormHeader");
-
         loginFormH.innerHTML = "Thank You ".concat(data['FirstName'].concat("!"));
-
         setTimeout(function () {
             loginstate.innerHTML = "logout";
             loginarea.style.visibility = "hidden";
