@@ -141,7 +141,7 @@ session_start();
         setTimeout(function () {
             loginstate.innerHTML = "logout";
             loginarea.style.visibility = "hidden";
-            button.className += " close";
+            button.className = "login-button";
         }, 1400);
     }
 </script>
