@@ -4,6 +4,8 @@
  * User: ian
  * Date: 11/8/16
  * Time: 8:24 AM
+ * Test Name: Test GetParams
+ * Description: ensures getParams works
  */
 
 include_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";

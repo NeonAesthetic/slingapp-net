@@ -4,6 +4,8 @@
  * User: ian
  * Date: 11/10/16
  * Time: 12:30 PM
+ * Test Name: Stress Test
+ * Description: Adds 20 accounts
  */
 
 require_once "classes/Account.php";
@@ -24,5 +26,5 @@ foreach ($ids as $id){
 }
 
 function cleanup(){
-    Database::connect()->exec("DELETE FROM Accounts");
+    Database::connect()->exec("DELETE FROM Accounts WHERE Email LIKE 'email[0-9]'");
 }

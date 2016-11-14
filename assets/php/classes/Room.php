@@ -11,6 +11,8 @@ require_once "interfaces/DatabaseObject.php";
 require_once "classes/RoomCode.php";
 require_once "classes/Account.php";
 
+//Needs a CreateRoomWithCode function
+
 class Room extends DatabaseObject
 {
     /** @var RoomCode[] $_room_codes * */
@@ -25,12 +27,12 @@ class Room extends DatabaseObject
     public function __construct($roomID, $token, $screenName)
     {
         $this->_roomID = $roomID;
-        $participantID = $this->addParticipant($token, $screenName);
 
-        $roomCodeObject = $this->addRoomCode($participantID);
-        $roomCode = $this->_room_codes[] = $roomCodeObject->getCode();
+        if($participantID = $this->addParticipant($token, $screenName)) {
+            $roomCodeObject = $this->addRoomCode($participantID);
+            $roomCode = $roomCodeObject->getCode();
 
-        $sql = "SELECT DISTINCT * FROM Rooms
+            $sql = "SELECT DISTINCT * FROM Rooms
                     LEFT JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
                     LEFT JOIN RoomCodes rc
@@ -39,26 +41,34 @@ class Room extends DatabaseObject
                                           FROM RoomCodes
                                           WHERE RoomCode = :roomCode
                                           )";
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute([":roomCode" => $roomCode]);
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $statement = Database::connect()->prepare($sql);
+            $statement->execute([":roomCode" => $roomCode]);
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($result != false) {
-            $this->_roomID = $result[0]["RoomID"];
-            $this->_roomName = $result[0]["RoomName"];
-            if ($roomCode != null) {
+            if ($result != false) {
+                $this->_roomID = $result[0]["RoomID"];
+                $this->_roomName = $result[0]["RoomName"];
+                if ($roomCode != null) {
 
-                foreach ($result as $row) {
-                    if ($row["RoomCode"] != null)
-                        $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
-                }
-
-                #var_dump($this->_accounts);
+//                    echo "Var Data:: ";
+//                    var_dump($result);
+                    foreach ($result as $row) {
+                        if ($row["RoomCode"] != null)
+                            $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
+                    }
+//
+//                    foreach($this->_room_codes as $rc) {
+//                        echo "Room CODE::::::$$::: ", $rc->getCode();
+//                    }
+                    #var_dump($this->_accounts);
 //                $this->_room_codes = array_unique($this->_room_codes);
 //                $this->_accounts[] = array_unique($this->_accounts);
+                }
+            } else {
+                throw new Exception("A Room with that code could not be found");
             }
         } else {
-            throw new Exception("A Room with that code could not be found");
+            throw new Exception("Participant could not be created with that token");
         }
     }
 
@@ -90,7 +100,7 @@ class Room extends DatabaseObject
             throw new Exception("Could not create room");
         }
         $roomID = Database::connect()->lastInsertId();
-        $account = Account::createTempAccount($roomID, $screenName);
+        $account = Account::CreateAccount();
         $token = $account->getToken();
 
         return new Room($roomID, $token, $screenName);
@@ -120,11 +130,13 @@ class Room extends DatabaseObject
      */
     public function addParticipant($token, $screenName)
     {
-//        echo "INSIDE ADDPARTICIPANT";
-        $account = Account::Login($token);
-        $account->addParticipant($this->getRoomID(), $screenName);
-        $this->_accounts[] = $account;
-        return $account->getParticipantID();
+        $retval = false;
+        if($account = Account::Login($token)) {
+            $account->addParticipant($this->getRoomID(), $screenName);
+            $this->_accounts[] = $account;
+            $retval = $account->getParticipantID();
+        }
+        return $retval;
     }
 
     private function deleteRoom()
@@ -225,7 +237,8 @@ class Room extends DatabaseObject
 
     public function addRoomCode($participantID, $uses = null, $expires = null)
     {
-        return RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
+        $this->_room_codes[] = $retval =  RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
+        return $retval;
     }
 
     public function getAccounts()
@@ -251,17 +264,23 @@ class Room extends DatabaseObject
         return $participants;
     }
 
-    public function getJSON($as_array = true)
+    /**
+     * @return RoomCode[]
+     */
+    public function getRoomCodes()
+    {
+        return $this->_room_codes;
+    }
+
+    public function getJSON($as_array = false)
     {
         $json = [];
         $json["Type"] = "Room";
-        $json['Participants'] = [];
-//        foreach($this->_participants as $p){
-//            $json['Participants'][] = json_decode($p->getJSON(), true);
-//        }
-        foreach ($this->_accounts as $p) {
-            $json['Participants'][] = $p;
+        $json['Accounts'] = [];
+        foreach($this->_accounts as $a){
+            $json['Accounts'][] = json_decode($a->getJSON(), true);
         }
+
         $json['RoomCodes'] = [];
         foreach ($this->_room_codes as $p) {
             $json['RoomCodes'][] = json_decode($p->getJSON(), true);

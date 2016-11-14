@@ -62,16 +62,16 @@ class Account extends DatabaseObject
      * These elements make up the new account in the database and will persist until removed on command
      * by the Delete Account function.
      */
-    public function __construct($accountID, $token, $_tokenGen, $email = null, $fName = null, $lName = null, $passHash = null
-        , $lastLogin = null, $joinDate = null)
+    public function __construct($accountID, $token, $tokenGen, $email = null, $fName = null, $lName = null,
+                                $lastLogin = null, $joinDate = null)
     {
-//        echo "AccountID IN CONSTRUCT:::::::: $accountID";
+        #echo "AccountID: $accountID, Token: $token, TokenGen: $tokenGen, LastLogin: $lastLogin, Join Date: $joinDate";
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;
         $this->_lName = $lName;
         $this->_token = $token;
-        $this->_tokenGen = $_tokenGen;
+        $this->_tokenGen = $tokenGen;
         $this->_lastLogin = $lastLogin;
         $this->_joinDate = $joinDate;
         $this->_roomID = null;
@@ -93,7 +93,11 @@ class Account extends DatabaseObject
      */
     public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null)
     {
-        $tempPassHash = password_hash($password, PASSWORD_BCRYPT);
+        if ($password)
+            $tempPassHash = password_hash($password, PASSWORD_BCRYPT);
+        else
+            $tempPassHash = null;
+
         $token = md5(uniqid(mt_rand(), true));
         $currentDate = gmdate("Y-m-d H:i:s");
 
@@ -101,7 +105,6 @@ class Account extends DatabaseObject
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
                 VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
 
-//        $sql = "CALL AddUser(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
         $statement = Database::connect()->prepare($sql);
 
         if (!$statement->execute([
@@ -218,46 +221,44 @@ class Account extends DatabaseObject
         return $retval;
     }
 
-    public static function createTempAccount($roomID, $screenName)
-    {
-        $retval = null;
-        $token = md5(uniqid(mt_rand(), true));
-        $currentDate = gmdate("Y-m-d H:i:s");
-
-        $sql = "INSERT INTO Accounts
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
-
-        $statement = Database::connect()->prepare($sql);
-
-        if ($statement->execute([
-            ':email' => null,
-            ':fName' => null,
-            ':lName' => null,
-            ':passHash' => null,
-            ':logTok' => $token,
-            ':tokGen' => $currentDate,
-            ':lastLog' => $currentDate,
-            ':joinDate' => $currentDate,
-        ])
-        ) {
-            $accountID = Database::connect()->lastInsertId();
-
-            $sql = "SELECT *
-                    FROM Accounts AS a
-                      JOIN Participants AS p
-                        ON a.AccountID = p.AccountID
-                    WHERE Email IS NULL";
-
-            Database::connect()->prepare($sql)->execute();
-
-            $account = new Account($accountID, $token, $currentDate);
-
-            #$account->addParticipant($roomID, $screenName);
-            $retval = $account;
-        }
-        return $retval;
-    }
+//    public static function createTempAccount()
+//    {
+//        $retval = null;
+//        $token = md5(uniqid(mt_rand(), true));
+//        $currentDate = gmdate("Y-m-d H:i:s");
+//
+//        $sql = "INSERT INTO Accounts
+//                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
+//                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+//
+//        $statement = Database::connect()->prepare($sql);
+//
+//        if ($statement->execute([
+//            ':email' => null,
+//            ':fName' => null,
+//            ':lName' => null,
+//            ':passHash' => null,
+//            ':logTok' => $token,
+//            ':tokGen' => $currentDate,
+//            ':lastLog' => $currentDate,
+//            ':joinDate' => $currentDate,
+//        ])
+//        ) {
+//            $accountID = Database::connect()->lastInsertId();
+//
+//            $sql = "SELECT *
+//                    FROM Accounts AS a
+//                      JOIN Participants AS p
+//                        ON a.AccountID = p.AccountID
+//                    WHERE Email IS NULL";
+//
+//            Database::connect()->prepare($sql)->execute();
+//
+//            $account = new Account($accountID, $token, $currentDate);
+//            $retval = $account;
+//        }
+//        return $retval;
+//    }
 
     /**
      * Function Delete
@@ -545,6 +546,13 @@ class Account extends DatabaseObject
                 $this->_screenName = $value;
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n Updated screenname from: $temp to: $value");
+                break;
+            case "_participantid":
+                echo "NAME::: ", $name;
+                $temp = $this->_screenName;
+                $this->_participantID = $value;
+                DatabaseObject::Log(__FILE__, "Updated Account",
+                    "Account: $this->_accountID \n Updated participantID from: $temp to: $value");
                 break;
             default:
                 DatabaseObject::Log(__FILE__, "Updated Account",

@@ -10,41 +10,37 @@
 //Description: Create a non-existant room and alter its state with Room methods.
 
 require_once "classes/Room.php";
-#require_once "classes/Participant.php";
-#require_once "classes/dummy/DummyParticipant.php";
-#$room;
 $was_exception = false;
 
-try{
-    $room = new Room("Test-Room");
-}catch (Exception $e){
+try {
+    $room = Room::createRoom("Test-Room", "notAToken", "myScreenName");
+} catch (Exception $e) {
     $was_exception = true;
 }
 
 assert($was_exception === true, "Assert that the Room threw an exception");
 
-$room = Room::createRoom("Test-Room");
-$roomid = $room->getRoomID();
+//$room = Room::createRoom("Test-Room");
+//$roomid = $room->getRoomID();
 
-echo "print me";
-#$GLOBALS["RoomID"] = 1234;
+//echo "print me";
+//$GLOBALS["RoomID"] = 1234;
 
-echo "RoomID:";
-#var_dump($GLOBALS['RoomID']);
-//$particpantID = $room->addParticipant("Test1", "screenName1");
-//$particpantID = $room->addParticipant("Test2", "screenName2");
-//
-//$room_code = $room->addRoomCode($particpantID);
-//$room = new Room($room_code);
-//$json = $room->getJSON();
-//$object = json_decode($json, true);
-//
-//assert($object["Type"] == "Room", "Assert that object has correct type attribute");
-//assert($object["Participants"][0]["type"] == "ParticipantObject", "Assert that object has correct Participants attribute");
-//assert($object["RoomCodes"][0]["code"] == $room_code, "Assert that object has correct RoomCode attribute");
-//
-//
+$account = Account::CreateAccount("roomtest@test.com", "Bob", "Marley", "password");
+$room = Room::createRoom("roomName", $account->getToken(), "screenName");
+$account1 = Account::CreateAccount();
+$account2 = Account::CreateAccount();
+
+$json = $room->getJSON(false);
+$object = json_decode($json, true);
+$roomCode = $room->getRoomCodes()[0]->getCode();
+
+assert($object["Type"] == "Room", "Assert that object has correct type attribute");
+assert($object["Accounts"][0]["Type"] == "Account", "Assert that object has correct Participants attribute");
+assert($object["RoomCodes"][0]["Code"] == $roomCode, "Assert that object has correct RoomCode attribute");
+
 //$room->delete();
+//
 //$was_exception = false;
 //try{
 //    $room = new Room($room_code);
@@ -55,29 +51,45 @@ echo "RoomID:";
 //assert($was_exception == true, "Assert that room was deleted");
 
 
-function cleanup(){
-//    try{
-//        #echo "vardump: ";
-//        #var_dump($GLOBALS['RoomID']);
-//        $roomid = $GLOBALS["RoomID"];
-//        $sql = "DELETE FROM roomcodes WHERE RoomID = :roomid";
-//        $statement = Database::connect()->prepare($sql);
-//        $statement->execute([
-//            ":roomid"=>$roomid
-//        ]);
-//
-//        $sql = "DELETE FROM participants WHERE RoomID = :roomid";
-//        $statement = Database::connect()->prepare($sql);
-//        $statement->execute([
-//            ":roomid"=>$roomid
-//        ]);
-//
-//        $sql = "DELETE FROM rooms WHERE RoomID = :roomid";
-//        $statement = Database::connect()->prepare($sql);
-//        $statement->execute([
-//            ":roomid"=>$roomid
-//        ]);
-//    }catch (Exception $e){
-//
-//    }
+function cleanup()
+{
+    try {
+        $sql = "SELECT RoomID, a.AccountID
+                                    FROM Accounts AS a
+                                    LEFT JOIN Participants AS p
+                                        ON a.AccountID = p.AccountID
+                                    WHERE (Email = 'testemail@test.com')
+                                    OR (Email = 'email@test.com')
+                                    OR (Email = 'replace@test.com')
+                                    OR (Email = 'testnewemail@test.com')
+                                    OR (Email = 'roomtest@gmail.com')
+                                    OR (Email = 'roomtest@test.com')
+                                    OR (Email IS NULL)";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute();
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($result as $row) {
+            if ($row['RoomID'] != null) {
+                $sql = "DELETE
+                FROM RoomCodes
+                WHERE RoomID = :roomID";
+                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+                $sql = "DELETE
+                FROM Participants
+                WHERE RoomID = :roomID";
+                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+                $sql = "DELETE
+                FROM Rooms
+                WHERE RoomID = :roomID";
+                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+            }
+            $sql = "DELETE
+                FROM Accounts
+                WHERE AccountID = :accountID";
+            Database::connect()->prepare($sql)->execute(array(':accountID' => $row['AccountID']));
+        }
+    } catch
+    (Exception $e) {
+    }
 }

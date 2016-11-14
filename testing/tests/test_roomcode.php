@@ -4,6 +4,8 @@
  * User: Ryan
  * Date: 11/10/16
  * Time: 10:04 AM
+ * Test Name: Test Room Codes
+ * Description: Ensures room codes are working properly
  */
 
 require_once "classes/RoomCode.php";

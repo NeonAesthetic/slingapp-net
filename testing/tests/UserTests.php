@@ -7,7 +7,6 @@
  */
 //Test Name: NOINCLUDE
 
-require_once "classes/Participant.php";
 //$participant = new Participant(
-Participant::createFingerPrint();
+#Participant::createFingerPrint();
 

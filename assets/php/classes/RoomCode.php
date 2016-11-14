@@ -121,7 +121,7 @@ class RoomCode extends DatabaseObject
     public function __construct($code, $roomID, $participantID, $uses = null, $expires_in = null){
         $this->_code = $code;
         $this->_roomID = $roomID;
-        $this->_creator = $participantID;
+        $this->_participantID = $participantID;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
     }
@@ -163,14 +163,23 @@ class RoomCode extends DatabaseObject
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":roomID" => $this->_roomID, ":created_by"=>$this->_participantID, ":exp"=>$this->_expire_date]);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return $this->_code;
+    }
+
     public function getJSON($as_array = false)
     {
         $json = [];
-        $json['type'] = "RoomCode";
-        $json["code"] = $this->_code;
+        $json['Type'] = "RoomCodes";
+        $json["Code"] = $this->_code;
+
+        if($as_array)
+            return $json;
         return json_encode($json);
-    }
-    public function getCode(){
-        return $this->_code;
     }
 }
