@@ -18,18 +18,22 @@ session_start();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
-<body style="background-color: #4286f4;">
+<body style="background-color: #4286f4; overflow: hidden">
 <div id="login-cont"
-     style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;">
+     style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;" onclick="hideLogin()">
+
     <center>
-        <form id="loginForm"
-              style="max-width: 300px; margin: 0 auto; margin-top: 100px" method="post"
-              onsubmit="return SubmitLogin(this);">
-            <h1 id="loginFormHeader">Login</h1>
+        <form id="loginForm" class="log-modal"
+              style="padding: 20px; position: relative; max-width: 400px; margin-top: 100px;;background-color: #fefefe; box-shadow: 3px 3px 5px rgba(0,0,0,.5)" method="post"
+              onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
+            <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
+                <a href="#" style="color: #333; text-decoration: none" onclick="hideLogin()">✕</a>
+            </div>
+            <h1 id="loginFormHeader" style="color: #333">Login</h1>
             <h4 id="error"><br></h4>
             <input name="email" class="form-control" placeholder="email" type="email">
             <input name="pass1" class="form-control" placeholder="password" type="password">
-            <button id="submitButton" type="button" onclick="submitLogin(this)">Submit</button>
+            <button id="submitButton" class="btn btn-primary" type="button" onclick="submitLogin(this)">Submit</button>
         </form>
 
     </center>
@@ -132,17 +136,16 @@ session_start();
         else
             loginError.innerHTML = "Username or password is Incorrect";
     }
-    function hideLogin(data) {
+    function hideLogin() {
         var button = document.getElementById("login-button");
         var loginarea = document.getElementById("login-cont");
-        var loginstate = document.getElementById("login-button");
-        var loginFormH = document.getElementById("loginFormHeader");
-        loginFormH.innerHTML = "Thank You ".concat(data['FirstName'].concat("!"));
-        setTimeout(function () {
-            loginstate.innerHTML = "logout";
-            loginarea.style.visibility = "hidden";
-            button.className = "login-button";
-        }, 1400);
+        button.className = "login-button";
+        loginarea.style.visibility = "hidden";
+    }
+
+    function noprop(e){
+        e.stopPropagation();
+        return false;
     }
 </script>
 </html>

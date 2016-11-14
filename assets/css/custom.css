@@ -110,8 +110,6 @@ h4 {
     border: 2px solid black;
     border-radius: 50px;
     background-color: white;
-    transition-duration: 1s;
-    transition-property: max-width, max-height, margin-top, margin-right, color;
     width: 500vw;
     height: 500vw;
     max-width: 100px;
@@ -127,34 +125,45 @@ h4 {
 }
 
 .open{
-    max-height: 300vw;
-    max-width: 300vw;
-    margin-right: -150vw;
-    margin-top: -150vw;
-    border-radius: 100%;
-    color: transparent;
-    background-color: #4286f4;
+    animation: 1s open forwards;
 }
 .close{
-    position: absolute;
-    z-index: 9999999;
-    right: 100px;
-    top: 100px;
-    border: 2px solid black;
-    border-radius: 50px;
-    background-color: white;
-    transition-duration: 1s;
-    transition-property: max-width, max-height, margin-top, margin-right, color;
-    width: 500vw;
-    height: 500vw;
-    max-width: 100px;
-    max-height: 40px;
-    font-size: 1.5em;
-    margin-top: -50px;
-    margin-right: -50px;
-    color: black;
+    animation: 1s open backwards;
 }
 
 .form-control{
     margin: 10px;
+    max-width: 300px;
+    border-radius: 50px;
+}
+
+@keyframes open {
+    0%{
+        max-width: 100px;
+        max-height: 40px;
+        margin-top: -50px;
+        margin-right: -50px;
+        border-radius: 50px;
+    }
+    5%{
+        border-radius: 50%;
+        max-width: 100px;
+        max-height: 100px;
+        margin-top: -80px;
+        margin-right: -50px;
+    }
+    100%{
+        max-height: 300vw;
+        max-width: 300vw;
+        margin-right: -150vw;
+        margin-top: -150vw;
+        border-radius: 100%;
+        color: transparent;
+        background-color: #4286f4;
+    }
+}
+
+.log-modal{
+    border: 1px solid #888;
+    border-radius: 2px;
 }
