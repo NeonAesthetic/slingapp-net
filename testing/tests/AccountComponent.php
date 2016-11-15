@@ -33,7 +33,7 @@ require_once "classes/Account.php";
 
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-    var_dump($result);
+//    var_dump($result);
 
     assert($result != null);
 
@@ -85,7 +85,7 @@ require_once "classes/Account.php";
  *          TEST REGISTER METHOD
  */
 {
-    $url = 'http://localhost/assets/php/components/account.php';
+    $url = 'https://dev.slingapp.net/assets/php/components/account.php';
     $data = array('action' => 'register', 'email' => 'ozzy.osbourne@gmail.com', 'fname' => 'ozzy', 'lname' => 'osbourne', 'pass1' => 'pass', 'pass2' => 'pass');
 
     $options = array(
