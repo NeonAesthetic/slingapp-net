@@ -24,6 +24,7 @@ session_start();
         <button class="btn btn-circle" onclick="clearconsole()"><span title="Clears the Console window" class="glyphicon glyphicon-console"></span> Clear Console </button>
         <button class="btn btn-circle" onclick="clearTestStatus()"><span title="Clears the status of all tests" class="glyphicon glyphicon-menu-hamburger"></span> Clear Test Status </button>
         <button class="btn btn-circle" onclick="refreshTests()"><span title="Refresh Test List" class="glyphicon glyphicon-refresh"></span> Repopulate Tests </button>
+
     </div>
 <!--    <div class="card" style="width: 100%; ">-->
 <!--        <center>-->
@@ -74,11 +75,13 @@ session_start();
         var div = element;
         var testScript = element.getAttribute("testfile");
         div.className = "list-group-item running";
-        div.innerHTML += ""
+        var old = div.innerHTML;
+        div.innerHTML += "<div class='sling' style='margin: 5px; right: 0;'></div>";
         get(base + testScript, "", function (data, responsetype) {
             var newstuff = "";
             newstuff += "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
             div.className = div.className.replace(/ running/, "");
+            div.innerHTML = old;
             if(data.search(/test-fail/) != -1){
                 div.className += " list-group-item-danger";
             }
