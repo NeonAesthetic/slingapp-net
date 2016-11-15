@@ -16,7 +16,7 @@ require_once "classes/Account.php";
 {
     Account::CreateAccount("ozzy.osbourne@gmail.com", "ozzy", "osbourne", "pass");
 
-    $url = 'http://localhost/assets/php/components/account.php';
+    $url = 'https://dev.slingapp.net/assets/php/components/account.php';
     $data = array('action' => 'login', 'email' => 'ozzy.osbourne@gmail.com', 'pass1' => 'pass');
 
     $options = array(
@@ -33,6 +33,7 @@ require_once "classes/Account.php";
 
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
+    var_dump($result);
 
     assert($result != null);
 
@@ -100,7 +101,7 @@ require_once "classes/Account.php";
     );
 
     $context  = stream_context_create($options);
-    $result = file_get_contents($url, false, $context);
+    $result = file_get_contents($url, null, $context);
     
     assert($result == true, "Register method");
 
