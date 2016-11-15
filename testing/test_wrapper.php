@@ -80,7 +80,7 @@ function mark($comment = null){
     }else{
         $end = microtime(true);
         $elapsed = ($end - $start);
-        echo $comment . ": [Run Time] <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
+        echo $comment . ": <br>[Run Time] <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
         $start = $end;
     }
 }
@@ -88,7 +88,7 @@ function mark($comment = null){
 if(isset($_GET['test'])){
     ob_start();
     $start = microtime(true);
-    include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/tests/". $_GET["test"]);
+    include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
     $end = microtime(true);
     $GLOBALS["RunTime"] = ($end - $start);
 }else{

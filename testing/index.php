@@ -114,6 +114,7 @@ session_start();
         var tests = document.getElementsByName("test");
         tests.forEach(function (t) {
             t.className = "list-group-item";
+            t.getElementsByClassName("ico-area")[0].innerHTML = "";
         })
     }
     
@@ -123,5 +124,25 @@ session_start();
         get("populate_tests.php", "", function (data, num) {
             tdiv.innerHTML=data;
         });
+
     }
+
+    function runContainingTests(event, e){
+        event.stopPropagation();
+        e= e.parentNode.parentNode;
+        console.log(e);
+        var id = e.getAttribute("href").slice(1);
+        console.log(id);
+        var tests = document.getElementById(id).querySelectorAll(".list-group-item");
+        console.log(tests);
+        for(var i = 0; i<tests.length; i++){
+            runTest(tests[i]);
+        }
+        
+        return false;
+    }
+
+
 </script>
+<script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
