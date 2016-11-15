@@ -18,7 +18,6 @@ session_start();
 
 </head>
 <body style="background-color: #eee">
-
 <div class="" style="margin: 0 auto; position: relative; left: 0; right: 0; max-width: 1200px; padding: 5px" >
     <div class="card" style="width: calc(100% - 10px);padding: 7px; margin: 5px;">
         <button class="btn btn-circle" onclick="clearconsole()"><span title="Clears the Console window" class="glyphicon glyphicon-console"></span> Clear Console </button>
@@ -73,20 +72,21 @@ session_start();
     function runTest(element){
         var base = "/testing/test_wrapper.php?test=";
         var div = element;
+        var icoArea = div.getElementsByClassName("ico-area")[0];
         var testScript = element.getAttribute("testfile");
         div.className = "list-group-item running";
-        var old = div.innerHTML;
-        div.innerHTML += "<div class='sling' style='margin: 5px; right: 0;'></div>";
+        icoArea.innerHTML = '<div class="sling" style=""></div>';
         get(base + testScript, "", function (data, responsetype) {
             var newstuff = "";
             newstuff += "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
             div.className = div.className.replace(/ running/, "");
-            div.innerHTML = old;
             if(data.search(/test-fail/) != -1){
                 div.className += " list-group-item-danger";
+                icoArea.innerHTML = "<span class='glyphicon glyphicon-remove' style='color: #ff5555'></span>";
             }
             else if(data.search(/test-pass/) != -1){
                 div.className += " list-group-item-success";
+                icoArea.innerHTML = "<span class='glyphicon glyphicon-ok' style='color: #33cc33'></span>";
             }
 
             newstuff+= data + "<hr style='border-color: #444'>";

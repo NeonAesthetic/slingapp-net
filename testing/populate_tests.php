@@ -9,6 +9,12 @@ foreach ($files as $testfile){
     preg_match("#(?<=Description:).+(?=\n)#", $text, $matches);
     $test_desc = $matches[0];
 
-    echo "<a href='#' title=\"" . $test_desc . "\" name=\"test\" testfile='". basename($testfile) . "' onclick='runTest(this)' class='list-group-item'>" . $test_name . " - <span class='tfile'>" . basename($testfile) . "</span></a>";
+    ?>
+<a href='#' title="[<?=basename($testfile)?>]: <?=$test_desc?>" name="test" testfile="<?=basename($testfile)?>" onclick='runTest(this)' class='list-group-item'>
+    <span class="tname"><?=$test_name?></span>
+    <span class='tfile'></span>
+    <div class='ico-area'></div>
+</a>
+<?php
 }
 ?>
