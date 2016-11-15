@@ -36,7 +36,7 @@ class Room extends DatabaseObject
                     LEFT JOIN Participants
                     ON Rooms.RoomID = Participants.RoomID
                     LEFT JOIN RoomCodes rc
-                    ON rooms.RoomID = rc.RoomID
+                    ON Rooms.RoomID = rc.RoomID
                     WHERE Rooms.RoomID = (SELECT RoomID
                                           FROM RoomCodes
                                           WHERE RoomCode = :roomCode
