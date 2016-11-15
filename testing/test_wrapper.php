@@ -80,7 +80,7 @@ function mark($comment = null){
     }else{
         $end = microtime(true);
         $elapsed = ($end - $start);
-        echo $comment . ": [Run Time] " . round($elapsed * 1000, 3) . " ms <br>";
+        echo $comment . ": [Run Time] <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
         $start = $end;
     }
 }

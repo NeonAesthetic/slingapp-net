@@ -210,12 +210,16 @@ require_once "classes/Room.php";
  **********************************************************************************************************************/
 {
     //Created room with temp account and current accounts joined
+    mark();
     $room = Room::createRoomWithoutAccount("roomName", "host");
+    mark("Create Room");
+    mark();
     $account1 = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
     $account2 = Account::CreateAccount("email@test.com", "Bob", "Marley", "password");
     $account3 = Account::CreateAccount("replace@test.com", "Bob", "Marley", "password");
     $account4 = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     $account5 = Account::CreateAccount("newer@gmail.com", "Bob", "Marley", "password");
+    mark("Create 6 Accounts");
     $room->addParticipant($account1->getToken(), "part1");
     $room->addParticipant($account2->getToken(), "part2");
     $room->addParticipant($account3->getToken(), "part3");
