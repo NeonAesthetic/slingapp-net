@@ -139,13 +139,6 @@ class Room extends DatabaseObject
         return $retval;
     }
 
-    private function deleteRoom()
-    {
-        $sql = "DELETE FROM Rooms WHERE RoomID = :id";
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute([":id" => $this->_roomID]);
-    }
-
     public function delete()
     {
 //        echo "ROOM ID: " . $this->_roomID;

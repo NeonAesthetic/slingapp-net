@@ -29,6 +29,10 @@ body{
     color: #AAA;
 }
 
+.timing-value{
+    color: #80ccff;
+}
+
 .spinner {
     margin: 100px auto;
     width: 50px;
