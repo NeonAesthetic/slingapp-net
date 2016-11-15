@@ -13,7 +13,7 @@ function map_test_dir($dir){
             </a>
             <div class="collapse" id="<?=basename($testfile)?>">
                 <?php
-                map_test_dir($testfile . "\\*");
+                map_test_dir($testfile . "/*");
                 ?>
             </div>
             <?php
