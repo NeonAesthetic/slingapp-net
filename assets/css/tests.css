@@ -136,7 +136,7 @@ body{
 
 @keyframes spin {
     from{}
-    to{transform: rotate(-720deg)}
+    to{transform: rotate(720deg)}
 }
 
 
