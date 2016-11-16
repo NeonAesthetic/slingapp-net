@@ -7,4 +7,4 @@
  * Test Name: Mems Lol
  */
 
-assert(1==2);
+assert(1==1);

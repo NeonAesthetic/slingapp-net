@@ -15,6 +15,7 @@ session_start();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/tests.css">
+    <script src="/assets/js/testing.js"></script>
 
 </head>
 <body style="background-color: #eee">
@@ -60,114 +61,8 @@ session_start();
 <script>
     window.addEventListener("load", function () {
         refreshTests();
+       
     });
-
-    function runAllTests(){
-        var tests = document.getElementsByName("test");
-        for(var i = 0; i<tests.length; i++){
-            runTest(tests[i]);
-        }
-    }
-
-    function runTest(element, callback){
-        var base = "/testing/test_wrapper.php?test=";
-        var div = element;
-        var icoArea = div.getElementsByClassName("ico-area")[0];
-        var testScript = element.getAttribute("testfile");
-        var passed = false;
-        div.className = "list-group-item running";
-        icoArea.innerHTML = '<div class="sling" style=""></div>';
-        get(base + testScript, "", function (data, responsetype) {
-            var newstuff = "";
-            newstuff += "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
-            div.className = div.className.replace(/ running/, "");
-            if(data.search(/test-fail/) != -1){
-                div.className += " list-group-item-danger";
-                icoArea.innerHTML = "<span class='glyphicon glyphicon-remove' style='color: #ff5555'></span>";
-                passed = false;
-            }
-            else if(data.search(/test-pass/) != -1){
-                div.className += " list-group-item-success";
-                icoArea.innerHTML = "<span class='glyphicon glyphicon-ok' style='color: #33cc33'></span>";
-                passed = true;
-            }
-
-            newstuff+= data + "<hr style='border-color: #444'>";
-
-            document.getElementById("console").innerHTML = newstuff + document.getElementById("console").innerHTML;
-            callback(passed);
-        })
-    }
-
-    function get(resource, parameters, callback){
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState == 4){
-                callback(xhr.responseText, xhr.status);
-            }
-        };
-        xhr.open("GET", resource + parameters, true);
-        xhr.send();
-    }
-
-    function clearconsole() {
-        document.getElementById("console").innerHTML = "";
-    }
-
-    function clearTestStatus(){
-        var tests = document.getElementsByName("test");
-        tests.forEach(function (t) {
-            t.className = "list-group-item";
-            t.getElementsByClassName("ico-area")[0].innerHTML = "";
-        })
-    }
-    
-    function refreshTests() {
-        var tdiv = document.getElementById("tests");
-        tdiv.innerHTML = document.getElementById("spinner").innerHTML;
-        get("populate_tests.php", "", function (data, num) {
-            tdiv.innerHTML=data;
-        });
-
-    }
-
-    function runContainingTests(event, e){
-        event.stopPropagation();
-        e= e.parentNode.parentNode;
-        console.log(e);
-        var id = e.getAttribute("href").slice(1);
-        console.log(id);
-        var tests = document.getElementById(id).querySelectorAll(".list-group-item");
-        function testCounter(passed) {
-            var numTests = tests.length;
-            var parentDiv = e;
-            console.log(passed, numTests);
-            testCounter.total = ++testCounter.total || 1;
-            if(passed)
-                testCounter.passed = ++testCounter.passed || 1;
-            if(testCounter.total === numTests)
-            {
-                console.log("Here");
-                if(testCounter.passed === testCounter.total){
-                    parentDiv.className += " list-group-item-success";
-                }else if(!testCounter.passed){
-                    parentDiv.className += " list-group-item-danger";
-                }else{
-                    parentDiv.className += " list-group-item-warning";
-                }
-            }
-
-
-        }
-        console.log(tests);
-        for(var i = 0; i<tests.length; i++){
-            runTest(tests[i], testCounter);
-        }
-        
-        return false;
-    }
-
-
 </script>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

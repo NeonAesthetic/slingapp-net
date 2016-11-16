@@ -49,6 +49,26 @@
     background-color: #fefefe;
 }
 
+.runtest{
+    position: absolute;
+    right: 0;
+    top:0;
+    margin: 5px;
+    margin-right: 45px;
+    border: 1px solid lightgray;
+    padding: 4px 10px 4px 10px;
+    border-radius: 50px;
+}
+
+.runtest:hover{
+    background-color: rgba(0,0,0,0.05);
+}
+
+.runtest:active{
+    background-color: rgba(0,0,0,0.1);
+ }
+
+
 
 .test-fail{
     color: #ff5555;

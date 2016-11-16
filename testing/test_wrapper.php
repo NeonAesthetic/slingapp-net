@@ -14,8 +14,20 @@ $GLOBALS['TEST_FAILED'] = false;
 
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 
+function create_test_json(){
+    $json = [];
+    $GLOBAL['timing'] = [];
+    $json["type"] = "Test Results";
+    $json["success"] = false;
+    $json["total-time"] = 0;
+    $json["timing"] = [];
+    $json["output"] = null;
+    return $json;
+}
+
+
 function test_end(){
-    $GLOBALS["TEST_OUTPUT"] = ob_get_clean();
+    $GLOBALS["json"]["output"] = ob_get_clean();
     if(function_exists("cleanup"))
         call_user_func("cleanup");
 }
@@ -47,13 +59,12 @@ function recurse_backtrace(array $bt, $level){
 register_shutdown_function(function (){
     test_end();
     if($GLOBALS['TEST_FAILED']){
-        echo "<span class='test-fail'>Test Failed</span><br>";
-//        echo $GLOBALS["TEST_OUTPUT"];
+        $GLOBALS["json"]["success"] = false;
     }else{
         $ms = round($GLOBALS['RunTime']*1000, 3);
-        echo "<span class='test-pass'>Test Passed in $ms milliseconds</span><br>";
+        $GLOBALS["json"]["success"] = true;
     }
-    echo $GLOBALS["TEST_OUTPUT"];
+    echo json_encode($GLOBALS["json"]);
 
 
 });
@@ -69,7 +80,6 @@ set_exception_handler(function(Throwable $exception){
 
 set_error_handler(function($errno, $errstr, $errfile, $errline){
     echo "PHP Error: " . $errstr . " at line " . $errline . " in " . $errfile . "<br>";
-//    recurse_backtrace(debug_backtrace(), 0 );
     fail_test();
 });
 
@@ -80,13 +90,15 @@ function mark($comment = null){
     }else{
         $end = microtime(true);
         $elapsed = ($end - $start);
-        echo $comment . ": <br>[Run Time] <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
+        $GLOBALS["json"]["timing"][] = ["description" => $comment,
+                                "time" => round($elapsed * 1000, 3)];
         $start = $end;
     }
 }
 
 if(isset($_GET['test'])){
     ob_start();
+    $GLOBALS["json"] = create_test_json();
     $start = microtime(true);
     include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
     $end = microtime(true);
