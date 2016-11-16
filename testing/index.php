@@ -69,11 +69,12 @@ session_start();
         }
     }
 
-    function runTest(element){
+    function runTest(element, callback){
         var base = "/testing/test_wrapper.php?test=";
         var div = element;
         var icoArea = div.getElementsByClassName("ico-area")[0];
         var testScript = element.getAttribute("testfile");
+        var passed = false;
         div.className = "list-group-item running";
         icoArea.innerHTML = '<div class="sling" style=""></div>';
         get(base + testScript, "", function (data, responsetype) {
@@ -83,15 +84,18 @@ session_start();
             if(data.search(/test-fail/) != -1){
                 div.className += " list-group-item-danger";
                 icoArea.innerHTML = "<span class='glyphicon glyphicon-remove' style='color: #ff5555'></span>";
+                passed = false;
             }
             else if(data.search(/test-pass/) != -1){
                 div.className += " list-group-item-success";
                 icoArea.innerHTML = "<span class='glyphicon glyphicon-ok' style='color: #33cc33'></span>";
+                passed = true;
             }
 
             newstuff+= data + "<hr style='border-color: #444'>";
 
-            document.getElementById("console").innerHTML = newstuff + document.getElementById("console").innerHTML
+            document.getElementById("console").innerHTML = newstuff + document.getElementById("console").innerHTML;
+            callback(passed);
         })
     }
 
@@ -134,9 +138,30 @@ session_start();
         var id = e.getAttribute("href").slice(1);
         console.log(id);
         var tests = document.getElementById(id).querySelectorAll(".list-group-item");
+        function testCounter(passed) {
+            var numTests = tests.length;
+            var parentDiv = e;
+            console.log(passed, numTests);
+            testCounter.total = ++testCounter.total || 1;
+            if(passed)
+                testCounter.passed = ++testCounter.passed || 1;
+            if(testCounter.total === numTests)
+            {
+                console.log("Here");
+                if(testCounter.passed === testCounter.total){
+                    parentDiv.className += " list-group-item-success";
+                }else if(!testCounter.passed){
+                    parentDiv.className += " list-group-item-danger";
+                }else{
+                    parentDiv.className += " list-group-item-warning";
+                }
+            }
+
+
+        }
         console.log(tests);
         for(var i = 0; i<tests.length; i++){
-            runTest(tests[i]);
+            runTest(tests[i], testCounter);
         }
         
         return false;

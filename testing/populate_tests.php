@@ -6,7 +6,7 @@ function map_test_dir($dir){
     foreach ($files as $testfile){
         if(!preg_match("/[.]php$/", $testfile)){
             ?>
-            <a title="[<?=basename($testfile)?>]" name="folder" data-toggle="collapse" aria-expanded="false" href="#<?=basename($testfile)?>" class='list-group-item list-group-header'>
+            <a title="[<?=basename($testfile)?>]" name="folder" data-toggle="collapse" aria-expanded="false" href="#<?=basename($testfile)?>" class='list-group-item'>
                 <span class="tname"><b><?=basename($testfile)?></b></span>
                 <span class='tfile'></span>
                 <div class='ico-area'><span class="tcount" onclick="runContainingTests(event, this)"><?=count(glob($testfile . "/*"))?></span></div>
