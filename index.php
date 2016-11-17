@@ -126,6 +126,9 @@ require_once "components/Components.php";
 </script>
 
 <script>
+
+    loggedIn = isTokenSet();
+
     function toggleform(e) {
         if (e.value === "Join a Room") {
             e.value = "";
