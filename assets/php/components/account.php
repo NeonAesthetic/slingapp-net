@@ -5,6 +5,10 @@
  * Date: 11/8/16
  * Time: 8:19 AM
  */
+session_start();
+
+#echo session_id();
+
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Account.php";
 $p = GetParams("action", "email", "fname", "lname", "pass1", "pass2");
@@ -14,7 +18,11 @@ switch ($p['action']) {
     case "register":     //value must equal the name(value) of the submit button from the HTML FORM to register
         $retval = false;
         if ($account = process($p)) {
-            $_SESSION['token'] = $account->getToken();
+            $token = $account->getToken();
+            setcookie('token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
+//            echo "Cookie set: ";
+//            var_dump($_COOKIE);
+            $_SESSION['token'] = $token;
             $retval = true;
         } else {
             DatabaseObject::Log(__FILE__, "Register Account", "Account could not be created");
@@ -33,6 +41,8 @@ switch ($p['action']) {
         if ($GLOBALS['login'] == 1 && $p['pass1']) {
             $account = Account::Login($p['email'], $p['pass1']);
             if ($account && isLoggedIn($p)) {
+                $token = $account->getToken();
+                setcookie('token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
                 $_SESSION['token'] = $account->getToken();
                 #echo "Successfully logged in using password!";
                 $retval = $account->getJSON();
@@ -57,7 +67,8 @@ switch ($p['action']) {
     }
         break;
     case "logout": {
-        var_dump($_SESSION['token']); //session doesn't last during unit test...
+        unset($_COOKIE['token']);
+        setcookie('token', '', time() - (60 * 60 * 24), "/");
 //        $account = Account::Login($_SESSION['token']);
 //
 //        session_destroy();

@@ -6,6 +6,8 @@
  * Time: 8:09 AM
  */
 session_start();
+
+#var_dump($_SESSION);
 ?>
 <html>
 <head>
@@ -20,11 +22,13 @@ session_start();
 </head>
 <body style="background-color: #4286f4; overflow: hidden">
 <div id="login-cont"
-     style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;" onclick="hideLogin()">
+     style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;"
+     onclick="hideLogin()">
 
     <center>
         <form id="loginForm" class="log-modal"
-              style="padding: 20px; position: relative; max-width: 400px; margin-top: 100px;;background-color: #fefefe; box-shadow: 3px 3px 5px rgba(0,0,0,.5)" method="post"
+              style="padding: 20px; position: relative; max-width: 400px; margin-top: 100px;;background-color: #fefefe; box-shadow: 3px 3px 5px rgba(0,0,0,.5)"
+              method="post"
               onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
             <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
                 <a href="#" style="color: #333; text-decoration: none" onclick="hideLogin()">✕</a>
@@ -40,7 +44,7 @@ session_start();
 </div>
 <div class="container-fluid"
      style="background-color: rgba(255,255,255,1); text-align: center; padding-bottom: 30px; min-height: 50vh">
-    <button id="login-button" class="login-button" onclick="showLogin()">Login</button>
+    <button id="login-button" class="login-button" onclick="(loggedIn ? logout() : showLogin())">Login</button>
     <h1 style="width:100%; text-align: center;">Sharing so easy you'll never go back</h1>
     <div class="wrapper">
         <div class="screenshot">
@@ -75,6 +79,8 @@ session_start();
 </script>
 
 <script>
+    var loggedIn = isTokenSet();
+
     function toggleform(e) {
         if (e.value === "Join a Room") {
             e.value = "";
@@ -96,14 +102,35 @@ session_start();
         return false;
     }
     function showLogin() {
-        var button = document.getElementById("login-button");
-        button.className += " open";
-        setTimeout(function () {
-            var loginarea = document.getElementById("login-cont");
-            loginarea.style.visibility = "visible";
-            console.log(loginarea);
-        }, 700);
+            var button = document.getElementById("login-button");
+            button.className += " open";
+            setTimeout(function () {
+                var loginarea = document.getElementById("login-cont");
+                loginarea.style.visibility = "visible";
+                console.log(loginarea);
+            }, 700);
     }
+
+    function logout() {
+        console.log("in logout");
+        var form = document.getElementById("loginForm");
+        var email = form.elements["email"].value;
+        var password = form.elements["pass1"].value;
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            data: {
+                action: "logout"
+            },
+            success: function () {
+                isTokenSet();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
     function submitLogin() {
         var form = document.getElementById("loginForm");
         var email = form.elements["email"].value;
@@ -119,6 +146,8 @@ session_start();
             },
             success: function (data) {
                 noErrors(data);
+                var cookies = document.cookie;
+                console.log(cookies);
                 return data;
             },
             error: function (error) {
@@ -128,24 +157,49 @@ session_start();
     }
     function noErrors(data) {
         var loginError = document.getElementById("error");
-        console.log(data);
-        if(data) {
+        //console.log(data);
+        if (data) {
             loginError.innerHTML = "<br>";
             hideLogin(data)
         }
         else
             loginError.innerHTML = "Username or password is Incorrect";
     }
-    function hideLogin() {
+    function hideLogin(data) {
         var button = document.getElementById("login-button");
         var loginarea = document.getElementById("login-cont");
+        button.innerHTML = "Logout";
         button.className = "login-button";
         loginarea.style.visibility = "hidden";
+        isTokenSet();
     }
 
-    function noprop(e){
+    function noprop(e) {
         e.stopPropagation();
         return false;
+    }
+
+    function isTokenSet() {
+        var allcookies = document.cookie;
+        var button = document.getElementById("login-button");
+        var loggedin = false;
+        var name;
+        var value;
+
+        cookiearray = allcookies.split(';');
+
+        for (var i = 0; i < cookiearray.length; i++) {
+            name = cookiearray[i].split('=')[0];
+            value = cookiearray[i].split('=')[1];
+            if (name == 'token' && value != '') {//check if token has value and is valid
+                button.innerHTML = "Logout";
+                loggedin = true;
+            }
+        }
+        if(!loggedin)
+            button.innerHTML = "Login";
+
+        return loggedin;
     }
 </script>
 </html>
