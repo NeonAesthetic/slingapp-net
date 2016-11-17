@@ -24,9 +24,9 @@ require_once "interfaces/DatabaseObject.php";
  * that the single participant and account are participating in.
  * */
 
-//password should be between 6 to 30 characters
-$minLength = 6;
-$maxLength = 30;
+//CONSTANTS
+$MINLENGTH = 6;
+$MAXLENGTH = 30;
 
 class Account extends DatabaseObject
 {
@@ -44,21 +44,18 @@ class Account extends DatabaseObject
     private $_roomID;
     private $_screenName;
     private $_participantID;
-
     /**
-     * This Constructor is used to create a new account based on data that is retrieved from the user at
-     * the point of creation. This will include
-     * First Name
-     * Last Name
-     * Email
-     * Password
-     * The Class will then retrieve/generate
-     * AccountID
-     * Password Hash
-     * Token
-     * Token Gen
-     * Last Login
-     * Join Date
+     * Account constructor.
+     * @param $accountID
+     * @param $token
+     * @param $tokenGen
+     * @param null $email
+     * @param null $fName
+     * @param null $lName
+     * @param null $lastLogin
+     * @param null $joinDate
+     * Function Constructor is used to create a new account based on data that is retrieved from the user at
+     * the point of creation.
      * These elements make up the new account in the database and will persist until removed on command
      * by the Delete Account function.
      */
@@ -77,7 +74,6 @@ class Account extends DatabaseObject
         $this->_roomID = null;
         $this->_screenName = null;
     }
-
     /**
      * Function CreateAccount
      * @param $email
@@ -127,7 +123,6 @@ class Account extends DatabaseObject
         return new Account($accountID, $token, $currentDate, $email, $fName, $lName,
             $currentDate, $currentDate);
     }
-
     /**
      * Function Login
      * @param $token_email
@@ -139,9 +134,8 @@ class Account extends DatabaseObject
      * If the user has not provided a password, then the system will return a new account provided a login token.
      * If the username or password do not match, the system will return false
      */
-    public static function Login($token_email, $password = null)        //add validity checks
+    public static function Login($token_email, $password = null)
     {
-//        echo "Password:: $password";
         $retval = null;
         $currentDate = gmdate("Y-m-d H:i:s");
         if ($password) {
@@ -173,8 +167,6 @@ class Account extends DatabaseObject
             $statement->execute(array(':logtok' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-//            echo "AccountID After Login:::: ";
-//            var_dump($result['AccountID']);
             if ($result) {
                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                     $result['Email'], $result['FirstName'], $result['LastName'], $result['LastLogin'], $result['JoinDate']);
@@ -190,16 +182,20 @@ class Account extends DatabaseObject
                 $retval = false;
             }
         }
-
         return $retval;
     }
-
+    /**
+     * Function LoginThroughID
+     * @param $AccountID
+     * @return Account|bool|null
+     * This function allows a user to login based on the accountID
+     * that is provided this function returns the account based on
+     * the ID lookup that it performs in the Accounts table.
+     */
     public static function LoginThroughID($AccountID)
     {
         $retval = null;
-
         $currentDate = gmdate("Y-m-d H:i:s");
-
         $sql = "SELECT *
             FROM Accounts
             WHERE AccountID = :accountID";
@@ -215,51 +211,12 @@ class Account extends DatabaseObject
                 SET LastLogin = :lastLog
                 WHERE AccountID = :accountID";
             //if account last login doesn't update don't return account
-            if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':accountID' => $AccountID)))
+            if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':accountID' => $AccountID))) {
                 $retval = null;
+            }
         }
         return $retval;
     }
-
-//    public static function createTempAccount()
-//    {
-//        $retval = null;
-//        $token = md5(uniqid(mt_rand(), true));
-//        $currentDate = gmdate("Y-m-d H:i:s");
-//
-//        $sql = "INSERT INTO Accounts
-//                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
-//                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
-//
-//        $statement = Database::connect()->prepare($sql);
-//
-//        if ($statement->execute([
-//            ':email' => null,
-//            ':fName' => null,
-//            ':lName' => null,
-//            ':passHash' => null,
-//            ':logTok' => $token,
-//            ':tokGen' => $currentDate,
-//            ':lastLog' => $currentDate,
-//            ':joinDate' => $currentDate,
-//        ])
-//        ) {
-//            $accountID = Database::connect()->lastInsertId();
-//
-//            $sql = "SELECT *
-//                    FROM Accounts AS a
-//                      JOIN Participants AS p
-//                        ON a.AccountID = p.AccountID
-//                    WHERE Email IS NULL";
-//
-//            Database::connect()->prepare($sql)->execute();
-//
-//            $account = new Account($accountID, $token, $currentDate);
-//            $retval = $account;
-//        }
-//        return $retval;
-//    }
-
     /**
      * Function Delete
      * @return boolean
@@ -275,7 +232,6 @@ class Account extends DatabaseObject
     public function delete()
     {
         $retval = false;
-
         $sql = "SELECT AccountID                                                                    
                     FROM Accounts
                     WHERE LoginToken = :logtok";
@@ -283,9 +239,7 @@ class Account extends DatabaseObject
 
         if ($statement->execute(array(':logtok' => $this->_token))) {
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
             $this->_accountID = $result[0]["AccountID"];
-
             //if a participant exists, delete it (check for roomID)
             if ($this->_roomID) {
                 $sql = "DELETE FROM Particpants
@@ -295,7 +249,6 @@ class Account extends DatabaseObject
                     $this->_roomID = null;
                     $this->_screenName = null;
                 }
-
             }//if participant was deleted successfully or if it didn't exist, delete account
             if (!$this->_roomID) {
                 $sql = "DELETE FROM Accounts
@@ -306,7 +259,6 @@ class Account extends DatabaseObject
         }
         return $retval;
     }
-
     /**
      * Function Update
      * This function will trigger whenever a setter is used or a user attempts to join a room,
@@ -317,7 +269,7 @@ class Account extends DatabaseObject
     //NEEDED:   Test that allows room to be created-> then account-> then update to move account and part. to room
     public function update()
     {
-        if ($this->_roomID) {            //account has participant
+        if ($this->_roomID) {                       //account has participant
             $sql = "UPDATE Accounts AS a 
                       JOIN Participants AS p
                         ON a.AccountID = p.AccountID
@@ -343,7 +295,7 @@ class Account extends DatabaseObject
                 ':accountID' => $this->_accountID,
                 ':roomID' => $this->_roomID,
                 ':screenName' => $this->_screenName));
-        } else {    //account doesn't have a participant
+        } else {                                    //account doesn't have a participant
             $sql = "UPDATE Accounts
                 SET Email = :email,
                     FirstName = :fName,
@@ -358,7 +310,6 @@ class Account extends DatabaseObject
             $statement->execute(array(':email' => $this->_email,
                 ':fName' => $this->_fName,
                 ':lName' => $this->_lName,
-//                ':passHash' => $this->_passHash,
                 ':logTok' => $this->_token,
                 ':tokGen' => $this->_tokenGen,
                 ':lastLog' => $this->_lastLogin,
@@ -366,23 +317,22 @@ class Account extends DatabaseObject
                 ':accountID' => $this->_accountID));
         }
     }
-
     /**
      * Function updateAfterSetter
+     * @param $roomID
+     * @return Account|bool|null
+     * @param $screenName
      * This function will trigger whenever a setter is used and will attempt to insert the
      * updated account/participant data. Data must pass validity checks before this function
      * is called. Validity checks are in the __set() function
      */
     public function addParticipant($roomID, $screenName)
     {
-//        echo "ROOM ID AFTER: ", $roomID;
-        //Do select statement and pull account id after account created.
         $sql = "INSERT INTO Participants
                 (AccountID, RoomID, ScreenName)
                 VALUES (:accountID, :roomID, :screenName)";
         $statement = Database::connect()->prepare($sql);
 
-//        echo "AccountID::::: $this->_accountID";
         if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $roomID, ':screenName' => $screenName))
         ) {
             $this->_participantID = Database::connect()->lastInsertId();
@@ -390,12 +340,18 @@ class Account extends DatabaseObject
             $this->_screenName = $screenName;
         }
     }
-
+    /**
+     * Function Update Password
+     * @param $pass
+     * @throws Exception
+     * This function allows a user to update the password stored in the database
+     * based on an existing account ID. This will allow user validity checks to
+     * be run elsewhere, this function will simply handle setting the new value.
+     */
     public function updatePass($pass)
     {
-        if (strlen($pass) >= $GLOBALS['minLength'] && strlen($pass) <= $GLOBALS['maxLength']) {
+        if (strlen($pass) >= $GLOBALS['MINLENGTH'] && strlen($pass) <= $GLOBALS['MAXLENGTH']) {
             $hashedPass = password_hash($pass, PASSWORD_BCRYPT);
-
             $sql = "UPDATE Accounts
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
@@ -403,18 +359,19 @@ class Account extends DatabaseObject
                 DatabaseObject::Log(__FILE__, "Updated Account",
                     "Account: $this->_accountID \n updated password");
             }
-
         } else
             throw new Exception("Password must be between 6 - 30 characters");
         return;
     }
-
+    /**
+     * @param $name
+     * @return int
+     */
     private function isNameValid($name)
     {
         $nameExp = "/^[^<,\"(){}@*$%?=>:|;#]*$/i";
         return preg_match($nameExp, $name) ? 1 : 0;
     }
-
     /**
      * @return mixed
      */
@@ -422,7 +379,6 @@ class Account extends DatabaseObject
     {
         return $this->_accountID;
     }
-
     /**
      * @return mixed
      */
@@ -430,7 +386,6 @@ class Account extends DatabaseObject
     {
         return $this->_token;
     }
-
     /**
      * @return mixed
      */
@@ -438,8 +393,6 @@ class Account extends DatabaseObject
     {
         return $this->_participantID;
     }
-
-
     /**
      * @return mixed
      */
@@ -447,7 +400,6 @@ class Account extends DatabaseObject
     {
         return $this->_roomID;
     }
-
     /**
      * @return string[]
      */
@@ -455,7 +407,6 @@ class Account extends DatabaseObject
     {
         return ["First" => $this->_fName, "Last" => $this->_lName];
     }
-
     /**
      * Function getJSON
      * @return string | array
@@ -475,7 +426,6 @@ class Account extends DatabaseObject
             return $json;
         return json_encode($json);
     }
-
     /**
      * @return mixed
      */
@@ -483,7 +433,6 @@ class Account extends DatabaseObject
     {
         return $this->_screenName;
     }
-
     /**
      * Function getEmail
      * @return mixed
@@ -493,7 +442,16 @@ class Account extends DatabaseObject
     {
         return $this->_email;
     }
-
+    /**
+     * Function Set
+     * @param $name
+     * @param $value
+     * @return mixed
+     * @throws Exception
+     * This function is a switch case that uses the different names it is passed in order to set different
+     * parameters throughout the database. The value passed is used in order to set a new value for the passed
+     * name, then the update function is called to finalize the changes.
+     */
     function __set($name, $value)
     {
         switch (strtolower($name)) {
@@ -560,7 +518,6 @@ class Account extends DatabaseObject
         }
 
         $this->update();
-
         return $value;
     }
 }

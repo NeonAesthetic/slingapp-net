@@ -7,8 +7,8 @@ CREATE DATABASE sling CHARACTER SET utf8 COLLATE utf8_bin;
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
-
-
+# Was in accounts?
+#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
 use sling;
 
 
@@ -35,7 +35,6 @@ CREATE TABLE Rooms (
 CREATE TABLE Accounts (
   AccountID SERIAL,
   Email VARCHAR(64) NULL UNIQUE,
-  #FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
   FirstName VARCHAR(32) NULL,
   LastName VARCHAR(32) NULL,
   PasswordHash VARCHAR(60) NULL,
@@ -49,7 +48,7 @@ CREATE TABLE Accounts (
 
 CREATE INDEX IDX_Account_Email
   ON Accounts(Email);
-
+# ADD Active Boolean to allow for participants to be classified as dormant without a current user
 CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,

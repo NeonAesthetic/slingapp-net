@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Room Class
  * Created by PhpStorm.
  * User: ian
  * Date: 10/16/16
@@ -12,18 +13,33 @@ require_once "classes/RoomCode.php";
 require_once "classes/Account.php";
 
 //Needs a CreateRoomWithCode function
-
+/**
+ * This Class handles all Rooms in the application, and manages their creation
+ * and deletion as well as adding and removing participants through its function
+ * calls. This class has the ability to make rooms for temporary accounts as well
+ * as permanent accounts. The participants generated in each room will exist for the
+ * duration of the room, and can be rejoined by an account via the cookie unique
+ * identity that each account will have based on its computer  and browser.
+ */
 class Room extends DatabaseObject
 {
-    /** @var RoomCode[] $_room_codes * */
     private $_room_codes = [];
-
-    /** @var Account[] $_accounts * */
-    private $_accounts = [];    //array of participating accounts
+    private $_accounts = [];
     private $_roomID;
     private $_roomName;
 
     //pass account object to constructor or just the needed parameters to factor out the select statement
+    /**
+     * Function Constructor
+     * Room constructor.
+     * @param $roomID
+     * @param $token
+     * @param $screenName
+     * @throws Exception
+     * This constructor will allow a room to be generated based on the creating participants
+     * token, and given screen name, the roomID will act as a unique identifier for the room.
+     * No room can exist without a participant.
+     */
     public function __construct($roomID, $token, $screenName)
     {
         $this->_roomID = $roomID;
@@ -50,19 +66,10 @@ class Room extends DatabaseObject
                 $this->_roomName = $result[0]["RoomName"];
                 if ($roomCode != null) {
 
-//                    echo "Var Data:: ";
-//                    var_dump($result);
                     foreach ($result as $row) {
                         if ($row["RoomCode"] != null)
                             $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                     }
-//
-//                    foreach($this->_room_codes as $rc) {
-//                        echo "Room CODE::::::$$::: ", $rc->getCode();
-//                    }
-                    #var_dump($this->_accounts);
-//                $this->_room_codes = array_unique($this->_room_codes);
-//                $this->_accounts[] = array_unique($this->_accounts);
                 }
             } else {
                 throw new Exception("A Room with that code could not be found");
@@ -71,7 +78,6 @@ class Room extends DatabaseObject
             throw new Exception("Participant could not be created with that token");
         }
     }
-
     /**
      * Function createRoom
      * @param $roomName
@@ -79,6 +85,9 @@ class Room extends DatabaseObject
      * @param $screenName
      * @throws Exception
      * @return Room
+     * This Function will allow a room to be generated based on a token from
+     * the account creating the room. This will allow both Account Users and
+     * Temp Users to join the room.
      */
     public static function createRoom($roomName, $token, $screenName)
     {
@@ -91,7 +100,15 @@ class Room extends DatabaseObject
 
         return new Room($roomID, $token, $screenName);
     }
-
+    /**
+     * Function createRoomWithoutAccount
+     * @param $roomName
+     * @param $screenName
+     * @return Room
+     * @throws Exception
+     * This Function will allow the generation of a room without an account
+     * token, and will allow the joining of Account Users as well as Temp Users.
+     */
     public static function createRoomWithoutAccount($roomName, $screenName)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
@@ -105,28 +122,36 @@ class Room extends DatabaseObject
 
         return new Room($roomID, $token, $screenName);
     }
-
+    /**
+     * @return mixed
+     */
     public function getRoomID()
     {
         return $this->_roomID;
     }
-
+    /**
+     * @return mixed
+     */
     public function getRoomName()
     {
         return $this->_roomName;
     }
-
+    /**
+     * @param $newRoomName
+     */
     public function setRoomName($newRoomName)
     {
         $this->_roomName = $newRoomName;
         $this->_has_changed = true;
     }
-
     /**
-     * Function Login
+     * Function AddParticipant
      * @param $token
      * @param $screenName
      * @return integer
+     * This Function allows a participant to be generated in a room based
+     * on its account token (Temp or Perm) and a screenName that the
+     * user provides.
      */
     public function addParticipant($token, $screenName)
     {
@@ -138,10 +163,14 @@ class Room extends DatabaseObject
         }
         return $retval;
     }
-
+    /**
+     * Function Delete
+     * This function will remove a RoomCode, then all Participants, the the Room
+     * that is targeted by it. This will allow referential integrity to remain valid
+     * and the removal of the room from the active database.
+     */
     public function delete()
     {
-//        echo "ROOM ID: " . $this->_roomID;
         $sql = "DELETE FROM RoomCodes WHERE RoomID=:roomid";
         if (!Database::connect()->prepare($sql)->execute([":roomid" => $this->_roomID])) {
             echo Database::connect()->errorInfo()[2] . "<br>";
@@ -160,7 +189,6 @@ class Room extends DatabaseObject
         }
         $this->_roomID = null;
     }
-
     /**
      * Function deleteParticipant
      * @param $accountID
@@ -183,9 +211,6 @@ class Room extends DatabaseObject
         $statement = Database::connect()->prepare($sql);
         $statement->execute(array(':accountID' => $accountID));
         if ($result = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-//            echo "ACCOUNT ID:::$$$$$$$$$$$$:::: ";
-//            var_dump($result);
             $sql = "DELETE 
                     FROM RoomCodes
                     WHERE RoomID = :roomID";
@@ -196,7 +221,6 @@ class Room extends DatabaseObject
                     FROM Participants
                     WHERE AccountID = :accountID";
 
-//                echo "AccountID::: $accountID";
                 if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
                     foreach ($this->_accounts as $a) {
                         if ($a->getAccountID() == $accountID) {
@@ -210,6 +234,11 @@ class Room extends DatabaseObject
         return $retval;
     }
 
+    /**
+     * Function Update
+     * This Function allows the update of an account and roomCode based
+     * on the changes made in either the account or the roomCode.
+     */
     public function update()
     {
         foreach ($this->_accounts as $account) {
@@ -221,6 +250,10 @@ class Room extends DatabaseObject
         if ($this->hasChanged()) $this->updateRoom();
     }
 
+    /**
+     * Function UpdateRoom
+     * This Function Changes the currenr room name in the database.
+     */
     private function updateRoom()
     {
         $sql = "UPDATE Rooms SET RoomName = :roomname WHERE RoomID = $this->_roomID";
@@ -228,35 +261,41 @@ class Room extends DatabaseObject
         $statement->execute([":roomname" => $this->_roomName]);
     }
 
+    /**
+     * Function AddRoomCode
+     * @param $participantID
+     * @param null $uses
+     * @param null $expires
+     * @return RoomCode
+     * This Function adds a roomCode to the given participant, and will allow for
+     * specific settings such as the uses remaining for the key as well as the
+     * datetime that the key will expire.
+     */
     public function addRoomCode($participantID, $uses = null, $expires = null)
     {
         $this->_room_codes[] = $retval =  RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
         return $retval;
     }
 
+    /**
+     * @return array
+     */
     public function getAccounts()
     {
         return $this->_accounts;
     }
 
-//    public function getParticipants(){
-//
-//        foreach ($this->_accounts as $p) {
-//            $participants[] = $p[0];
-//        }
-//
-//        var_dump($participants);
-//    }
+    /**
+     * @return array|null
+     */
     public function getParticipants()
     {
         $participants = null;
         foreach ($this->_accounts as $p) {
             $participants[] = $p->getScreenName();
         }
-//        var_dump($participants);
         return $participants;
     }
-
     /**
      * @return RoomCode[]
      */
@@ -265,6 +304,13 @@ class Room extends DatabaseObject
         return $this->_room_codes;
     }
 
+    /**
+     * Function getJSON
+     * @param bool $as_array
+     * @return array|string
+     * This Function allows the return of the encoded JSON object
+     * to be used in different areas of the program.
+     */
     public function getJSON($as_array = false)
     {
         $json = [];
