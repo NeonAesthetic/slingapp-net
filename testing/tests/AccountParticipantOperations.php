@@ -9,7 +9,6 @@
  * Description: Runs all the tests required to make sure Account works as intended: Login, Create, set, get, update
  */
 
-//add screenname setter test
 require_once "classes/Account.php";
 require_once "classes/Room.php";
 
@@ -204,6 +203,15 @@ require_once "classes/Room.php";
     assert($room != null, "Add participant with preexisting account");
 
     cleanup();
+}
+/***********************************************************************************************************************
+ *          Update Participant ScreenName
+ **********************************************************************************************************************/
+{
+    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
+    $room = Room::createRoom("roomName", $account->getToken(), "screenName");
+    $account->_ScreenName = "BobMar";
+    assert($account->getScreenName() == "BobMar", "Update Participant ScreenName to BobMar");
 }
 /***********************************************************************************************************************
  *          Create rooms and Get Participants from Room
