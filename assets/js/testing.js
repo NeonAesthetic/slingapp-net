@@ -134,10 +134,7 @@ function startTest(){
     runTest(this, null);
 }
 
-// NodeList.prototype.forEach = foreach(list, callback){
-//     var nodes = [].slice.call(list, 1);
-//     nodes.forEach(callback);
-// }
+
 
 function runFolderTests(e){
     // console.log(this);

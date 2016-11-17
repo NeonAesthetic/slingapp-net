@@ -6,41 +6,82 @@
  * Time: 8:09 AM
  */
 session_start();
+set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
+require_once "components/Components.php";
 ?>
 <html>
 <head>
     <title>
         Sharing Site
     </title>
-    <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
-    <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
-<body style="background-color: #4286f4; overflow: hidden">
+<body style="background-color: #38474F; overflow: hidden; padding-top: 50px;">
+<div id="modal" onclick="hideModal()">
+    
+</div>
+
 <div id="login-cont"
      style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;" onclick="hideLogin()">
 
     <center>
         <form id="loginForm" class="log-modal"
-              style="padding: 20px; position: relative; max-width: 400px; margin-top: 100px;;background-color: #fefefe; box-shadow: 3px 3px 5px rgba(0,0,0,.5)" method="post"
+              style="" method="post"
               onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
             <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
                 <a href="#" style="color: #333; text-decoration: none" onclick="hideLogin()">✕</a>
             </div>
             <h1 id="loginFormHeader" style="color: #333">Login</h1>
-            <h4 id="error"><br></h4>
+
             <input name="email" class="form-control" placeholder="email" type="email">
             <input name="pass1" class="form-control" placeholder="password" type="password">
-            <button id="submitButton" class="btn btn-primary" type="button" onclick="submitLogin(this)">Submit</button>
+            <div id="error" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
+            <hr>
+            <div id="submitButton" class="sbtn card-width-button" onclick="submitLogin(this)">SUBMIT</div>
+
+
         </form>
 
     </center>
 </div>
+<nav class="navbar navbar-fixed-top" >
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand noselect" href="/"><span class="glyphicon glyphicon-blackboard" style="font-size: 24px"> </span>SLING</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+            <li>
+                <div class="btn-group navbar-btn">
+
+                    <ul id="context-menu" class="dropdown-menu context-menu" style="padding: 5px 0 5px 0; margin-top: 15px;">
+                        <li>
+                            Login
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <div class="btn-group navbar-btn">
+                    <button id="login-button" class="login-button" onclick="showLogin()">Login</button>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
 <div class="container-fluid"
-     style="background-color: rgba(255,255,255,1); text-align: center; padding-bottom: 30px; min-height: 50vh">
-    <button id="login-button" class="login-button" onclick="showLogin()">Login</button>
+     style="background-color: rgba(255,255,255,1); text-align: center; padding: 50px;; ">
+    <a class="register-link" href="/register/" style="position: absolute; top: 0; right: 0; margin: 60px;">Register</a>
+
     <h1 style="width:100%; text-align: center;">Sharing so easy you'll never go back</h1>
     <div class="wrapper">
         <div class="screenshot">
@@ -49,22 +90,24 @@ session_start();
 
 </div>
 
-<div class="container" style="text-align: center; ">
-    <div class="col-lg-6">
-        <button class="btn-main" style=" width: 200px; margin: 30px">
-            Share Screen
+<div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 50px;">
+    <div class="" style="margin: 0 auto;">
+        <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block" onclick="modal('Create Room Modal')">
+            Create Room
         </button>
-    </div>
-    <div class="col-lg-6">
-        <form class="" style="margin: 30px;" onsubmit="joinroom(event, this);">
+
+        <form class="" style="margin: 30px; display: inline-block" onsubmit="joinroom(event, this);">
             <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;"
                    value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
         </form>
     </div>
+
 </div>
 
 </body>
-
+<script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
     document.getElementById('loginForm').onkeypress = function (e) {
@@ -72,6 +115,11 @@ session_start();
             document.getElementById('submitButton').click();
         }
     }
+
+    /** PAGE SETUP HERE **/
+    window.addEventListener("load", function () {
+        Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
+    });
 </script>
 
 <script>
@@ -108,6 +156,8 @@ session_start();
         var form = document.getElementById("loginForm");
         var email = form.elements["email"].value;
         var password = form.elements["pass1"].value;
+        var errorDiv = document.getElementById("error");
+        errorDiv.innerHTML = "<div class='sling' style=''></div>";
         return $.ajax({
             type: 'post',
             url: 'assets/php/components/account.php',
@@ -146,6 +196,42 @@ session_start();
     function noprop(e){
         e.stopPropagation();
         return false;
+    }
+
+    window.addEventListener("load", function () {
+        var sbtns = document.getElementsByClassName("sbtn");
+        for(var i = sbtns.length-1; i>= 0; i--){
+            console.log(sbtns[i]);
+            var button = sbtns[i];
+            button.addEventListener("click", function (event) {
+                var drip = document.createElement("div");
+                var brect = button.getBoundingClientRect();
+                drip.className = "drip";
+                drip.style.left = event.pageX - brect.left -50;
+                drip.style.top = event.pageY-brect.top-50;
+                setTimeout(function(){
+                    button.removeChild(drip)
+                }, 1000);
+                button.appendChild(drip);
+            })
+        }
+
+    });
+    
+    function modal(resourceName){
+        var modalContents = Resource.get(resourceName);
+        if(modalContents != null){
+            document.getElementById("modal").style.visibility = "visible";
+            document.getElementById("modal").innerHTML = modalContents;
+        }else{
+            console.error("Resource " + resourceName + " has not been loaded.  Load the resource first with Resource.load()");
+        }
+
+
+    }
+
+    function hideModal(){
+        document.getElementById("modal").style.visibility = "hidden";
     }
 </script>
 </html>

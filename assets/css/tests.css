@@ -5,16 +5,7 @@
     animation: pulse 1.8s infinite ease-in-out;
 }
 
-.sling{
-    background-image: url("/assets/images/sling64.png") ;
-    background-size: contain;
-    animation: 1.1s spin infinite;
-    height: 32px;
-    width: 32px;
-    display: inline-block;
-    position: absolute;
-    top: 0;
-}
+
 
 .ico-area{
     height: 32px;
@@ -147,10 +138,7 @@ body{
        }
 }
 
-@keyframes spin {
-    from{}
-    to{transform: rotate(720deg)}
-}
+
 
 .context-menu{
     position: absolute;
