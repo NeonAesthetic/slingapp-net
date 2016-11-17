@@ -5,15 +5,15 @@ function map_test_dir($dir){
     //usleep(1000000);
     foreach ($files as $testfile){
         if(!preg_match("/[.]php$/", $testfile)){
+            $num_containing = count(glob($testfile . "/*"));
             ?>
-            <a title="[<?=basename($testfile)?>]" name="folder" data-toggle="collapse" aria-expanded="false" href="#<?=basename($testfile)?>" class='list-group-item test-folder' style="">
+            <a href='#<?=basename($testfile)?>-container' id="<?=basename($testfile)?>-button" title="<?=basename($testfile)?> directory" name="folder" data-toggle="collapse" aria-expanded="false" container="<?=basename($testfile)?>-container" class='list-group-item test-folder' style="">
                 <span class="tname"><?=basename($testfile)?></span>
                 <span class='tfile'></span>
-
-                <div class='ico-area'><span class="tcount" onclick="runContainingTests(event, this)"><?=count(glob($testfile . "/*"))?></span></div>
-                <div class="runtest">Run All</div>
+                <div class="t-btn tcount" title="Contains <?=$num_containing?> objects"><?=$num_containing?></div>
+                <div class="t-btn runtest" title="Run all contained tests">RUN</div>
             </a>
-            <div class="collapse test-container" id="<?=basename($testfile)?>" style="border-left: 1px dashed #ddd; padding-left: 8px;">
+            <div class="collapse test-container" id="<?=basename($testfile)?>-container" button="<?=basename($testfile)?>-button" style="border-left: 1px dashed #ddd; padding-left: 8px;">
                 <?php
                 map_test_dir($testfile . "/*");
                 ?>
@@ -28,7 +28,7 @@ function map_test_dir($dir){
             $test_desc = $matches[0];
 
             ?>
-            <a href='#' title="[<?=basename($testfile)?>]: <?=$test_desc?>" name="test" testfile="<?=substr($testfile, 2)?>" onclick='runTest(this)' class='list-group-item test' style=";">
+            <a href='javascript:;' title="[<?=basename($testfile)?>]: <?=$test_desc?>" name="test" testfile="<?=substr($testfile, 2)?>" class='list-group-item test' style=";">
                 <span class="tname"><?=$test_name?></span>
                 <span class='tfile'></span>
                 <div class='ico-area'></div>

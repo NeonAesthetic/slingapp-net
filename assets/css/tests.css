@@ -8,13 +8,12 @@
 .sling{
     background-image: url("/assets/images/sling64.png") ;
     background-size: contain;
-    animation: 1.1s spin infinite ;
+    animation: 1.1s spin infinite;
     height: 32px;
     width: 32px;
     display: inline-block;
     position: absolute;
     top: 0;
-    filter: hue-rotate(90deg);
 }
 
 .ico-area{
@@ -32,32 +31,26 @@
 }
 
 .tcount{
-    /*border: 1px solid #666;*/
-    padding-top: 5px;
     font-size: 14px;
-    border-radius: 50%;
-
     width: 28px;
-    height: 28px;
-    margin: 2px;
-
     display: inline-block;
-    color: #333;
     text-align: center;
     vertical-align: middle;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.5) inset;
-    background-color: #fefefe;
+    border: 1px solid lightgray;
+    float: right;
+    font-weight: 600;
 }
 
-.runtest{
-    position: absolute;
-    right: 0;
-    top:0;
-    margin: 5px;
-    margin-right: 45px;
+.t-btn{
     border: 1px solid lightgray;
     padding: 4px 10px 4px 10px;
     border-radius: 50px;
+    height: 28px;
+    margin: -4px -5px 0 10px;
+}
+
+.runtest{
+    float: right;
 }
 
 .runtest:hover{
@@ -159,5 +152,38 @@ body{
     to{transform: rotate(720deg)}
 }
 
+.context-menu{
+    position: absolute;
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.5);
+    background-color: #fefefe;
+    min-width: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+}
 
+.context-menu a{
+    width: 100%;
+    display: inline-block;
+    text-decoration: none;
+    padding: 3px 20px 3px 20px;
+
+}
+
+.context-menu a:hover{
+    background-color: #4286f4;
+    color: white;
+    cursor: pointer;
+}
+
+.context-menu p{
+    padding: 5px 20px 5px 20px;
+
+    border-bottom: 1px solid lightgrey;
+    width: 100%;
+}
+
+.context-menu hr{
+    margin: 5px;
+}
 

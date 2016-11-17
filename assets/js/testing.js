@@ -1,8 +1,19 @@
 /**
  * Created by Ian Murphy on 11/15/2016.
  */
+var testConsole = null;
+var testList = null;
+var TestStatus = {};
+var ContextMenu = null;
 
-
+window.addEventListener("load", function () {
+    testConsole = document.getElementById("console");
+    testList = document.getElementById("tests");
+    testConsole.addEventListener("contextmenu", function (event) {
+        contextMenu(event, getConsoleNodeList());
+        return false;
+    });
+});
 
 function runAllTests(){
     var tests = document.getElementsByName("test");
@@ -12,21 +23,37 @@ function runAllTests(){
 }
 
 function runTest(div, callback){
+    if(div.className.search(/ disabled/) != -1) return;
     var base = "/testing/test_wrapper.php?test=";
     
     var icoArea = div.getElementsByClassName("ico-area")[0];
-    var testScript = element.getAttribute("testfile");
+    var testScript = div.getAttribute("testfile");
+    div.removeClass("list-group-item-success");
+    div.removeClass("list-group-item-warning");
+    div.removeClass("list-group-item-danger");
     div.className += " running";
     icoArea.innerHTML = '<div class="sling" style=""></div>';
     
     get(base + testScript, "", function (data, responsetype) {
-        var test = JSON.parse(data);
+        console.log(responsetype);
+        var test = null;
+        try{
+            test = JSON.parse(data);
+        }catch(e){
+            console.log(data);
+        }
+
 
         var newstuff = "<span style=\"color: #fff\">" + testScript + "</span> &middot; ";
-        div.className = div.className.replace(/ running/, "");
-        if(test.success === true){
+        div.removeClass("running");
+        if(test && test.success === true){
+            newstuff += "<span class='timing-value'> " + test['total-time'] + " ms </span><br>";
             div.className += " list-group-item-success";
             icoArea.innerHTML = "<span class='glyphicon glyphicon-ok' style='color: #33cc33'></span>";
+            test['timing'].forEach(function (timeval) {
+                newstuff+= (timeval['description'] + " --- <span class='timing-value'>" + timeval['time'] + " ms</span><br>");
+            });
+
         }
         else{
             div.className += " list-group-item-danger";
@@ -36,8 +63,8 @@ function runTest(div, callback){
         newstuff += test.output + "<hr style='border-color: #444'>";
 
         document.getElementById("console").innerHTML = newstuff + document.getElementById("console").innerHTML;
-        callback(test.success);
-    })
+        checkChildStatus(div.parentNode)
+    });
 }
 
 function get(resource, parameters, callback){
@@ -68,7 +95,7 @@ function clearTestStatus(){
 }
 
 HTMLElement.prototype.removeClass = function(classname) {
-    this.className = this.className.replace(new RegExp(classname), "");
+    this.className = this.className.replace(new RegExp(" ?" + classname), "");
 };
 
 function refreshTests() {
@@ -76,57 +103,160 @@ function refreshTests() {
     tdiv.innerHTML = document.getElementById("spinner").innerHTML;
     get("populate_tests.php", "", function (data, num) {
         tdiv.innerHTML=data;
-        addRTButtonListener();
+        addTestButtonEvents();
     });
 }
 
-function runContainingTests(event, e){
-    event.stopPropagation();
-    e= e.parentNode.parentNode;
-    console.log(e);
-    var id = e.getAttribute("href").slice(1);
-    console.log(id);
-    var tests = document.getElementById(id).querySelectorAll(".list-group-item");
-    function testCounter(passed) {
-        var numTests = tests.length;
-        var parentDiv = e;
-        console.log(passed, numTests);
-        testCounter.total = ++testCounter.total || 1;
-        if(passed)
-            testCounter.passed = ++testCounter.passed || 1;
-        if(testCounter.total === numTests)
-        {
-            console.log("Here");
-            if(testCounter.passed === testCounter.total){
-                parentDiv.className += " list-group-item-success";
-            }else if(!testCounter.passed){
-                parentDiv.className += " list-group-item-danger";
-            }else{
-                parentDiv.className += " list-group-item-warning";
-            }
+
+function addTestButtonEvents(){
+    var testdiv = document.getElementById("tests");
+    var tests = testdiv.querySelectorAll(".test");
+    var foldersTestButtons = testdiv.querySelectorAll(".runtest");
+    var folderContainers = testdiv.querySelectorAll("test-container");
+
+    tests.forEach(function(n){
+        n.addEventListener("click", startTest);
+        n.addEventListener("contextmenu", function (event) {
+
+            contextMenu(event, getTestNodeList(n));
+            return false;
+        });
+    });
+
+    foldersTestButtons.forEach(function (n) {
+        n.addEventListener("click", runFolderTests);
+    })
+
+}
+
+
+function startTest(){
+    runTest(this, null);
+}
+
+// NodeList.prototype.forEach = foreach(list, callback){
+//     var nodes = [].slice.call(list, 1);
+//     nodes.forEach(callback);
+// }
+
+function runFolderTests(e){
+    // console.log(this);
+    e.stopPropagation();
+    var folderButton = this.parentNode;
+    // console.log(folderButton);
+    var containerId = folderButton.getAttribute("container");
+    var testContainer = document.getElementById(containerId);
+    var tests = testContainer.querySelectorAll(".test");
+
+    tests.forEach(function (test) {
+        runTest(test);
+    });
+}
+
+function checkChildStatus(e){
+    var button = document.getElementById(e.getAttribute("button"));
+    var children = e.querySelectorAll(".test");
+    var numChildren = children.length;
+    var numFail = 0;
+    for (var i = numChildren -1; i >= 0; i--){
+
+        if(children[i].className.search(/list-group-item-danger/) != -1){
+            numFail++;
         }
     }
-    console.log(tests);
-    for(var i = 0; i<tests.length; i++){
-        runTest(tests[i], testCounter);
+    // console.log(numChildren, numFail);
+    if(numFail == numChildren){
+        button.className.replace(/ list-group-item-danger/, "");
+        button.className+=" list-group-item-danger";
+    }else if(numFail === 0){
+        button.className.replace(/ list-group-item-success/, "");
+        button.className+=" list-group-item-success";
+    }else{
+        button.className.replace(/ list-group-item-warning/, "");
+        button.className+=" list-group-item-warning";
     }
-
-    return false;
 }
 
+function createMenuLink(text, classname, callback){
+    var link = document.createElement("a");
+    link.innerHTML = text;
+    link.className = classname;
+    link.onclick = callback;
+    return link;
+}
 
-function addRTButtonListener(){
-    var rtbuttons = document.getElementsByClassName("runtest");
-    var len = rtbuttons.length;
-    for(var i = 0; i<len; i++){
-        rtbuttons[i].addEventListener("click", function(event){
-            event.stopPropagation();
-            var folder = this.parentNode;
-            var contents = document.getElementById(folder.getAttribute("href").slice(1)).querySelectorAll(".test");
-            var len = contents.length;
-            for (var i = 0; i<len;i++){
-                contents[i]
-            }
+function contextMenu(event, nodelist){
+    if(ContextMenu){
+        document.body.removeChild(ContextMenu);
+        ContextMenu = null;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    ContextMenu = document.createElement("div");
+    ContextMenu.className = "context-menu";
+    ContextMenu.close = function () {
+        document.body.click();
+    };
+    var menuitemslen = nodelist.length;
+    for(var i = 0; i<menuitemslen; i++){
+        ContextMenu.appendChild(nodelist[i]);
+    }
+    document.onclick = function(){
+        if(ContextMenu){
+            document.body.removeChild(ContextMenu);
+            ContextMenu = null;
+        }
+    };
+    ContextMenu.style.left = event.pageX;
+    ContextMenu.style.top = event.pageY;
+    ContextMenu.onclick = function (event) {
+        event.stopPropagation();
+    };
+    document.body.appendChild(ContextMenu);
+}
+
+function getTestNodeList(testElement){
+    var list = [];
+    var label = document.createElement("p");
+    label.innerHTML = testElement.querySelector(".tname").innerHTML;
+    var runTest = createMenuLink("Run Test", "", function () {
+        testElement.click();
+    });
+
+    var disable = null;
+    if(testElement.className.search(/disabled/) != -1){
+        disable = createMenuLink("Enable Test", "", function () {
+            testElement.removeClass("disabled");
+            ContextMenu.close();
+        });
+    }else{
+        disable = createMenuLink("Disable Test", "", function () {
+            testElement.className += " disabled";
+            ContextMenu.close();
         });
     }
+
+
+    var hr = document.createElement("hr");
+
+    var reload = createMenuLink("Reload Tests", "", function () {
+        refreshTests();
+        ContextMenu.close();
+    });
+
+    return [label, runTest, disable, hr, reload];
 }
+
+function getConsoleNodeList(){
+    var console = document.createElement("p");
+    console.innerHTML = "Test Console";
+
+    var clear = createMenuLink("Clear", "", function () {
+        clearconsole();
+        ContextMenu.close();
+    });
+
+    return [console, clear];
+}
+
+

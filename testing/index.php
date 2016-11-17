@@ -61,7 +61,6 @@ session_start();
 <script>
     window.addEventListener("load", function () {
         refreshTests();
-       
     });
 </script>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
