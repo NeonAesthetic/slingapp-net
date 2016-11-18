@@ -16,7 +16,11 @@ require_once "classes/Account.php";
 {
     Account::CreateAccount("ozzy.osbourne@gmail.com", "ozzy", "osbourne", "pass");
 
-    $url = 'https://dev.slingapp.net/assets/php/components/account.php';
+    if($_SERVER['HTTP_HOST'] == "sling" || $_SERVER['HTTP_HOST'] == "localhost")
+        $url = 'http://localhost/assets/php/components/account.php';
+    else
+        $url = 'https://dev.slingapp.net/assets/php/components/account.php';
+
     $data = array('action' => 'login', 'email' => 'ozzy.osbourne@gmail.com', 'pass1' => 'pass');
 
     $options = array(
@@ -85,7 +89,11 @@ require_once "classes/Account.php";
  *          TEST REGISTER METHOD
  */
 {
-    $url = 'https://dev.slingapp.net/assets/php/components/account.php';
+    if($_SERVER['HTTP_HOST'] == "sling" || $_SERVER['HTTP_HOST'] == "localhost")
+        $url = 'http://localhost/assets/php/components/account.php';
+    else
+        $url = 'https://dev.slingapp.net/assets/php/components/account.php';
+
     $data = array('action' => 'register', 'email' => 'ozzy.osbourne@gmail.com', 'fname' => 'ozzy', 'lname' => 'osbourne', 'pass1' => 'pass', 'pass2' => 'pass');
 
     $options = array(
