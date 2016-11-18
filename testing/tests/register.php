@@ -8,7 +8,8 @@
  * Test Name: NOINCLUDE
  * Description: Echos form data
  */
-
+echo "Cookie set: ";
+var_dump($_COOKIE);
 ?>
 
 <form action="/assets/php/components/account.php" method="POST">

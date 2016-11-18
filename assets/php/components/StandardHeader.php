@@ -13,8 +13,11 @@
 //  Import constants file?
 //
 //
-set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
 session_start();
+set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
+
+#echo session_id();
+
 function GetParams(...$params){
     $parameters = [];
     foreach ($params as $pname){

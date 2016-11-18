@@ -21,9 +21,13 @@ require_once "components/Components.php";
 <body style="background-color: #38474F; overflow: hidden; ">
 <div id="modal" onclick="hideModal()">
 
+
+
 </div>
 
+
 <nav class="navbar navbar-fixed-top" style="z-index: 999999">
+
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
             <span class="sr-only">Toggle navigation</span>
@@ -31,12 +35,14 @@ require_once "components/Components.php";
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
+
         <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-blackboard" style="font-size: 24px"> </span>SLING</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-right">
             <li>
                 <button id="login-button" class="login-button" onclick="showLogin()" style="margin: 5px;">Login</button>
+
             </li>
         </ul>
     </div>
@@ -56,7 +62,8 @@ require_once "components/Components.php";
 
 <div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 50px;">
     <div class="" style="margin: 0 auto;">
-        <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block" onclick="modal('Create Room Modal')">
+        <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block"
+                onclick="modal('Create Room Modal')">
             Create Room
         </button>
 
@@ -74,11 +81,7 @@ require_once "components/Components.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
-//    document.getElementById('loginForm').onkeypress = function (e) {
-//        if (e.keyCode == 13) {
-//            document.getElementById('submitButton').click();
-//        }
-//    }
+    
 
     /** PAGE SETUP HERE **/
     window.addEventListener("load", function () {
@@ -88,6 +91,9 @@ require_once "components/Components.php";
 </script>
 
 <script>
+
+    loggedIn = isTokenSet();
+
     function toggleform(e) {
         if (e.value === "Join a Room") {
             e.value = "";
@@ -117,6 +123,27 @@ require_once "components/Components.php";
             })}, 700
         );
     }
+
+    function logout() {
+        console.log("in logout");
+        var form = document.getElementById("loginForm");
+        var email = form.elements["email"].value;
+        var password = form.elements["pass1"].value;
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            data: {
+                action: "logout"
+            },
+            success: function () {
+                isTokenSet();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
     function submitLogin() {
         var form = document.getElementById("loginForm");
         var email = form.elements["email"].value;
@@ -143,45 +170,47 @@ require_once "components/Components.php";
     }
     function noErrors(data) {
         var loginError = document.getElementById("error");
-        console.log(data);
-        if(data) {
+        //console.log(data);
+        if (data) {
             loginError.innerHTML = "<br>";
             hideLogin(data)
         }
         else
             loginError.innerHTML = "Username or password is Incorrect";
     }
-    function hideLogin() {
+
+    function hideLogin(data) {
         var button = document.getElementById("login-button");
         var loginarea = document.getElementById("login-cont");
+        button.innerHTML = "Logout";
         button.className = "login-button";
-        hideModal();
-    }
 
-    function noprop(e){
+        isTokenSet();
+
+    }
+    function noprop(e) {
         e.stopPropagation();
         return false;
     }
-
     window.addEventListener("load", function () {
         var sbtns = document.getElementsByClassName("sbtn");
-        for(var i = sbtns.length-1; i>= 0; i--){
+        for (var i = sbtns.length - 1; i >= 0; i--) {
             console.log(sbtns[i]);
             var button = sbtns[i];
             button.addEventListener("click", function (event) {
                 var drip = document.createElement("div");
                 var brect = button.getBoundingClientRect();
                 drip.className = "drip";
-                drip.style.left = event.pageX - brect.left -50;
-                drip.style.top = event.pageY-brect.top-50;
-                setTimeout(function(){
+                drip.style.left = event.pageX - brect.left - 50;
+                drip.style.top = event.pageY - brect.top - 50;
+                setTimeout(function () {
                     button.removeChild(drip)
                 }, 1000);
                 button.appendChild(drip);
             })
         }
-
     });
+
     
     function modal(resourceName, classname, onblur){
         var modalContents = Resource.get(resourceName);
@@ -196,14 +225,35 @@ require_once "components/Components.php";
                 if(onblur) onblur();
             };
         }else{
+
             console.error("Resource " + resourceName + " has not been loaded.  Load the resource first with Resource.load()");
         }
-
-
+    }
+    function hideModal() {
+        document.getElementById("modal").style.visibility = "hidden";
     }
 
-    function hideModal(){
-        document.getElementById("modal").style.visibility = "hidden";
+    function isTokenSet() {
+        var allcookies = document.cookie;
+        var button = document.getElementById("login-button");
+        var loggedin = false;
+        var name;
+        var value;
+
+        cookiearray = allcookies.split(';');
+
+        for (var i = 0; i < cookiearray.length; i++) {
+            name = cookiearray[i].split('=')[0];
+            value = cookiearray[i].split('=')[1];
+            if (name == 'token' && value != '') {//check if token has value and is valid
+                button.innerHTML = "Logout";
+                loggedin = true;
+            }
+        }
+        if(!loggedin)
+            button.innerHTML = "Login";
+
+        return loggedin;
     }
 </script>
 </html>
