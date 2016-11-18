@@ -212,6 +212,7 @@ require_once "classes/Room.php";
     $room = Room::createRoom("roomName", $account->getToken(), "screenName");
     $account->_ScreenName = "BobMar";
     assert($account->getScreenName() == "BobMar", "Update Participant ScreenName to BobMar");
+    cleanup();
 }
 /***********************************************************************************************************************
  *          Create rooms and Get Participants from Room

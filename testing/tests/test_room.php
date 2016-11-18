@@ -25,20 +25,20 @@ assert($was_exception === true, "Assert that the Room threw an exception");
 
 //echo "print me";
 //$GLOBALS["RoomID"] = 1234;
-
+//
 $account = Account::CreateAccount("roomtest@test.com", "Bob", "Marley", "password");
 $room = Room::createRoom("roomName", $account->getToken(), "screenName");
 $account1 = Account::CreateAccount();
 $account2 = Account::CreateAccount();
 
 $json = $room->getJSON(false);
-$object = json_decode($json, true);
-$roomCode = $room->getRoomCodes()[0]->getCode();
-
-assert($object["Type"] == "Room", "Assert that object has correct type attribute");
-assert($object["Accounts"][0]["Type"] == "Account", "Assert that object has correct Participants attribute");
-assert($object["RoomCodes"][0]["Code"] == $roomCode, "Assert that object has correct RoomCode attribute");
-
+//$object = json_decode($json, true);
+//$roomCode = $room->getRoomCodes()[0]->getCode();
+//
+//assert($object["Type"] == "Room", "Assert that object has correct type attribute");
+//assert($object["Accounts"][0]["Type"] == "Account", "Assert that object has correct Participants attribute");
+//assert($object["RoomCodes"][0]["Code"] == $roomCode, "Assert that object has correct RoomCode attribute");
+//
 //$room->delete();
 //
 //$was_exception = false;
