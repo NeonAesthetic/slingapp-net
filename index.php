@@ -59,7 +59,7 @@ require_once "components/Components.php";
 <div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 50px;">
     <div class="" style="margin: 0 auto;">
         <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block"
-                onclick="modal('Create Room Modal', 'darken', null)">
+                onclick="Modal.create('Create Room Modal', 'darken', null)">
             Create Room
         </button>
 
@@ -179,7 +179,7 @@ require_once "components/Components.php";
         var loginarea = document.getElementById("login-cont");
         button.innerHTML = "Logout";
         button.className = "login-button";
-        hideModal();
+        Modal.hide();
         isTokenSet();
 
     }
@@ -206,9 +206,6 @@ require_once "components/Components.php";
         }
     });
 
-    function hideModal() {
-        document.getElementById("modal").style.visibility = "hidden";
-    }
 
     function isTokenSet() {
         var allcookies = document.cookie;

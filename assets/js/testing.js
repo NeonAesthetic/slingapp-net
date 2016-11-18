@@ -10,7 +10,7 @@ window.addEventListener("load", function () {
     testConsole = document.getElementById("console");
     testList = document.getElementById("tests");
     testConsole.addEventListener("contextmenu", function (event) {
-        contextMenu(event, getConsoleNodeList());
+        ContextMenu.create(event, getConsoleNodeList());
         return false;
     });
 });
@@ -20,6 +20,10 @@ function runAllTests(){
     for(var i = 0; i<tests.length; i++){
         runTest(tests[i]);
     }
+}
+
+function failTest(testDiv){
+    
 }
 
 function runTest(div, callback){
@@ -40,7 +44,9 @@ function runTest(div, callback){
         try{
             test = JSON.parse(data);
         }catch(e){
-            console.log(data);
+            newstuff += data;
+            testConsole.innerHTML = newstuff + testConsole.innerHTML;
+            return;
         }
 
 
@@ -65,17 +71,6 @@ function runTest(div, callback){
         document.getElementById("console").innerHTML = newstuff + document.getElementById("console").innerHTML;
         checkChildStatus(div.parentNode)
     });
-}
-
-function get(resource, parameters, callback){
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if(xhr.readyState == 4){
-            callback(xhr.responseText, xhr.status);
-        }
-    };
-    xhr.open("GET", resource + parameters, true);
-    xhr.send();
 }
 
 function clearconsole() {
@@ -117,8 +112,7 @@ function addTestButtonEvents(){
     tests.forEach(function(n){
         n.addEventListener("click", startTest);
         n.addEventListener("contextmenu", function (event) {
-
-            contextMenu(event, getTestNodeList(n));
+            ContextMenu.create(event, getTestNodeList(n));
             return false;
         });
     });
@@ -152,6 +146,7 @@ function runFolderTests(e){
 
 function checkChildStatus(e){
     var button = document.getElementById(e.getAttribute("button"));
+    if(!button) return;
     var children = e.querySelectorAll(".test");
     var numChildren = children.length;
     var numFail = 0;
@@ -174,60 +169,22 @@ function checkChildStatus(e){
     }
 }
 
-function createMenuLink(text, classname, callback){
-    var link = document.createElement("a");
-    link.innerHTML = text;
-    link.className = classname;
-    link.onclick = callback;
-    return link;
-}
-
-function contextMenu(event, nodelist){
-    if(ContextMenu){
-        document.body.removeChild(ContextMenu);
-        ContextMenu = null;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    ContextMenu = document.createElement("div");
-    ContextMenu.className = "context-menu";
-    ContextMenu.close = function () {
-        document.body.click();
-    };
-    var menuitemslen = nodelist.length;
-    for(var i = 0; i<menuitemslen; i++){
-        ContextMenu.appendChild(nodelist[i]);
-    }
-    document.onclick = function(){
-        if(ContextMenu){
-            document.body.removeChild(ContextMenu);
-            ContextMenu = null;
-        }
-    };
-    ContextMenu.style.left = event.pageX;
-    ContextMenu.style.top = event.pageY;
-    ContextMenu.onclick = function (event) {
-        event.stopPropagation();
-    };
-    document.body.appendChild(ContextMenu);
-}
 
 function getTestNodeList(testElement){
-    var list = [];
     var label = document.createElement("p");
     label.innerHTML = testElement.querySelector(".tname").innerHTML;
-    var runTest = createMenuLink("Run Test", "", function () {
+    var runTest = ContextMenu.createMenuLink("Run Test", "", function () {
         testElement.click();
     });
 
     var disable = null;
     if(testElement.className.search(/disabled/) != -1){
-        disable = createMenuLink("Enable Test", "", function () {
+        disable = ContextMenu.createMenuLink("Enable Test", "", function () {
             testElement.removeClass("disabled");
             ContextMenu.close();
         });
     }else{
-        disable = createMenuLink("Disable Test", "", function () {
+        disable = ContextMenu.createMenuLink("Disable Test", "", function () {
             testElement.className += " disabled";
             ContextMenu.close();
         });
@@ -236,7 +193,7 @@ function getTestNodeList(testElement){
 
     var hr = document.createElement("hr");
 
-    var reload = createMenuLink("Reload Tests", "", function () {
+    var reload = ContextMenu.createMenuLink("Reload Tests", "", function () {
         refreshTests();
         ContextMenu.close();
     });
@@ -248,7 +205,7 @@ function getConsoleNodeList(){
     var console = document.createElement("p");
     console.innerHTML = "Test Console";
 
-    var clear = createMenuLink("Clear", "", function () {
+    var clear = ContextMenu.createMenuLink("Clear", "", function () {
         clearconsole();
         ContextMenu.close();
     });

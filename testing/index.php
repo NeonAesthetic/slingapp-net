@@ -15,7 +15,7 @@ session_start();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/tests.css">
-    <script src="/assets/js/testing.js"></script>
+
 
 </head>
 <body style="background-color: #eee">
@@ -63,5 +63,7 @@ session_start();
         refreshTests();
     });
 </script>
+<script src="/assets/js/testing.js"></script>
+<script src="/assets/js/sling.js"></script>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

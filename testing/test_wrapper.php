@@ -104,8 +104,7 @@ if(isset($_GET['test'])){
 
     include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
 
-
-
+    
     $end = microtime(true);
     $GLOBALS["json"]["total-time"] = round(($end - $start)*1000, 3);
 }else{
