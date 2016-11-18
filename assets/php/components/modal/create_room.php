@@ -11,7 +11,8 @@
 
 <div class="card abs-center" onclick="noprop(event)" style="margin-top: calc(50vh - 200px);">
     <form>
-        <input type="text" placeholder="Room Name">
+        <input class="form-control" type="text" placeholder="Room Name">
+
     </form>
 </div>
 

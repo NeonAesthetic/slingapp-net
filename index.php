@@ -19,11 +19,7 @@ require_once "components/Components.php";
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
 <body style="background-color: #38474F; overflow: hidden; ">
-<div id="modal" onclick="hideModal()">
 
-
-
-</div>
 
 
 <nav class="navbar navbar-fixed-top" style="z-index: 999999">
@@ -63,7 +59,7 @@ require_once "components/Components.php";
 <div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 50px;">
     <div class="" style="margin: 0 auto;">
         <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block"
-                onclick="modal('Create Room Modal')">
+                onclick="modal('Create Room Modal', 'darken', null)">
             Create Room
         </button>
 
@@ -81,10 +77,9 @@ require_once "components/Components.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
-    
-
     /** PAGE SETUP HERE **/
     window.addEventListener("load", function () {
+        Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
     });
@@ -118,7 +113,7 @@ require_once "components/Components.php";
         var button = document.getElementById("login-button");
         button.className += " open";
         setTimeout(function(){
-            modal("Login Form", false, function () {
+            Modal.create("Login Form", "", function () {
                 hideLogin();
             })}, 700
         );
@@ -184,7 +179,7 @@ require_once "components/Components.php";
         var loginarea = document.getElementById("login-cont");
         button.innerHTML = "Logout";
         button.className = "login-button";
-
+        hideModal();
         isTokenSet();
 
     }
@@ -211,24 +206,6 @@ require_once "components/Components.php";
         }
     });
 
-    
-    function modal(resourceName, classname, onblur){
-        var modalContents = Resource.get(resourceName);
-        if(modalContents != null){
-            var modal =  document.getElementById("modal");
-            modal.className = classname;
-
-            modal.style.visibility = "visible";
-            modal.innerHTML = modalContents;
-            modal.onclick = function(){
-                hideModal();
-                if(onblur) onblur();
-            };
-        }else{
-
-            console.error("Resource " + resourceName + " has not been loaded.  Load the resource first with Resource.load()");
-        }
-    }
     function hideModal() {
         document.getElementById("modal").style.visibility = "hidden";
     }
