@@ -101,11 +101,11 @@ if(isset($_GET['test'])){
     ob_start();
     $start = microtime(true);
     create_test_json();
-    try{
-        include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
-    }catch (Throwable $e){
-        echo "REEEE";
-    }
+
+    include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
+
+
+
     $end = microtime(true);
     $GLOBALS["json"]["total-time"] = round(($end - $start)*1000, 3);
 }else{
