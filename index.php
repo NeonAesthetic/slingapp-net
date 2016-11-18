@@ -18,35 +18,12 @@ require_once "components/Components.php";
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
-<body style="background-color: #38474F; overflow: hidden; padding-top: 50px;">
+<body style="background-color: #38474F; overflow: hidden; ">
 <div id="modal" onclick="hideModal()">
-    
+
 </div>
 
-<div id="login-cont"
-     style="position: fixed; width: 100%; height: 100%; visibility: hidden; color: white; z-index: 99999999999;" onclick="hideLogin()">
-
-    <center>
-        <form id="loginForm" class="log-modal"
-              style="" method="post"
-              onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
-            <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
-                <a href="#" style="color: #333; text-decoration: none" onclick="hideLogin()">✕</a>
-            </div>
-            <h1 id="loginFormHeader" style="color: #333">Login</h1>
-
-            <input name="email" class="form-control" placeholder="email" type="email">
-            <input name="pass1" class="form-control" placeholder="password" type="password">
-            <div id="error" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
-            <hr>
-            <div id="submitButton" class="sbtn card-width-button" onclick="submitLogin(this)">SUBMIT</div>
-
-
-        </form>
-
-    </center>
-</div>
-<nav class="navbar navbar-fixed-top" >
+<nav class="navbar navbar-fixed-top" style="z-index: 999999">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
             <span class="sr-only">Toggle navigation</span>
@@ -54,30 +31,17 @@ require_once "components/Components.php";
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand noselect" href="/"><span class="glyphicon glyphicon-blackboard" style="font-size: 24px"> </span>SLING</a>
+        <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-blackboard" style="font-size: 24px"> </span>SLING</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-left">
+        <ul class="nav navbar-right">
             <li>
-                <div class="btn-group navbar-btn">
-
-                    <ul id="context-menu" class="dropdown-menu context-menu" style="padding: 5px 0 5px 0; margin-top: 15px;">
-                        <li>
-                            Login
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <div class="btn-group navbar-btn">
-                    <button id="login-button" class="login-button" onclick="showLogin()">Login</button>
-                </div>
+                <button id="login-button" class="login-button" onclick="showLogin()" style="margin: 5px;">Login</button>
             </li>
         </ul>
     </div>
 </nav>
+
 <div class="container-fluid"
      style="background-color: rgba(255,255,255,1); text-align: center; padding: 50px;; ">
     <a class="register-link" href="/register/" style="position: absolute; top: 0; right: 0; margin: 60px;">Register</a>
@@ -110,15 +74,16 @@ require_once "components/Components.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
-    document.getElementById('loginForm').onkeypress = function (e) {
-        if (e.keyCode == 13) {
-            document.getElementById('submitButton').click();
-        }
-    }
+//    document.getElementById('loginForm').onkeypress = function (e) {
+//        if (e.keyCode == 13) {
+//            document.getElementById('submitButton').click();
+//        }
+//    }
 
     /** PAGE SETUP HERE **/
     window.addEventListener("load", function () {
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
+        Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
     });
 </script>
 
@@ -146,11 +111,11 @@ require_once "components/Components.php";
     function showLogin() {
         var button = document.getElementById("login-button");
         button.className += " open";
-        setTimeout(function () {
-            var loginarea = document.getElementById("login-cont");
-            loginarea.style.visibility = "visible";
-            console.log(loginarea);
-        }, 700);
+        setTimeout(function(){
+            modal("Login Form", false, function () {
+                hideLogin();
+            })}, 700
+        );
     }
     function submitLogin() {
         var form = document.getElementById("loginForm");
@@ -190,7 +155,7 @@ require_once "components/Components.php";
         var button = document.getElementById("login-button");
         var loginarea = document.getElementById("login-cont");
         button.className = "login-button";
-        loginarea.style.visibility = "hidden";
+        hideModal();
     }
 
     function noprop(e){
@@ -218,11 +183,18 @@ require_once "components/Components.php";
 
     });
     
-    function modal(resourceName){
+    function modal(resourceName, classname, onblur){
         var modalContents = Resource.get(resourceName);
         if(modalContents != null){
-            document.getElementById("modal").style.visibility = "visible";
-            document.getElementById("modal").innerHTML = modalContents;
+            var modal =  document.getElementById("modal");
+            modal.className = classname;
+
+            modal.style.visibility = "visible";
+            modal.innerHTML = modalContents;
+            modal.onclick = function(){
+                hideModal();
+                if(onblur) onblur();
+            };
         }else{
             console.error("Resource " + resourceName + " has not been loaded.  Load the resource first with Resource.load()");
         }

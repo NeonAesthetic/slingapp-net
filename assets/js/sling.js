@@ -8,6 +8,7 @@ var Resource = {
         get(resource, "", function(data){
             Resource.dictionary[name] = data;
             if(callback) callback(data);
+            console.info("Finished loading " + name);
         });
 
     },
