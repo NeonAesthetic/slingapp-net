@@ -16,11 +16,11 @@ require_once "interfaces/DatabaseObject.php";
  * This Class handles all Accounts and linked participants in the database.
  * This class will create a new account for  user that does not already have
  * one based on the status of the login token. The account will be used in order
- * to maintain a single participant to any room a single account is participating
+ * to maintain a single participant to any rooms a single account is participating
  * in. The account class can have at most one participant per session.
  *
  * This class uses SQL statements in order to locate data pertaining to any current
- * accounts in the database and any participants linked to that account and any room
+ * accounts in the database and any participants linked to that account and any rooms
  * that the single participant and account are participating in.
  * */
 
@@ -83,7 +83,7 @@ class Account extends DatabaseObject
      * @return Account
      * @throws Exception
      * This function is used to create a new account in the database. It will be called when a user
-     * is attempting to join a room without already having an account, or when a user opts to register
+     * is attempting to join a rooms without already having an account, or when a user opts to register
      * a new account with the Sling Application.
      * This Function executes the SQL DML Statement Insert to add a new account to the database.
      */
@@ -261,12 +261,12 @@ class Account extends DatabaseObject
     }
     /**
      * Function Update
-     * This function will trigger whenever a setter is used or a user attempts to join a room,
+     * This function will trigger whenever a setter is used or a user attempts to join a rooms,
      * it will attempt to insert the account
-     * data and the participant data to correlate with the new room and participant status.
+     * data and the participant data to correlate with the new rooms and participant status.
      */
-    //NEEDED:   Update Account status based on room to join and allow linked participant to join room
-    //NEEDED:   Test that allows room to be created-> then account-> then update to move account and part. to room
+    //NEEDED:   Update Account status based on rooms to join and allow linked participant to join rooms
+    //NEEDED:   Test that allows rooms to be created-> then account-> then update to move account and part. to rooms
     public function update()
     {
         if ($this->_roomID) {                       //account has participant

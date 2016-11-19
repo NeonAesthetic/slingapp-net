@@ -1,4 +1,4 @@
-DROP USER 'sling'@'localhost';
+# DROP USER 'sling'@'localhost';
 DROP DATABASE if exists sling;
 
 CREATE USER 'sling'@'localhost';
@@ -53,7 +53,7 @@ CREATE TABLE Participants (
   ParticipantID SERIAL,
   RoomID BIGINT UNSIGNED NOT NULL,
   AccountID BIGINT UNSIGNED NULL,
-  ScreenName VARCHAR(20) NOT NULL,
+  ScreenName VARCHAR(20) NULL,
 
   PRIMARY KEY (ParticipantID),
   FOREIGN KEY(RoomID) REFERENCES Rooms(RoomID),

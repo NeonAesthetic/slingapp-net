@@ -9,8 +9,9 @@
 $room = $_GET["room"];
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
 require_once "classes/Room.php";
+$token = $_COOKIE["Token"];
 
-$room_obj = new Room($room);
+$room_obj = new Room($room, $token);
 
 ?>
 <html>

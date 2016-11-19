@@ -13,7 +13,6 @@
 //  Import constants file?
 //
 //
-session_start();
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
 
 #echo session_id();

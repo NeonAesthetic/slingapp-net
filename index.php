@@ -5,7 +5,6 @@
  * Date: 10/14/16
  * Time: 8:09 AM
  */
-session_start();
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 ?>
@@ -82,6 +81,7 @@ require_once "components/Components.php";
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
+        AssureCookie();
     });
 </script>
 
@@ -228,6 +228,37 @@ require_once "components/Components.php";
             button.innerHTML = "Login";
 
         return loggedin;
+    }
+
+    function getCookie(){
+        console.log(document.cookie)
+//        return document
+    }
+    
+    function CreateRoom(event, element){
+        var roomname = element.roomname.value;
+        var token = GetCookie().value;
+        $.ajax({
+            type: 'post',
+            url: 'assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "create",
+                roomname: roomname,
+                token:token
+            },
+            success: function (data) {
+                console.log(data);
+                window.location = "/rooms/" + data.RoomID;
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+
     }
 </script>
 </html>

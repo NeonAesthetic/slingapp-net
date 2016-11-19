@@ -5,7 +5,6 @@
  * Date: 11/8/16
  * Time: 8:19 AM
  */
-session_start();
 
 #echo session_id();
 
@@ -84,6 +83,12 @@ switch ($p['action']) {
     case "newtoken": {
     }
         break;
+    case "nocookie":
+    {
+        $account = Account::CreateAccount();
+        echo $account->getJSON();
+    }
+    break;
     default:
         DatabaseObject::Log(__FILE__, "action not valid",
             "action wasn't valid");

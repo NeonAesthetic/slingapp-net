@@ -12,13 +12,13 @@ require_once "interfaces/DatabaseObject.php";
 require_once "classes/RoomCode.php";
 require_once "classes/Account.php";
 
-//Needs setter for number of room code uses
+//Needs setter for number of rooms code uses
 /**
  * This Class handles all Rooms in the application, and manages their creation
  * and deletion as well as adding and removing participants through its function
  * calls. This class has the ability to make rooms for temporary accounts as well
- * as permanent accounts. The participants generated in each room will exist for the
- * duration of the room, and can be rejoined by an account via the cookie unique
+ * as permanent accounts. The participants generated in each rooms will exist for the
+ * duration of the rooms, and can be rejoined by an account via the cookie unique
  * identity that each account will have based on its computer  and browser.
  */
 class Room extends DatabaseObject
@@ -37,48 +37,36 @@ class Room extends DatabaseObject
      * @param $token
      * @param $screenName
      * @throws Exception
-     * This constructor will allow a room to be generated based on the creating participants
-     * token, and given screen name, the roomID will act as a unique identifier for the room.
-     * No room can exist without a participant.
+     * This constructor will allow a rooms to be generated based on the creating participants
+     * token, and given screen name, the roomID will act as a unique identifier for the rooms.
+     * No rooms can exist without a participant.
      */
-    public function __construct($roomID, $token, $screenName, $uses, $expirationDate)
+    public function __construct($roomID, $token)
     {
         $this->_roomID = $roomID;
-        $this->_usesLeft = $uses;
 
-        $this->_expirationDate = $expirationDate;
-        if($participantID = $this->addParticipant($token, $screenName)) {
-            $roomCodeObject = $this->addRoomCode($participantID, $uses, $expirationDate);
-            $roomCode = $roomCodeObject->getCode();
+        $sql = "SELECT * FROM Rooms
+                LEFT JOIN Participants pt
+                ON Rooms.RoomID = pt.RoomID
+                LEFT JOIN RoomCodes rc
+                ON Rooms.RoomID = rc.RoomID
+                LEFT JOIN Accounts ac
+                ON ac.AccountID = pt.AccountID
+                WHERE Rooms.RoomID = :roomid";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":roomid" => $roomID]);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-            $sql = "SELECT DISTINCT * FROM Rooms
-                    LEFT JOIN Participants
-                    ON Rooms.RoomID = Participants.RoomID
-                    LEFT JOIN RoomCodes rc
-                    ON Rooms.RoomID = rc.RoomID
-                    WHERE Rooms.RoomID = (SELECT RoomID
-                                          FROM RoomCodes
-                                          WHERE RoomCode = :roomCode
-                                          )";
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute([":roomCode" => $roomCode]);
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if ($result != false) {
+            $this->_roomName = $result[0]["RoomName"];
 
-            if ($result != false) {
-                $this->_roomID = $result[0]["RoomID"];
-                $this->_roomName = $result[0]["RoomName"];
-                if ($roomCode != null) {
-
-                    foreach ($result as $row) {
-                        if ($row["RoomCode"] != null)
-                            $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
-                    }
-                }
-            } else {
-                throw new Exception("A Room with that code could not be found");
+            foreach ($result as $row) {
+                if ($row["RoomCode"] != null)
+                    $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
+                if ($row["AccountID"] != null)
+                    $this->_accounts[] = new Account($row["AccountID"], $row["LoginToken"]);
             }
-        } else {
-            throw new Exception("Participant could not be created with that token");
+
         }
     }
     /**
@@ -88,16 +76,16 @@ class Room extends DatabaseObject
      * @param $screenName
      * @throws Exception
      * @return Room
-     * This Function will allow a room to be generated based on a token from
-     * the account creating the room. This will allow both Account Users and
-     * Temp Users to join the room.
+     * This Function will allow a rooms to be generated based on a token from
+     * the account creating the rooms. This will allow both Account Users and
+     * Temp Users to join the rooms.
      */
     public static function createRoom($roomName, $token, $screenName, $uses = null, $expirationDate = null)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
         if (!$statement->execute([":name" => $roomName])) {
-            throw new Exception("Could not create room");
+            throw new Exception("Could not create rooms");
         }
         $roomID = Database::connect()->lastInsertId();
 
@@ -109,7 +97,7 @@ class Room extends DatabaseObject
      * @param $screenName
      * @return Room
      * @throws Exception
-     * This Function will allow the generation of a room without an account
+     * This Function will allow the generation of a rooms without an account
      * token, and will allow the joining of Account Users as well as Temp Users.
      */
     public static function createRoomWithoutAccount($roomName, $screenName, $uses = null, $expirationDate = null)
@@ -117,7 +105,7 @@ class Room extends DatabaseObject
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
         if (!$statement->execute([":name" => $roomName])) {
-            throw new Exception("Could not create room");
+            throw new Exception("Could not create rooms");
         }
         $roomID = Database::connect()->lastInsertId();
         $account = Account::CreateAccount();
@@ -152,7 +140,7 @@ class Room extends DatabaseObject
      * @param $token
      * @param $screenName
      * @return integer
-     * This Function allows a participant to be generated in a room based
+     * This Function allows a participant to be generated in a rooms based
      * on its account token (Temp or Perm) and a screenName that the
      * user provides. Checks how many uses are left and returns false if
      * no uses left.
@@ -172,7 +160,7 @@ class Room extends DatabaseObject
      * Function Delete
      * This function will remove a RoomCode, then all Participants, the the Room
      * that is targeted by it. This will allow referential integrity to remain valid
-     * and the removal of the room from the active database.
+     * and the removal of the rooms from the active database.
      */
     public function delete()
     {
@@ -202,7 +190,7 @@ class Room extends DatabaseObject
      * This function uses an SQL statement in order to find an
      * existing participant based on an account's ID. If it succeeds in finding
      * and deleting the participant, it will return 'true'.
-     * This function should be called when a room expires.
+     * This function should be called when a rooms expires.
      */
     public function deleteParticipant($accountID)
     {
@@ -257,7 +245,7 @@ class Room extends DatabaseObject
 
     /**
      * Function UpdateRoom
-     * This Function Changes the currenr room name in the database.
+     * This Function Changes the currenr rooms name in the database.
      */
     private function updateRoom()
     {

@@ -164,3 +164,47 @@ function get(url, parameters, callback){
     xhr.open("GET", url + parameters, true);
     xhr.send();
 }
+
+function noprop(event){
+    event.stopPropagation();
+}
+
+function GetCookie(){
+    var cstring = document.cookie;
+    var comp = cstring.split(";");
+    console.log(comp);
+    var keynval = comp[0].split("=");
+    var key = keynval[0];
+    var value = keynval[1];
+    var date = comp[1];
+    return {key:key,
+            value:value,
+            expires:date};
+}
+
+function SetCookie(key, value, daysTillExp) {
+    var date = new Date();
+    date.setTime(date.getTime() + (daysTillExp*24*60*60*1000));
+    var expires = "expires="+ date.toUTCString();
+    document.cookie = key + "=" + value + ";" + expires + ";path=/";
+}
+
+function AssureCookie(){
+    if(GetCookie()['key'] != "Token"){
+        $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            dataType: 'JSON',
+            data: {
+                action: "nocookie"
+            },
+            success: function (data) {
+                SetCookie("Token", data.LoginToken, 7);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
+    }
+}
