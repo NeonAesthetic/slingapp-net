@@ -146,6 +146,11 @@ var ContextMenu = {
         link.className = classname;
         link.onclick = onclick;
         return link;
+    },
+    createLabel:function(text){
+        var label = document.createElement('p');
+        label.innerHTML = text;
+        return label;
     }
 };
 

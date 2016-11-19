@@ -5,7 +5,10 @@
     animation: pulse 1.8s infinite ease-in-out;
 }
 
-
+.test-output-container{
+    border-bottom: 1px inset #555;
+    margin-bottom: 10px;
+}
 
 .ico-area{
     height: 32px;

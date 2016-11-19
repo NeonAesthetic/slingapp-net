@@ -23,14 +23,21 @@ function map_test_dir($dir){
             $text = fread(fopen($testfile, "r"), filesize($testfile));
             preg_match("#(?<=Test Name:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
             $test_name = $match[0];
+            preg_match("#(?<=Type:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
+            if($match)
+                $test_type = $match[0];
+            else    //if no type listed assume test is PHP
+                $test_type = "PHP";
             if(strpos($test_name, "NOINCLUDE") !== false) continue;
             preg_match("#(?<=Description:).+(?=\n)#", $text, $matches);
             $test_desc = $matches[0];
-
+            $classname = "list-group-item test ";
+            if(strpos($test_type, "JS") != false)
+                $classname .= "test-js";
             ?>
-            <a href='javascript:;' title="[<?=basename($testfile)?>]: <?=$test_desc?>" name="test" testfile="<?=substr($testfile, 2)?>" class='list-group-item test' style=";">
-                <span class="tname"><?=$test_name?></span>
-                <span class='tfile'></span>
+            <a href='javascript:;' title="[<?=basename($testfile)?>]: <?=$test_desc?>" name="test" testfile="<?=substr($testfile, 2)?>" class='<?=$classname?>' style=";">
+                <span class="tname"><?=$test_name?></span> &middot;
+                <span class='tfile'><?=$test_type?></span>
                 <div class='ico-area'></div>
             </a>
             <?php
