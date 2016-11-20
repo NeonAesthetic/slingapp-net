@@ -41,7 +41,7 @@ switch ($p['action']) {
             $account = Account::Login($p['email'], $p['pass1']);
             if ($account && isLoggedIn($p)) {
                 $token = $account->getToken();
-                setcookie('token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
+                setcookie('Token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
                 $_SESSION['token'] = $account->getToken();
                 #echo "Successfully logged in using password!";
                 $retval = $account->getJSON();

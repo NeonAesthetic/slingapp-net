@@ -520,4 +520,9 @@ class Account extends DatabaseObject
         $this->update();
         return $value;
     }
+
+    function __toString()
+    {
+        return $this->_accountID.$this->__toString();
+    }
 }

@@ -237,7 +237,7 @@ require_once "components/Components.php";
     
     function CreateRoom(event, element){
         var roomname = element.roomname.value;
-        var token = GetCookie().value;
+        var token = GetToken();
         $.ajax({
             type: 'post',
             url: 'assets/php/components/room.php',

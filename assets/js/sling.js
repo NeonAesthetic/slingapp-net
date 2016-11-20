@@ -169,17 +169,21 @@ function noprop(event){
     event.stopPropagation();
 }
 
-function GetCookie(){
+function GetToken(){
+
     var cstring = document.cookie;
-    var comp = cstring.split(";");
-    console.log(comp);
-    var keynval = comp[0].split("=");
+    var cookies = cstring.split(";");
+    var tokenstr = null;
+    cookies.forEach(function (c) {
+        if(c.search(/Token/) != -1)
+            tokenstr=c;
+    });
+
+    var keynval = tokenstr.split("=");
     var key = keynval[0];
     var value = keynval[1];
-    var date = comp[1];
-    return {key:key,
-            value:value,
-            expires:date};
+    console.log(keynval);
+    return value;
 }
 
 function SetCookie(key, value, daysTillExp) {
@@ -190,7 +194,7 @@ function SetCookie(key, value, daysTillExp) {
 }
 
 function AssureCookie(){
-    if(GetCookie()['key'] != "Token"){
+    if(GetToken() == null){
         $.ajax({
             type: 'post',
             url: 'assets/php/components/account.php',
@@ -208,3 +212,7 @@ function AssureCookie(){
 
     }
 }
+
+var Account = {
+    data:null
+};

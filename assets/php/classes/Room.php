@@ -80,16 +80,20 @@ class Room extends DatabaseObject
      * the account creating the rooms. This will allow both Account Users and
      * Temp Users to join the rooms.
      */
-    public static function createRoom($roomName, $token, $screenName, $uses = null, $expirationDate = null)
+    public static function createRoom($roomName, $token, $screenName)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
         if (!$statement->execute([":name" => $roomName])) {
             throw new Exception("Could not create rooms");
         }
-        $roomID = Database::connect()->lastInsertId();
 
-        return new Room($roomID, $token, $screenName, $uses, $expirationDate);
+        $roomID = Database::connect()->lastInsertId();
+        $room = new Room($roomID, $token);
+        $room->addParticipant($token, null);
+
+        $room->update();
+        return $room;
     }
     /**
      * Function createRoomWithoutAccount
@@ -147,11 +151,15 @@ class Room extends DatabaseObject
      */
     public function addParticipant($token, $screenName)
     {
+
         $retval = false;
-        if($this->_usesLeft-- >= 0 && $account = Account::Login($token)) {
-            $account->addParticipant($this->getRoomID(), $screenName);
-            $this->_accounts[] = $account;
-            $retval = $account->getParticipantID();
+        if($account = Account::Login($token)) {
+            if(!array_key_exists($account, $this->_accounts)){
+                $account->addParticipant($this->getRoomID(), $screenName);
+                $this->_accounts[] = $account;
+                $retval = $account->getParticipantID();
+
+            }
         }
 
         return $retval;

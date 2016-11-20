@@ -12,6 +12,7 @@ require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 
 $room_obj = new Room($room, $token);
+$account = Account::Login($token);
 
 ?>
 <html>
@@ -38,10 +39,17 @@ $room_obj = new Room($room, $token);
     <div class="module" id="main" style="height: 60%; padding-left: 20px; width: 60%">
         Main Screen
     </div>
-    <div class="module" id="main" style="height: calc(100% - 100px); padding-left: 20px; width: calc(40% - 230px)">
-        Chat
+    <div class="module" id="chat" style="height: calc(100% - 100px); padding-left: 20px; width: calc(40% - 230px)">
+        <textarea rows="1" class="send-box"></textarea>
     </div>
 
 
 </div>
+<script src="/assets/js/sling.js"></script>
+<script src="/assets/js/room.js"></script>
+<script>
+    Account.data = <?=$account->getJSON()?>;
+    Room.data = <?=$room_obj->getJSON()?>;
+    Room.connect();
+</script>
 
