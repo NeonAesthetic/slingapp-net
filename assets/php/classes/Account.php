@@ -44,8 +44,9 @@ class Account extends DatabaseObject
     private $_roomID;
     private $_screenName;
     private $_participantID;
+    private $_active;
     /**
-     * Account constructor.
+     * Account-Tests constructor.
      * @param $accountID
      * @param $token
      * @param $tokenGen
@@ -57,7 +58,7 @@ class Account extends DatabaseObject
      * Function Constructor is used to create a new account based on data that is retrieved from the user at
      * the point of creation.
      * These elements make up the new account in the database and will persist until removed on command
-     * by the Delete Account function.
+     * by the Delete Account-Tests function.
      */
     public function __construct($accountID, $token, $tokenGen, $email = null, $fName = null, $lName = null,
                                 $lastLogin = null, $joinDate = null)
@@ -73,6 +74,7 @@ class Account extends DatabaseObject
         $this->_joinDate = $joinDate;
         $this->_roomID = null;
         $this->_screenName = null;
+        $this->_active = true;
     }
     /**
      * Function CreateAccount
@@ -248,6 +250,7 @@ class Account extends DatabaseObject
                 if ($retval = $statement->execute()) {
                     $this->_roomID = null;
                     $this->_screenName = null;
+                    $this->_active = false;
                 }
             }//if participant was deleted successfully or if it didn't exist, delete account
             if (!$this->_roomID) {
@@ -265,7 +268,7 @@ class Account extends DatabaseObject
      * it will attempt to insert the account
      * data and the participant data to correlate with the new rooms and participant status.
      */
-    //NEEDED:   Update Account status based on rooms to join and allow linked participant to join rooms
+    //NEEDED:   Update Account-Tests status based on rooms to join and allow linked participant to join rooms
     //NEEDED:   Test that allows rooms to be created-> then account-> then update to move account and part. to rooms
     public function update()
     {
@@ -281,7 +284,8 @@ class Account extends DatabaseObject
                     LastLogin = :lastLog,
                     JoinDate = :joinDate,
                     RoomID = :roomID,
-                    ScreenName = :screenName
+                    ScreenName = :screenName,
+                    Active = :active
                 WHERE a.AccountID = :accountID";
 
             $statement = Database::connect()->prepare($sql);
@@ -294,7 +298,8 @@ class Account extends DatabaseObject
                 ':joinDate' => $this->_joinDate,
                 ':accountID' => $this->_accountID,
                 ':roomID' => $this->_roomID,
-                ':screenName' => $this->_screenName));
+                ':screenName' => $this->_screenName,
+                ':active' => $this->_active));
         } else {                                    //account doesn't have a participant
             $sql = "UPDATE Accounts
                 SET Email = :email,
@@ -338,6 +343,7 @@ class Account extends DatabaseObject
             $this->_participantID = Database::connect()->lastInsertId();
             $this->_roomID = $roomID;
             $this->_screenName = $screenName;
+
         }
     }
     /**
@@ -356,8 +362,8 @@ class Account extends DatabaseObject
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
             if (Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n updated password");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n updated password");
             }
         } else
             throw new Exception("Password must be between 6 - 30 characters");
@@ -378,6 +384,13 @@ class Account extends DatabaseObject
     public function getAccountID()
     {
         return $this->_accountID;
+    }
+    /**
+     * @return bool
+     */
+    public function getActive()
+    {
+        return $this->_active;
     }
     /**
      * @return mixed
@@ -415,7 +428,7 @@ class Account extends DatabaseObject
     public function getJSON($as_array = false)
     {
         $json = [];
-        $json['Type'] = "Account";
+        $json['Type'] = "Account-Tests";
         $json['Email'] = $this->_email;
         $json["FirstName"] = $this->_fName;
         $json["LastName"] = $this->_lName;
@@ -436,7 +449,7 @@ class Account extends DatabaseObject
     /**
      * Function getEmail
      * @return mixed
-     * This function allows the Current Account Email to be returned.
+     * This function allows the Current Account-Tests Email to be returned.
      */
     public function getEmail()
     {
@@ -459,8 +472,8 @@ class Account extends DatabaseObject
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     $temp = $this->_email;
                     $this->_email = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account",
-                        "Account: $this->_accountID \n Updated Email From: $temp to: $value");
+                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                        "Account-Tests: $this->_accountID \n Updated Email From: $temp to: $value");
                 } else
                     throw new Exception("Email is not valid, please try again.");
 
@@ -470,8 +483,8 @@ class Account extends DatabaseObject
                 if ($this->isNameValid($value)) {
                     $temp = $this->_fName;
                     $this->_fName = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account",
-                        "Account: $this->_accountID \n Updated First Name From: $temp to: $value");
+                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                        "Account-Tests: $this->_accountID \n Updated First Name From: $temp to: $value");
                 } else
                     throw new Exception("First name is not valid, please try again.");
 
@@ -481,8 +494,8 @@ class Account extends DatabaseObject
                 if ($this->isNameValid($value)) {
                     $temp = $this->_lName;
                     $this->_lName = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account",
-                        "Account: $this->_accountID \n Updated Last Name From: $temp to: $value");
+                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                        "Account-Tests: $this->_accountID \n Updated Last Name From: $temp to: $value");
                 } else
                     throw new Exception("Last name is not valid, please try again.");
 
@@ -490,31 +503,37 @@ class Account extends DatabaseObject
             case "_token":
                 $this->_token = md5(uniqid(mt_rand(), true));
                 $this->_tokenGen = gmdate('Y-m-d H:i:s');
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n Updated token");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n Updated token");
                 break;
             case "_roomid":
                 $temp = $this->_roomID;
                 $this->_roomID = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n Updated roomID from: $temp to: $value");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n Updated roomID from: $temp to: $value");
                 break;
             case "_screenname":             //add validation check
                 $temp = $this->_screenName;
                 $this->_screenName = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n Updated screenname from: $temp to: $value");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n Updated screenname from: $temp to: $value");
+                break;
+            case "_active":
+                $temp = $this->_active;
+                $this->_active = $value;
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n Updated active from: $temp to: $value");
                 break;
             case "_participantid":
                 echo "NAME::: ", $name;
                 $temp = $this->_screenName;
                 $this->_participantID = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n Updated participantID from: $temp to: $value");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n Updated participantID from: $temp to: $value");
                 break;
             default:
-                DatabaseObject::Log(__FILE__, "Updated Account",
-                    "Account: $this->_accountID \n set method using: $name wasn't valid");
+                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+                    "Account-Tests: $this->_accountID \n set method using: $name wasn't valid");
         }
 
         $this->update();

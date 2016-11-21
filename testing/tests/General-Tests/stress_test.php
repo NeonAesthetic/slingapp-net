@@ -8,13 +8,13 @@
  * Description: Adds 20 accounts
  */
 
-require_once "classes/Account.php";
+require_once "classes/Account-Tests.php";
 require_once "classes/RoomCode.php";
 
 $ids = [];
 //mark();
 //for ($i = 0; $i < 20; $i++){
-//    $account = Account::CreateAccount("email$i", "fname$i", "lname$i", "password$i");
+//    $account = Account-Tests::CreateAccount("email$i", "fname$i", "lname$i", "password$i");
 //    $ids[] = $account->getJSON(true)["ID"];
 //}
 //mark("Insert 20 accounts");

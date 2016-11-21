@@ -21,7 +21,7 @@ function map_test_dir($dir){
             <?php
         }else{
             $text = fread(fopen($testfile, "r"), filesize($testfile));
-            preg_match("#(?<=Test Name:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
+            preg_match("#(?<=Test Name:) [a-zA-Z0-9 -]+?(?=\n|\r)#", $text, $match);
             $test_name = $match[0];
             preg_match("#(?<=Type:) [a-zA-Z0-9 ]+?(?=\n|\r)#", $text, $match);
             if($match)

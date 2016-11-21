@@ -9,8 +9,10 @@
 #echo session_id();
 
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
+
 require_once "classes/Account.php";
 $p = GetParams("action", "email", "fname", "lname", "pass1", "pass2", "token");
+
 $GLOBALS['access'] = 0;
 $GLOBALS['login'] = 0;
 switch ($p['action']) {
@@ -24,7 +26,7 @@ switch ($p['action']) {
             $_SESSION['token'] = $token;
             $retval = true;
         } else {
-            DatabaseObject::Log(__FILE__, "Register Account", "Account could not be created");
+            DatabaseObject::Log(__FILE__, "Register Account-Tests", "Account-Tests could not be created");
             #echo "Registration was unsuccessful";
         }
         echo $retval;
@@ -68,7 +70,7 @@ switch ($p['action']) {
     case "logout": {
         unset($_COOKIE['token']);
         setcookie('token', '', time() - (60 * 60 * 24), "/");
-//        $account = Account::Login($_SESSION['token']);
+//        $account = Account-Tests::Login($_SESSION['token']);
 //
 //        session_destroy();
 //        $GLOBALS['access'] = 0;
@@ -112,7 +114,7 @@ function process($p)
  * @param array [string]string
  * @return boolean
  * This Function returns the _access variable, which determines whether the
- * Account needs to be registered or logged into.
+ * Account-Tests needs to be registered or logged into.
  */
 function isLoggedIn($p)
 {

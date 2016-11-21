@@ -76,7 +76,7 @@ class Room extends DatabaseObject
      * @throws Exception
      * @return Room
      * This Function will allow a rooms to be generated based on a token from
-     * the account creating the rooms. This will allow both Account Users and
+     * the account creating the rooms. This will allow both Account-Tests Users and
      * Temp Users to join the rooms.
      */
     public static function createRoom($roomName, $token)
@@ -101,7 +101,7 @@ class Room extends DatabaseObject
      * @return Room
      * @throws Exception
      * This Function will allow the generation of a rooms without an account
-     * token, and will allow the joining of Account Users as well as Temp Users.
+     * token, and will allow the joining of Account-Tests Users as well as Temp Users.
      */
     public static function createRoomWithoutAccount($roomName, $screenName, $uses = null, $expirationDate = null)
     {
@@ -200,6 +200,47 @@ class Room extends DatabaseObject
      */
     public function deleteParticipant($accountID)
     {
+        $sql = "DELETE FROM Participants WHERE AccountID = :accid";
+        if(Database::connect()->prepare($sql)->execute([":accid" => $accountID])){
+            unset($this->_accounts[$accountID]);
+            return true;
+        }
+        return false;
+
+//        $sql = "SELECT p.RoomID
+//                FROM Participants AS p
+//                  JOIN RoomCodes AS rc
+//                    ON p.RoomID = rc.RoomID
+//                WHERE AccountID = :accountID";
+//        $statement = Database::connect()->prepare($sql);
+//        $statement->execute(array(':accountID' => $accountID));
+//        if ($result = $statement->fetch(PDO::FETCH_ASSOC)) {
+//            $sql = "DELETE
+//                    FROM RoomCodes
+//                    WHERE RoomID = :roomID";
+//            $statement = Database::connect()->prepare($sql);
+//            if ($statement->execute(array(':roomID' => $result['RoomID']))) {
+//
+//                $sql = "DELETE
+//                    FROM Participants
+//                    WHERE AccountID = :accountID";
+//
+//                if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
+//                    foreach ($this->_accounts as $a) {
+//                        if ($a->getAccountID() == $accountID) {
+//                            $a->_roomID = null;
+//                            $a->_screenName = null;
+//                            $a->_active = false;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+    }
+
+    public function setParticipantInactive($accountID)
+    {
         $retval = false;
 
         $sql = "SELECT p.RoomID
@@ -210,21 +251,20 @@ class Room extends DatabaseObject
         $statement = Database::connect()->prepare($sql);
         $statement->execute(array(':accountID' => $accountID));
         if ($result = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $sql = "DELETE 
+            $sql = "SELECT 
                     FROM RoomCodes
                     WHERE RoomID = :roomID";
             $statement = Database::connect()->prepare($sql);
             if ($statement->execute(array(':roomID' => $result['RoomID']))) {
 
-                $sql = "DELETE 
+                $sql = "SELECT 
                     FROM Participants
                     WHERE AccountID = :accountID";
 
                 if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
                     foreach ($this->_accounts as $a) {
                         if ($a->getAccountID() == $accountID) {
-                            $a->_roomID = null;
-                            $a->_screenName = null;
+                            $a->_active = false;
                         }
                     }
                 }
@@ -232,7 +272,6 @@ class Room extends DatabaseObject
         }
         return $retval;
     }
-
     /**
      * Function Update
      * This Function allows the update of an account and roomCode based
