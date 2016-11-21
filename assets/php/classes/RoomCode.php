@@ -7,6 +7,16 @@
  * Time: 1:20 PM
  */
 
+/**
+ * This Class handles all Room Codes in the database.
+ * This class will create a new Room Code for users that create a new
+ * Room.
+ *
+ * This class uses SQL statements in order to check for duplicate room codes
+ * and insert into the database. It will also delete from the database when
+ * Room Codes are invalid because of time or remaining uses.
+ * */
+
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "interfaces/DatabaseObject.php";
 require_once "classes/Room.php";
@@ -19,6 +29,14 @@ class RoomCode extends DatabaseObject
     private $_expire_date;
     private $_uses;
 
+    /**
+     * RoomCode constructor.
+     * @param $code
+     * @param $roomID
+     * @param $participantID
+     * @param null $uses
+     * @param null $expires_in
+     */
     public function __construct($code, $roomID, $participantID, $uses = null, $expires_in = null)
     {
         $this->_code = $code;
@@ -28,6 +46,16 @@ class RoomCode extends DatabaseObject
         $this->_expire_date = $expires_in;
     }
 
+    /**
+     * @param $roomID
+     * @param $participantID
+     * @param null $uses
+     * @param null $expires_in
+     * @return RoomCode
+     * This function is used to create a new room code. It will run an SQL check
+     * to make sure the room code that is generated doesnt already exist in the
+     * database. If it doesnt the function will then execute SQL to insert the code.
+     */
     public static function createRoomCode($roomID, $participantID, $uses = null, $expires_in = null)
     {
         do {
@@ -64,6 +92,10 @@ class RoomCode extends DatabaseObject
         return new RoomCode($code, $roomID, $participantID);
     }
 
+    /**
+     * @return string
+     * This function genrates and returns a random 6 digit code.
+     */
     public static function generate_code()
     {
         $chars = str_split("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
@@ -71,6 +103,10 @@ class RoomCode extends DatabaseObject
         return $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)];
     }
 
+    /**
+     * @return bool
+     * This function deletes a certain room code from the database.
+     */
     public function delete()
     {
         $sql = "    DELETE FROM RoomCodes
@@ -97,6 +133,10 @@ class RoomCode extends DatabaseObject
         return $this->_code;
     }
 
+    /**
+     * @param bool $as_array
+     * @return array|string
+     */
     public function getJSON($as_array = false)
     {
         $json = [];
