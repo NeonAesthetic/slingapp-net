@@ -5,8 +5,8 @@
  * Date: 11/10/16
  * Time: 9:17 AM
  *
- * Test Name: All Account Tests
- * Description: Runs all the tests required to make sure Account works as intended: Login, Create, set, get, update
+ * Test Name: All Account-Tests Tests
+ * Description: Runs all the tests required to make sure Account-Tests works as intended: Login, Create, set, get, update
  */
 
 require_once "classes/Account.php";
@@ -78,14 +78,14 @@ require_once "classes/Room.php";
 
     $account->_email = "email@test.com";
 
-    assert($account->getEmail() == "email@test.com", "email is email@test.com, Create Account section");
+    assert($account->getEmail() == "email@test.com", "email is email@test.com, Create Account-Tests section");
 
     cleanup();
 }
 
 
 /***********************************************************************************************************************
- *          Set Account
+ *          Set Account-Tests
  **********************************************************************************************************************/
 {
     //Also uses update function in Accounts
@@ -151,7 +151,7 @@ require_once "classes/Room.php";
 }
 
 /***********************************************************************************************************************
- *          Get Account
+ *          Get Account-Tests
  **********************************************************************************************************************/
 {
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
@@ -174,13 +174,13 @@ require_once "classes/Room.php";
     cleanup();
 }
 /***********************************************************************************************************************
- *          Delete Account/Participant
+ *          Delete Account-Tests/Participant
  **********************************************************************************************************************/
 {
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     mark();
-    assert($account->delete(), "Account deleted successfully");
-    mark("Account deletion");
+    assert($account->delete(), "Account-Tests deleted successfully");
+    mark("Account-Tests deletion");
 
     cleanup();
 }

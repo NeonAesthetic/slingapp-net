@@ -4,7 +4,7 @@
  * User: Isaac
  * Date: 11/11/2016
  * Time: 10:33 AM
- * Test Name: All Account Component Tests
+ * Test Name: All Account-Tests Component Tests
  * Description: Runs all the tests required to make sure the account component works as intended: Login, Logout, register, delete account
  */
 

@@ -36,7 +36,7 @@ $json = $room->getJSON(false);
 //$roomCode = $room->getRoomCodes()[0]->getCode();
 //
 //assert($object["Type"] == "Room", "Assert that object has correct type attribute");
-//assert($object["Accounts"][0]["Type"] == "Account", "Assert that object has correct Participants attribute");
+//assert($object["Accounts"][0]["Type"] == "Account-Tests", "Assert that object has correct Participants attribute");
 //assert($object["RoomCodes"][0]["Code"] == $roomCode, "Assert that object has correct RoomCode attribute");
 //
 //$room->delete();

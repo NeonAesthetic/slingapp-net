@@ -94,7 +94,7 @@ class RoomCode extends DatabaseObject
 
     /**
      * @return string
-     * This function genrates and returns a random 6 digit code.
+     * This function generates and returns a random 6 digit code.
      */
     public static function generate_code()
     {
