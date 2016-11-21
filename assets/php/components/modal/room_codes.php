@@ -5,3 +5,13 @@
  * Date: 11/20/2016
  * Time: 12:51 PM
  */
+
+?>
+
+<div class="abs-center card" style="margin-top: 100px; padding: 20px;" onclick="noprop(event)">
+    <center>
+        <div id="room-codes" style="width: 50%;">
+
+        </div>
+    </center>
+</div>

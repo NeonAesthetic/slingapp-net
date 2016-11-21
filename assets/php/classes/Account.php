@@ -521,8 +521,8 @@ class Account extends DatabaseObject
         return $value;
     }
 
-    function __toString()
+    public function __toString()
     {
-        return $this->_accountID.$this->__toString();
+        return (string)$this->_accountID;
     }
 }

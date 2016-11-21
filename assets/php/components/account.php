@@ -10,7 +10,7 @@
 
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Account.php";
-$p = GetParams("action", "email", "fname", "lname", "pass1", "pass2");
+$p = GetParams("action", "email", "fname", "lname", "pass1", "pass2", "token");
 $GLOBALS['access'] = 0;
 $GLOBALS['login'] = 0;
 switch ($p['action']) {
@@ -50,10 +50,10 @@ switch ($p['action']) {
         } else {   //no password = use token to login
             if ($account = Account::Login($p['token'])) {
                 #echo "Successfully logged in using token!";
-                $_SESSION['token'] = $p['token'];
+//                $_SESSION['token'] = $p['token'];
                 $retval = $account->getJSON();
             } else {
-                #echo "Unable to login through token";
+                echo $p["token"];
             }
         }
         echo $retval;   //ajax expects echo not return

@@ -169,21 +169,25 @@ function noprop(event){
     event.stopPropagation();
 }
 
-function GetToken(){
+function GetToken() {
 
     var cstring = document.cookie;
     var cookies = cstring.split(";");
     var tokenstr = null;
+    var rvalue;
     cookies.forEach(function (c) {
-        if(c.search(/Token/) != -1)
-            tokenstr=c;
+        if (c.search(/Token/) != -1)
+            tokenstr = c;
     });
-
-    var keynval = tokenstr.split("=");
-    var key = keynval[0];
-    var value = keynval[1];
-    console.log(keynval);
-    return value;
+    if (tokenstr != null) {
+        var keynval = tokenstr.split("=");
+        var key = keynval[0];
+        rvalue = keynval[1];
+        console.log(keynval);
+    }
+    else
+        rvalue = null;
+    return rvalue;
 }
 
 function SetCookie(key, value, daysTillExp) {
@@ -197,7 +201,7 @@ function AssureCookie(){
     if(GetToken() == null){
         $.ajax({
             type: 'post',
-            url: 'assets/php/components/account.php',
+            url: '/assets/php/components/account.php',
             dataType: 'JSON',
             data: {
                 action: "nocookie"
@@ -214,5 +218,25 @@ function AssureCookie(){
 }
 
 var Account = {
-    data:null
-};
+    data:null,
+    login:function(){
+        var token = GetToken();
+        console.log(token);
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/account2.php',
+            dataType: 'JSON',
+            data: {
+                action:"login",
+                token:token
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+}
+

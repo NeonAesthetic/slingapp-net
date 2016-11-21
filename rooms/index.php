@@ -31,7 +31,7 @@ $account = Account::Login($token);
         <span class="vertical-text">SCREENS</span>
     </div>
     <div class="module" id="controls" style="height: 80px; padding-left: 20px; width: 60%">
-        Controls
+        <button class="btn btn-primary" onclick="displayRoomCodes()">Show Room Codes</button>
     </div>
     <div class="module" id="info" style="height: 80px; padding-left: 20px; width: calc(40% - 230px)">
         <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$room?>">slingapp.net/room/<?=$room?></a></span>
@@ -45,11 +45,20 @@ $account = Account::Login($token);
 
 
 </div>
+<script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="/assets/js/sling.js"></script>
 <script src="/assets/js/room.js"></script>
+
 <script>
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room_obj->getJSON()?>;
-    Room.connect();
+    window.addEventListener("load", function () {
+        console.log(Account.data);
+        console.log(Room.data);
+    })
+
+
+    
 </script>
 

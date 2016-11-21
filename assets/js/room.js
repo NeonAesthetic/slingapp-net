@@ -3,7 +3,10 @@
  */
 
 window.addEventListener("load", function () {
-     Chat.init();
+    Chat.init();
+    Modal.init();
+    Resource.load("/assets/php/components/modal/room_codes.php", "Room Codes");
+    Room.connect();
 });
 
 var Chat = {
@@ -54,6 +57,15 @@ var Room = {
                     token:Account.data.LoginToken,
                     text:message};
         Room.socket.send(JSON.stringify(json));
+    },
+    getRoomCodes:function(){
+        return Room.data.RoomCodes;
     }
 };
+
+function displayRoomCodes(){
+    Modal.create("Room Codes", "darken");
+    document.getElementById('room-codes').innerHTML = Room.data;
+    console.log(Room.data);
+}
 

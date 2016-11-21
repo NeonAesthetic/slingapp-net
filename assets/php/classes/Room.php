@@ -35,7 +35,6 @@ class Room extends DatabaseObject
      * Room constructor.
      * @param $roomID
      * @param $token
-     * @param $screenName
      * @throws Exception
      * This constructor will allow a rooms to be generated based on the creating participants
      * token, and given screen name, the roomID will act as a unique identifier for the rooms.
@@ -64,7 +63,7 @@ class Room extends DatabaseObject
                 if ($row["RoomCode"] != null)
                     $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 if ($row["AccountID"] != null)
-                    $this->_accounts[] = new Account($row["AccountID"], $row["LoginToken"]);
+                    $this->addParticipant( $row["LoginToken"]);
             }
 
         }
@@ -80,7 +79,7 @@ class Room extends DatabaseObject
      * the account creating the rooms. This will allow both Account Users and
      * Temp Users to join the rooms.
      */
-    public static function createRoom($roomName, $token, $screenName)
+    public static function createRoom($roomName, $token)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
@@ -149,16 +148,15 @@ class Room extends DatabaseObject
      * user provides. Checks how many uses are left and returns false if
      * no uses left.
      */
-    public function addParticipant($token, $screenName)
+    public function addParticipant($token, $screenName = null)
     {
 
         $retval = false;
         if($account = Account::Login($token)) {
-            if(!array_key_exists($account, $this->_accounts)){
+            if(!array_key_exists($account->getAccountID(), $this->_accounts)){
                 $account->addParticipant($this->getRoomID(), $screenName);
-                $this->_accounts[] = $account;
+                $this->_accounts[$account->getAccountID()] = $account;
                 $retval = $account->getParticipantID();
-
             }
         }
 
