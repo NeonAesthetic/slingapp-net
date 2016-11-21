@@ -24,6 +24,7 @@ var Room = {
     data:null,
     socket:null,
     connect:function(){
+        if(!Room.data) return;
         var url = "ws:localhost:8000/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);

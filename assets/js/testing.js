@@ -303,8 +303,12 @@ function getFolderNodeList(f){
     var runtests = ContextMenu.createMenuLink("Run Contained Tests", "", function () {
         f.querySelector(".runtest").click();
     });
+    var reload = ContextMenu.createMenuLink("Reload Tests", "", function () {
+        refreshTests();
+        ContextMenu.close();
+    });
 
-    return [label, runtests];
+    return [label, runtests, reload];
 }
 
 function assert(stuff, comment){

@@ -40,7 +40,7 @@ class Room extends DatabaseObject
      * token, and given screen name, the roomID will act as a unique identifier for the rooms.
      * No rooms can exist without a participant.
      */
-    public function __construct($roomID, $token)
+    public function __construct($roomID)
     {
         $this->_roomID = $roomID;
 
@@ -63,7 +63,7 @@ class Room extends DatabaseObject
                 if ($row["RoomCode"] != null)
                     $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 if ($row["AccountID"] != null)
-                    $this->addParticipant( $row["LoginToken"]);
+                    $this->addParticipant($row["LoginToken"]);
             }
 
         }
@@ -88,7 +88,7 @@ class Room extends DatabaseObject
         }
 
         $roomID = Database::connect()->lastInsertId();
-        $room = new Room($roomID, $token);
+        $room = new Room($roomID);
         $room->addParticipant($token, null);
 
         $room->update();
@@ -159,7 +159,6 @@ class Room extends DatabaseObject
                 $retval = $account->getParticipantID();
             }
         }
-
         return $retval;
     }
     /**

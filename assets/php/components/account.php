@@ -91,6 +91,14 @@ switch ($p['action']) {
         echo $account->getJSON();
     }
     break;
+    case "tokenisvalid":
+    {
+        if(Account::Login($p['token']) != false){
+            echo json_encode(["valid"=>true]);
+        }else{
+            echo json_encode(["valid"=>true]);
+        }
+    }break;
     default:
         DatabaseObject::Log(__FILE__, "action not valid",
             "action wasn't valid");

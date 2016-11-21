@@ -15,7 +15,11 @@ $p = GetParams("action", "roomname", "screenname", "token");
 switch ($p['action']) {
     case "create":
         $room = Room::createRoom($p["roomname"], $p["token"], null);
-        echo $room->getJSON();
+        if($room){
+            echo $room->getJSON();
+        }else{
+            echo json_encode(["error"=>"Could not lookup account"]);
+        }
         break;
     case "join":
 

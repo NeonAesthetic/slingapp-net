@@ -198,23 +198,44 @@ function SetCookie(key, value, daysTillExp) {
 }
 
 function AssureCookie(){
-    if(GetToken() == null){
-        $.ajax({
-            type: 'post',
-            url: '/assets/php/components/account.php',
-            dataType: 'JSON',
-            data: {
-                action: "nocookie"
-            },
-            success: function (data) {
-                SetCookie("Token", data.LoginToken, 7);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
+    var token = GetToken();
 
-    }
+    CheckTokenValidity(token, function (valid) {
+        if(!valid){
+            $.ajax({
+                type: 'post',
+                url: '/assets/php/components/account.php',
+                dataType: 'JSON',
+                data: {
+                    action: "nocookie"
+                },
+                success: function (data) {
+                    SetCookie("Token", data.LoginToken, 7);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+}
+
+function CheckTokenValidity(token, callback){
+    $.ajax({
+        type: 'post',
+        url: '/assets/php/components/account.php',
+        dataType: 'JSON',
+        data: {
+            action: "tokenisvalid",
+            token: token
+        },
+        success: function (token) {
+            if(callback) callback(token.valid);
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
 }
 
 var Account = {

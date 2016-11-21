@@ -91,8 +91,7 @@ function mark($comment = null){
     }else{
         $end = microtime(true);
         $elapsed = ($end - $start);
-        $GLOBALS["json"]["timing"][] = ["description" => $comment,
-                                        "time" => round($elapsed * 1000, 3)];
+        echo $comment . ": <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
         $start = $end;
     }
 }

@@ -12,6 +12,11 @@ require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 
 $room_obj = new Room($room, $token);
+if($room_obj)
+    $room_json = $room_obj->getJSON();
+else{
+    $room_json = json_encode(["error" => "Room Lookup Failed"]);
+}
 $account = Account::Login($token);
 
 ?>
@@ -51,12 +56,13 @@ $account = Account::Login($token);
 <script src="/assets/js/room.js"></script>
 
 <script>
-    Account.data = <?=$account->getJSON()?>;
-    Room.data = <?=$room_obj->getJSON()?>;
+
     window.addEventListener("load", function () {
-        console.log(Account.data);
+        console.log("hello");
         console.log(Room.data);
-    })
+    });
+    Account.data = <?=$account->getJSON()?>;
+    Room.data = <?=$room_json?>;
 
 
     
