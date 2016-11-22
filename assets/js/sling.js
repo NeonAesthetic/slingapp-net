@@ -12,7 +12,8 @@ var Resource = {
      */
     load:function (resource, name, callback) {
         get(resource, "", function(data){
-            Resource.dictionary[name] = data;
+            Resource.dictionary[name] = document.createElement("div");
+            Resource.dictionary[name].innerHTML = data;
             if(callback) callback(data);
             console.info("Finished loading " + name);
         });
@@ -28,6 +29,7 @@ var Modal = {
     current:null,
     stack:[],
     modal:null,
+    dict:{},
     init:function(){
         document.body.innerHTML += "<div id='modal' ></div>";
         Modal.modal = document.getElementById("modal");
@@ -35,10 +37,7 @@ var Modal = {
     create:function(resourceName, classname, onblur) {
         var modalContents = Resource.get(resourceName);
         if (modalContents != null) {
-            Modal.modal.innerHTML = "";
-            var newModal = document.createElement("div");
-            newModal.innerHTML = modalContents;
-            Modal.modal.appendChild(newModal);
+            Modal.modal.appendChild(modalContents);
             Modal.modal.className = classname;
             Modal.modal.style.visibility = "visible";
 
@@ -46,7 +45,7 @@ var Modal = {
                 Modal.hide();
                 if (onblur) onblur();
             };
-            Modal.current = newModal;
+            Modal.current = resourceName;
         } else {
             console.error("Resource " + resourceName + " has not been loaded.  Load the resource first with Resource.load()");
         }
@@ -56,14 +55,25 @@ var Modal = {
             Modal.modal.style.visibility = "hidden";
         }
     },
-    show:function(){
-        if(Modal.current){
+    show:function(resource){
+        if(resource){
+            if(resource in Modal.dict) return false;
+            Modal.modal.innerHTML = "";
+            Modal.modal.appendChild(Modal.dict[resource]);
+        }else{
             Modal.modal.style.visibility = "visible";
         }
+        return true;
     },
     destroy:function(){
         if(Modal.current){
             Modal.current = null;
+        }
+    },
+    pushCurrent:function(){
+        if(Modal.current){
+            var current = Modal.modal.firstChild;
+            Modal.stack.push(current);
         }
     }
 

@@ -15,7 +15,6 @@
 //
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
 
-#echo session_id();
 
 function GetParams(...$params){
     $parameters = [];
@@ -23,4 +22,9 @@ function GetParams(...$params){
         $parameters[$pname] = isset($_POST[$pname]) ? $_POST[$pname] : (isset($_GET[$pname]) ? $_GET[$pname] : null);
     }
     return $parameters;
+}
+
+function ApacheError($number){
+    http_response_code($number);
+    header("Location: /assets/error/$number.html");
 }

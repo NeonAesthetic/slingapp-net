@@ -30,9 +30,6 @@ $MAXLENGTH = 30;
 
 class Account extends DatabaseObject
 {
-    /**
-     * @return null
-     */
     private $_fName;
     private $_lName;
     private $_email;
@@ -60,7 +57,7 @@ class Account extends DatabaseObject
      * These elements make up the new account in the database and will persist until removed on command
      * by the Delete Account-Tests function.
      */
-    public function __construct($accountID, $token, $tokenGen, $email = null, $fName = null, $lName = null,
+    public function __construct($accountID, $token, $tokenGen = null, $email = null, $fName = null, $lName = null,
                                 $lastLogin = null, $joinDate = null)
     {
         #echo "AccountID: $accountID, Token: $token, TokenGen: $tokenGen, LastLogin: $lastLogin, Join Date: $joinDate";
@@ -219,6 +216,15 @@ class Account extends DatabaseObject
         }
         return $retval;
     }
+
+    public function setParticipantID($pid){
+        $this->_participantID = $pid;
+    }
+
+    public function setRoomID($rid){
+        $this->_roomID = $rid;
+    }
+    
     /**
      * Function Delete
      * @return boolean
@@ -322,30 +328,8 @@ class Account extends DatabaseObject
                 ':accountID' => $this->_accountID));
         }
     }
-    /**
-     * Function updateAfterSetter
-     * @param $roomID
-     * @return Account|bool|null
-     * @param $screenName
-     * This function will trigger whenever a setter is used and will attempt to insert the
-     * updated account/participant data. Data must pass validity checks before this function
-     * is called. Validity checks are in the __set() function
-     */
-    public function addParticipant($roomID, $screenName)
-    {
-        $sql = "INSERT INTO Participants
-                (AccountID, RoomID, ScreenName)
-                VALUES (:accountID, :roomID, :screenName)";
-        $statement = Database::connect()->prepare($sql);
 
-        if ($statement->execute(array(':accountID' => $this->_accountID, ':roomID' => $roomID, ':screenName' => $screenName))
-        ) {
-            $this->_participantID = Database::connect()->lastInsertId();
-            $this->_roomID = $roomID;
-            $this->_screenName = $screenName;
 
-        }
-    }
     /**
      * Function Update Password
      * @param $pass
@@ -435,6 +419,7 @@ class Account extends DatabaseObject
         $json["LoginToken"] = $this->_token;
         $json['ID'] = $this->_accountID;
         $json['ScreenName'] = $this->_screenName;
+        $json['ParticipantID'] = $this->_participantID;
         if ($as_array)
             return $json;
         return json_encode($json);

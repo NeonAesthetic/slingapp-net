@@ -5,8 +5,9 @@
 window.addEventListener("load", function () {
     Chat.init();
     Modal.init();
-    Resource.load("/assets/php/components/modal/room_codes.php", "Room Codes");
+    Resource.load("/assets/php/components/modal/room_codes.php", "Room Codes", CreateRoomCodeModal);
     Room.connect();
+
 });
 
 var Chat = {
@@ -66,7 +67,15 @@ var Room = {
 
 function displayRoomCodes(){
     Modal.create("Room Codes", "darken");
-    document.getElementById('room-codes').innerHTML = Room.data;
-    console.log(Room.data);
+    
+}
+
+function CreateRoomCodeModal(){
+    var rcDiv = Resource.dictionary["Room Codes"].querySelector("#room-codes");
+    var numCodes = Room.data.RoomCodes.length;
+    for(var i = 0; i<numCodes; i++){
+        console.log();
+        rcDiv.innerHTML += (Room.data.RoomCodes[i].Code + "<br>");
+    }
 }
 

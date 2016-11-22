@@ -7,6 +7,14 @@
  */
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
+require_once "classes/Account.php";
+$token = $_COOKIE['Token'];
+$account = Account::Login($token);
+if(!$account){
+    $account = Account::CreateAccount();
+    $token = $account->getToken();
+    setcookie("Token", $token);
+}
 ?>
 <html>
 <head>
@@ -81,7 +89,6 @@ require_once "components/Components.php";
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
-        AssureCookie();
     });
 </script>
 

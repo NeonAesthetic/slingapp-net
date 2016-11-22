@@ -1,3 +1,4 @@
 RewriteEngine on
 RewriteCond %{REQUEST_URI} ^[a-zA-Z0-9/]+$
 RewriteRule "([a-zA-Z0-9]+)$"  "/rooms/index.php?room=$1"
+

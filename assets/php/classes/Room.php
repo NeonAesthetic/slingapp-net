@@ -24,6 +24,7 @@ require_once "classes/Account.php";
 class Room extends DatabaseObject
 {
     private $_room_codes = [];
+    /** @var Account[] */
     private $_accounts = [];
     private $_roomID;
     private $_roomName;
@@ -34,7 +35,6 @@ class Room extends DatabaseObject
      * Function Constructor
      * Room constructor.
      * @param $roomID
-     * @param $token
      * @throws Exception
      * This constructor will allow a rooms to be generated based on the creating participants
      * token, and given screen name, the roomID will act as a unique identifier for the rooms.
@@ -61,9 +61,14 @@ class Room extends DatabaseObject
 
             foreach ($result as $row) {
                 if ($row["RoomCode"] != null)
-                    $this->_room_codes[] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
-                if ($row["AccountID"] != null)
-                    $this->addParticipant($row["LoginToken"]);
+                    $this->_room_codes[$row["RoomCode"]] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
+                if ($row["AccountID"] != null){
+                    $this->_accounts[$row["AccountID"]] = new Account($row["AccountID"], $row["LoginToken"]);
+                    $this->_accounts[$row["AccountID"]]->setRoomID($roomID);
+                    $this->_accounts[$row["AccountID"]]->setParticipantID($row["ParticipantID"]);
+                }
+
+                $this->_accounts = array_unique($this->_accounts);
             }
 
         }
@@ -79,7 +84,7 @@ class Room extends DatabaseObject
      * the account creating the rooms. This will allow both Account-Tests Users and
      * Temp Users to join the rooms.
      */
-    public static function createRoom($roomName, $token)
+    public static function createRoom($roomName)
     {
         $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
         $statement = Database::connect()->prepare($sql);
@@ -89,10 +94,17 @@ class Room extends DatabaseObject
 
         $roomID = Database::connect()->lastInsertId();
         $room = new Room($roomID);
-        $room->addParticipant($token, null);
-
-        $room->update();
         return $room;
+    }
+
+    public static function GetFromCode($code){
+        $sql = "SELECT RoomID FROM RoomCodes WHERE RoomCode = :rc";
+        $result = Database::connect()->prepare($sql)->execute([":rc" => $code]);
+        if($result){
+            return new Room($result->fetch());
+        }else{
+            return false;
+        }
     }
     /**
      * Function createRoomWithoutAccount
@@ -103,19 +115,19 @@ class Room extends DatabaseObject
      * This Function will allow the generation of a rooms without an account
      * token, and will allow the joining of Account-Tests Users as well as Temp Users.
      */
-    public static function createRoomWithoutAccount($roomName, $screenName, $uses = null, $expirationDate = null)
-    {
-        $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
-        $statement = Database::connect()->prepare($sql);
-        if (!$statement->execute([":name" => $roomName])) {
-            throw new Exception("Could not create rooms");
-        }
-        $roomID = Database::connect()->lastInsertId();
-        $account = Account::CreateAccount();
-        $token = $account->getToken();
-
-        return new Room($roomID, $token, $screenName, $uses, $expirationDate);
-    }
+//    public static function createRoomWithoutAccount($roomName, $screenName, $uses = null, $expirationDate = null)
+//    {
+//        $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
+//        $statement = Database::connect()->prepare($sql);
+//        if (!$statement->execute([":name" => $roomName])) {
+//            throw new Exception("Could not create rooms");
+//        }
+//        $roomID = Database::connect()->lastInsertId();
+//        $account = Account::CreateAccount();
+//        $token = $account->getToken();
+//
+//        return new Room($roomID, $token, $screenName, $uses, $expirationDate);
+//    }
     /**
      * @return mixed
      */
@@ -138,9 +150,17 @@ class Room extends DatabaseObject
         $this->_roomName = $newRoomName;
         $this->_has_changed = true;
     }
+
+    public function accountInRoom(Account $account){
+        $aID = $account->getAccountID();
+        if(array_key_exists($aID, $this->_accounts) && $this->_accounts[$aID]->getToken() == $account->getToken())
+            return true;
+        return false;
+    }
+
     /**
      * Function AddParticipant
-     * @param $token
+     * @param Account $account
      * @param $screenName
      * @return integer
      * This Function allows a participant to be generated in a rooms based
@@ -148,17 +168,17 @@ class Room extends DatabaseObject
      * user provides. Checks how many uses are left and returns false if
      * no uses left.
      */
-    public function addParticipant($token, $screenName = null)
+    public function addParticipant(Account $account, $screenName = null)
     {
-
         $retval = false;
-        if($account = Account::Login($token)) {
-            if(!array_key_exists($account->getAccountID(), $this->_accounts)){
-                $account->addParticipant($this->getRoomID(), $screenName);
-                $this->_accounts[$account->getAccountID()] = $account;
-                $retval = $account->getParticipantID();
-            }
+
+        if(!array_key_exists($account->getAccountID(), $this->_accounts)){
+            $account->setRoomID($this->_roomID);
+            $account->update();
+            $this->_accounts[$account->getAccountID()] = $account;
+            $retval = true;
         }
+
         return $retval;
     }
     /**
@@ -256,7 +276,7 @@ class Room extends DatabaseObject
             $statement = Database::connect()->prepare($sql);
             if ($statement->execute(array(':roomID' => $result['RoomID']))) {
 
-                $sql = "SELECT 
+                $sql = "SELECT *
                     FROM Participants
                     WHERE AccountID = :accountID";
 
@@ -308,9 +328,12 @@ class Room extends DatabaseObject
      * specific settings such as the uses remaining for the key as well as the
      * datetime that the key will expire.
      */
-    public function addRoomCode($participantID, $uses = null, $expires = null)
+    public function addRoomCode($accountID, $uses = null, $expires = null)
     {
-        $this->_room_codes[] = $retval =  RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
+        if(array_key_exists($accountID, $this->_accounts)){
+            $participantID = $this->_accounts[$accountID]->getParticipantID();
+            $this->_room_codes[] = $retval =  RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
+        }
         return $retval;
     }
 

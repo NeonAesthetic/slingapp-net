@@ -142,6 +142,9 @@ class RoomCode extends DatabaseObject
         $json = [];
         $json['Type'] = "RoomCodes";
         $json["Code"] = $this->_code;
+        $json["Creator"] = $this->_participantID;
+        $json["Expires"] = $this->_expire_date;
+        $json["UsesRemaining"] = $this->_uses;
 
         if ($as_array)
             return $json;

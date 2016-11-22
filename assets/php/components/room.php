@@ -10,11 +10,13 @@
 require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Room.php";
 
-$p = GetParams("action", "roomname", "screenname", "token");
+$p = GetParams("action", "roomname", "screenname", "token", "code", "room");
 
 switch ($p['action']) {
     case "create":
-        $room = Room::createRoom($p["roomname"], $p["token"], null);
+        $room = Room::createRoom($p["roomname"]);
+        $room->addParticipant(Account::Login($p["token"]));
+        $room->update();
         if($room){
             echo $room->getJSON();
         }else{
@@ -22,5 +24,30 @@ switch ($p['action']) {
         }
         break;
     case "join":
+    {
+        $code = $p["code"];
+        $room = Room::GetFromCode($code);
+        if($room){
+            $account = Account::Login($p["token"]);
+            $room->addParticipant($account);
+            echo $room->getJSON();
+        }else{
+            echo json_encode(false);
+        }
+
+    }
+    break;
+
+    case "gencode":
+    {
+        $room = new Room($p["room"]);
+        if($room){
+            $account = Account::Login($p["token"]);
+            $code = $room->addRoomCode($account->getAccountID());
+            echo $code->getJSON();
+        }else{
+            echo json_encode(false);
+        }
+    }break;
 
 }

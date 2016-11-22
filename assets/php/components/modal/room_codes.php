@@ -10,6 +10,9 @@
 
 <div class="abs-center card" style="margin-top: 100px; padding: 20px;" onclick="noprop(event)">
     <center>
+        <form>
+            <input class="form-control" placeholder="Test">
+        </form>
         <div id="room-codes" style="width: 50%;">
 
         </div>

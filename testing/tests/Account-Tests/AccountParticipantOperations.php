@@ -264,7 +264,7 @@ require_once "classes/Room.php";
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     $room = Room::createRoom("roomName", $account->getToken(),  "screenName");
     mark();
-    
+
     assert($room->deleteParticipant($account->getAccountID()), "Participant deleted successfully");
     mark("Participant deletion");
 

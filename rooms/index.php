@@ -6,18 +6,34 @@
  * Time: 5:29 PM
  */
 
-$room = $_GET["room"];
-set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
+$roomid = $_GET["room"];
+require_once realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 
-$room_obj = new Room($room, $token);
-if($room_obj)
-    $room_json = $room_obj->getJSON();
-else{
-    $room_json = json_encode(["error" => "Room Lookup Failed"]);
-}
+$room = new Room($roomid);
 $account = Account::Login($token);
+
+
+if(!$account){
+    header("HTTP/1.1 401 Unauthorized");
+    header("Location: /assets/error/401.html");
+}
+if(!$room->accountInRoom($account))
+{
+//    ApacheError(403);
+
+}
+
+if($room){
+    $room_json = $room->getJSON();
+}
+else{
+//    ApacheError(404);
+}
+
+
+
 
 ?>
 <html>
@@ -39,7 +55,7 @@ $account = Account::Login($token);
         <button class="btn btn-primary" onclick="displayRoomCodes()">Show Room Codes</button>
     </div>
     <div class="module" id="info" style="height: 80px; padding-left: 20px; width: calc(40% - 230px)">
-        <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$room?>">slingapp.net/room/<?=$room?></a></span>
+        <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$roomid?>">slingapp.net/room/<?=$roomid?></a></span>
     </div>
     <div class="module" id="main" style="height: 60%; padding-left: 20px; width: 60%">
         Main Screen
@@ -56,15 +72,10 @@ $account = Account::Login($token);
 <script src="/assets/js/room.js"></script>
 
 <script>
-
     window.addEventListener("load", function () {
-        console.log("hello");
-        console.log(Room.data);
+
     });
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room_json?>;
-
-
-    
 </script>
 
