@@ -25,7 +25,7 @@ if(!$account){
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
 </head>
-<body style="background-color: #38474F; overflow: hidden; ">
+<body style="overflow: hidden; ">
 
 
 
@@ -63,7 +63,7 @@ if(!$account){
 
 </div>
 
-<div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 50px;">
+<div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 10px; background: #38474F;">
     <div class="" style="margin: 0 auto;">
         <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block"
                 onclick="Modal.create('Create Room Modal', 'darken', null)">

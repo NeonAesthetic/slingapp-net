@@ -5,7 +5,7 @@
 window.addEventListener("load", function () {
     Chat.init();
     Modal.init();
-    Resource.load("/assets/php/components/modal/room_codes.php", "Room Codes", CreateRoomCodeModal);
+    Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
     Room.connect();
 
 });
@@ -62,20 +62,84 @@ var Room = {
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;
+    },
+    settings:{
+        categoryPanel:{
+            links:null,
+            node:null
+        },
+        optionsPanel:{
+            panels:null,
+            node:null
+        }
     }
+
 };
 
 function displayRoomCodes(){
-    Modal.create("Room Codes", "darken");
+    Modal.create("Settings", "darken");
     
 }
 
-function CreateRoomCodeModal(){
-    var rcDiv = Resource.dictionary["Room Codes"].querySelector("#room-codes");
-    var numCodes = Room.data.RoomCodes.length;
-    for(var i = 0; i<numCodes; i++){
-        console.log();
-        rcDiv.innerHTML += (Room.data.RoomCodes[i].Code + "<br>");
+function InitSettingsModal(){
+    Room.settings.categoryPanel.node = Resource.dictionary["Settings"].querySelector(".settings-left");
+    Room.settings.optionsPanel = Resource.dictionary["Settings"].querySelector(".settings-right");
+    Room.settings.categoryPanel.links = Room.settings.categoryPanel.node.querySelectorAll("a");
+    Room.settings.optionsPanel.panels = Room.settings.optionsPanel.querySelectorAll(".settings-panel");
+
+    Room.settings.categoryPanel.links.forEach(function (l) {
+        l.addEventListener("click", function () {
+            Room.settings.optionsPanel.panels.forEach(function (p) {
+                p.removeClass("active");
+            });
+            Room.settings.categoryPanel.links.forEach(function (l) {
+                l.removeClass("selected");
+            });
+            l.className+= " selected";
+            var id = l.getAttribute("href").slice(1);
+            document.getElementById(id).className += " active";
+        });
+    });
+
+    updateUsersHere();
+    updateInvites();
+
+    
+
+}
+
+function updateUsersHere(){
+    var userPanel = Room.settings.optionsPanel.querySelector("#Users");
+    var here = userPanel.querySelector("#users-here");
+    here.innerHTML = "";
+    var num_users = Room.data.Accounts.length;
+    for(var i = 0; i<num_users; i++){
+        here.innerHTML += "<span class='user'>" + Room.data.Accounts[i].ScreenName + "</span><br>";
     }
+}
+
+function createInviteCode(e){
+    var roomid = Room.data.RoomID;
+    var token = GetToken();
+    $.ajax({
+        type: 'post',
+        url: '/assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "gencode",
+            room:roomid,
+            token: token
+        },
+        success: function (data) {
+            Room.data.RoomCodes.push(data);
+            updateInvites();
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+function updateInvites(){
+
 }
 

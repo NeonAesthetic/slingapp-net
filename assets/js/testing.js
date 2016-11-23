@@ -161,9 +161,7 @@ function clearTestStatus(){
     }
 }
 
-HTMLElement.prototype.removeClass = function(classname) {
-    this.className = this.className.replace(new RegExp(" ?" + classname), "");
-};
+
 
 function refreshTests() {
     var tdiv = document.getElementById("tests");

@@ -174,7 +174,8 @@ class Room extends DatabaseObject
 
         if(!array_key_exists($account->getAccountID(), $this->_accounts)){
             $account->setRoomID($this->_roomID);
-            $account->update();
+            $account->_screenName = $screenName;
+            $account->updateParticipant();
             $this->_accounts[$account->getAccountID()] = $account;
             $retval = true;
         }
@@ -330,7 +331,9 @@ class Room extends DatabaseObject
      */
     public function addRoomCode($accountID, $uses = null, $expires = null)
     {
+        $retval = false;
         if(array_key_exists($accountID, $this->_accounts)){
+            
             $participantID = $this->_accounts[$accountID]->getParticipantID();
             $this->_room_codes[] = $retval =  RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
         }

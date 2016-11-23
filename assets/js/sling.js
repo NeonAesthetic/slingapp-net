@@ -37,6 +37,7 @@ var Modal = {
     create:function(resourceName, classname, onblur) {
         var modalContents = Resource.get(resourceName);
         if (modalContents != null) {
+            Modal.modal.innerHTML = "";
             Modal.modal.appendChild(modalContents);
             Modal.modal.className = classname;
             Modal.modal.style.visibility = "visible";
@@ -269,5 +270,9 @@ var Account = {
             }
         });
     }
-}
+};
+
+HTMLElement.prototype.removeClass = function(classname) {
+    this.className = this.className.replace(new RegExp(" ?" + classname), "");
+};
 

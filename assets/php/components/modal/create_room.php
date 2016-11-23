@@ -9,7 +9,7 @@
 
 ?>
 
-<div class="abs-center" style="margin-top: 100px;">
+<div class="flex" style="margin-top: -150px">
     <center>
         <form id="createRoom" class="log-modal abs-center"
               onsubmit="return CreateRoom(event, this);" onclick="return noprop(event)">

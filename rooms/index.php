@@ -21,8 +21,8 @@ if(!$account){
 }
 if(!$room->accountInRoom($account))
 {
-//    ApacheError(403);
-
+    var_dump($room->getAccounts());
+    exit();
 }
 
 if($room){

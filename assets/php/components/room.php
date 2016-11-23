@@ -16,7 +16,6 @@ switch ($p['action']) {
     case "create":
         $room = Room::createRoom($p["roomname"]);
         $room->addParticipant(Account::Login($p["token"]));
-        $room->update();
         if($room){
             echo $room->getJSON();
         }else{
@@ -44,7 +43,11 @@ switch ($p['action']) {
         if($room){
             $account = Account::Login($p["token"]);
             $code = $room->addRoomCode($account->getAccountID());
-            echo $code->getJSON();
+            if($code)
+                echo $code->getJSON();
+            else{
+                var_dump($room);
+            }
         }else{
             echo json_encode(false);
         }

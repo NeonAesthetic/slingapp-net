@@ -224,6 +224,19 @@ class Account extends DatabaseObject
     public function setRoomID($rid){
         $this->_roomID = $rid;
     }
+
+    public function updateParticipant(){
+        $sql = "INSERT INTO Participants 
+                (RoomID, AccountID, ScreenName)   
+                VALUES(:rmid, :accid, :sn)
+                ON DUPLICATE KEY
+                UPDATE RoomID = :rmid, ScreenName = :sn;";
+        Database::connect()->prepare($sql)->execute([
+            ":rmid" => $this->_roomID,
+            ":sn" => $this->_screenName,
+            ":accid" => $this->_accountID
+        ]);
+    }
     
     /**
      * Function Delete
@@ -292,10 +305,12 @@ class Account extends DatabaseObject
                     RoomID = :roomID,
                     ScreenName = :screenName,
                     Active = :active
+                    
                 WHERE a.AccountID = :accountID";
 
             $statement = Database::connect()->prepare($sql);
-            $statement->execute(array(':email' => $this->_email,
+            if(!$statement->execute(array(
+                ':email' => $this->_email,
                 ':fName' => $this->_fName,
                 ':lName' => $this->_lName,
                 ':logTok' => $this->_token,
@@ -305,7 +320,11 @@ class Account extends DatabaseObject
                 ':accountID' => $this->_accountID,
                 ':roomID' => $this->_roomID,
                 ':screenName' => $this->_screenName,
-                ':active' => $this->_active));
+                ':active' => $this->_active))){
+                error_log("ACCOUNT UPDATE FAILURE: " . $statement->errorInfo()[2]);
+            }else{
+                error_log("UPDATE TOTALLY WORKED");
+            }
         } else {                                    //account doesn't have a participant
             $sql = "UPDATE Accounts
                 SET Email = :email,
