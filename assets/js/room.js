@@ -26,13 +26,14 @@ var Room = {
     socket:null,
     connect:function(){
         if(!Room.data) return;
-        var url = "ws:localhost:8000/rooms/" + Room.data.RoomID;
+        var url = "ws:localhost:8001/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);
         Room.socket.onopen = function(){
             Room.socket.send(JSON.stringify({
-                action:"register",
-                token:Account.data.LoginToken
+                action:"Register",
+                token:Account.data.LoginToken,
+                room:Room.data.ID
             }));
         };
         Room.socket.onmessage = function(data){
@@ -132,6 +133,7 @@ function createInviteCode(e){
         },
         success: function (data) {
             Room.data.RoomCodes.push(data);
+            alert(data.Code);
             updateInvites();
         },
         error: function (error) {
@@ -142,4 +144,29 @@ function createInviteCode(e){
 function updateInvites(){
 
 }
+
+function changeScreenName(){
+    var accountID = Account.data.ID;
+    var token = GetToken();
+    var name = prompt("Enter a new nickname:");
+    $.ajax({
+        type: 'post',
+        url: '/assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "changename",
+            room:roomid,
+            token: token,
+            name:name
+        },
+        success: function (data) {
+            Room.data.RoomCodes.push(data);
+            updateInvites();
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
 

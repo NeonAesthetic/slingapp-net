@@ -20,6 +20,10 @@
         <div id="Users" class="settings-panel active">
             <h1>Users</h1>
             <hr>
+            <h2>YOU</h2>
+            <div id="you">
+                <span class="user"></span><button class="btn-circle" onclick="changeScreenName()">Change Nickname</button>
+            </div>
             <h2>HERE NOW</h2>
             <div id="users-here">
 

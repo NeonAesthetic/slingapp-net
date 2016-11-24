@@ -26,7 +26,7 @@
 <script>
     Websocket = null;
     window.addEventListener("load", function () {
-        var url = "ws://localhost:8000/rooms/uure93";
+        var url = "ws://localhost:8001/rooms/77483";
         Websocket = new WebSocket(url);
         Websocket.onopen = function(){
         };

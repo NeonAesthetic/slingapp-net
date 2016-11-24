@@ -7,10 +7,9 @@
  * Date: 10/16/16
  * Time: 5:53 PM
  */
-set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "interfaces/DatabaseObject.php";
-require_once "classes/RoomCode.php";
-require_once "classes/Account.php";
+require_once "RoomCode.php";
+require_once "Account.php";
 
 //Needs setter for number of rooms code uses
 /**
@@ -71,6 +70,8 @@ class Room extends DatabaseObject
                 $this->_accounts = array_unique($this->_accounts);
             }
 
+        }else{
+            throw new Exception("Room lookup failed");
         }
     }
     /**
@@ -99,9 +100,12 @@ class Room extends DatabaseObject
 
     public static function GetFromCode($code){
         $sql = "SELECT RoomID FROM RoomCodes WHERE RoomCode = :rc";
-        $result = Database::connect()->prepare($sql)->execute([":rc" => $code]);
+        $statement = Database::connect()->prepare($sql);
+        $result = $statement->execute([":rc" => $code]);
         if($result){
-            return new Room($result->fetch());
+            $id = $statement->fetch()[0];
+            error_log($id);
+            return new Room($id);
         }else{
             return false;
         }

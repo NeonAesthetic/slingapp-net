@@ -53,4 +53,20 @@ switch ($p['action']) {
         }
     }break;
 
+    case "changename":
+    {
+        $room = new Room($p["room"]);
+        if($room){
+            $account = Account::Login($p["token"]);
+            $code = $room->addRoomCode($account->getAccountID());
+            if($code)
+                echo $code->getJSON();
+            else{
+                var_dump($room);
+            }
+        }else{
+            echo json_encode(false);
+        }
+    }break;
+
 }

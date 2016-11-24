@@ -40,7 +40,7 @@ function createTestOutputContainer(){
     var outputDiv = document.createElement("div");
     outputDiv.className = "test-output-container";
     var beginning = testConsole.firstChild;
-    console.log(beginning);
+    // console.log(beginning);
     testConsole.insertBefore(outputDiv, beginning);
     return outputDiv;
 

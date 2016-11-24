@@ -112,8 +112,26 @@ if(!$account){
     function joinroom(event, f) {
         event.preventDefault();
         console.log(f);
-        var room = f["room"].value;
-        window.location = "/room/" + room;
+        var code = f["room"].value;
+        $.ajax({
+            type: 'post',
+            url: 'assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "join",
+                token:GetToken(),
+                code:code
+            },
+            success: function (data) {
+                var roomid = data.RoomID;
+                console.log(data);
+                window.location = "/rooms/" + roomid;
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
         return false;
     }
     function showLogin() {

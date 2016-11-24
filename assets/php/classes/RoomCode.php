@@ -17,9 +17,9 @@
  * Room Codes are invalid because of time or remaining uses.
  * */
 
-set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
+//set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "interfaces/DatabaseObject.php";
-require_once "classes/Room.php";
+require_once "Room.php";
 
 class RoomCode extends DatabaseObject
 {

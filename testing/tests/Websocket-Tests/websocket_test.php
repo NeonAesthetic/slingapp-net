@@ -13,7 +13,7 @@
 <script>
 function test(console){
     console.log("Socket");
-    var url = "ws://localhost:8000/rooms/uure93";
+    var url = "ws://localhost:8001/rooms/socket.php";
     var Socket = new WebSocket(url);
     Socket.onopen = function(){
         console.log("Connected to server");

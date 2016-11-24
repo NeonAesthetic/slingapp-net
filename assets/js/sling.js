@@ -194,7 +194,7 @@ function GetToken() {
         var keynval = tokenstr.split("=");
         var key = keynval[0];
         rvalue = keynval[1];
-        console.log(keynval);
+        // console.log(keynval);
     }
     else
         rvalue = null;
