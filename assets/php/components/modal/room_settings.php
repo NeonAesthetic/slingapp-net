@@ -32,7 +32,17 @@
         <div id="Invites" class="settings-panel">
             <h1>Invites</h1>
             <hr>
-            <button class="btn-circle" style="font-size: 1em" onclick="createInviteCode(this)">Create Invite Code</button>
+            <table>
+                <tr>
+                    <td>Code</td>
+                    <td>Member</td>
+                    <td>Restrictions</td>
+                </tr>
+            </table>
+            <table id="invite-codes">
+
+            </table>
+            <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
             
         </div>
     </div>

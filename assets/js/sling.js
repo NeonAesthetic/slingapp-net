@@ -24,6 +24,18 @@ var Resource = {
     }
 };
 
+var Toast = {
+    pop:function(node, timeout){
+        var toast = document.createElement("div");
+        toast.className = "toast";
+        toast.appendChild(node);
+        document.body.appendChild(toast);
+        setTimeout(function(){
+            document.body.removeChild(toast);
+        },timeout)
+    }
+};
+
 
 var Modal = {
     current:null,
@@ -37,6 +49,7 @@ var Modal = {
     create:function(resourceName, classname, onblur) {
         var modalContents = Resource.get(resourceName);
         if (modalContents != null) {
+            modalContents.className = "flex";
             Modal.modal.innerHTML = "";
             Modal.modal.appendChild(modalContents);
             Modal.modal.className = classname;

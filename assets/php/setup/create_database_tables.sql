@@ -121,6 +121,48 @@ CREATE TABLE Logs(
   Description VARCHAR(256)
 );
 
+CREATE TABLE Animals(
+  AnimalID SERIAL,
+  Name VARCHAR(32),
+  PRIMARY KEY (AnimalID)
+);
+
+INSERT INTO Animals (Name)
+    VALUES
+      ('Panda'),
+      ('Zebra'),
+      ('Elephant'),
+      ('Moose'),
+      ('Canine'),
+      ('Feline'),
+      ('Seal'),
+      ('Snake'),
+      ('Orangutan'),
+      ('Lion'),
+      ('Tiger'),
+      ('Water Buffalo'),
+      ('Chameleon'),
+      ('Frog'),
+      ('Gecko'),
+      ('Bear'),
+      ('Sloth'),
+      ('Crocodile'),
+      ('Alligator'),
+      ('Duck'),
+      ('Falcon'),
+      ('Squirrel'),
+      ('Lizard'),
+      ('Crow'),
+      ('Penguin'),
+      ('Slow Loris'),
+      ('Sandpiper'),
+      ('Skunk'),
+      ('Deer'),
+      ('Fox'),
+      ('Turtle'),
+      ('Harambe')
+
+
 
 
 

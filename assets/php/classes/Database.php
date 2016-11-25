@@ -20,8 +20,20 @@ class Database
             //pass
         }else{
             static::$_instance = new PDO('mysql:host=127.0.0.1;dbname=sling', "sling", '');
-//            static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return static::$_instance;
+    }
+
+    public static function getRandomAnimal(){
+//        $sql = "SELECT (CEIL(RAND() * (SELECT COUNT(*) FROM Animals)))";
+//        $statement = Database::connect()->query($sql);
+//        $id = $statement->fetch()[0];
+//        echo $id . "<br>";
+        $sql = "SELECT Name FROM Animals WHERE AnimalID = (CEIL(RAND() * 32));";
+        $statement = Database::connect()->prepare($sql);
+        if(!$statement->execute()){
+            var_dump($statement->errorInfo()[2]);
+        }
     }
 }

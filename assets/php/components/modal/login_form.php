@@ -6,7 +6,7 @@
  * Time: 3:41 PM
  */
 ?>
-<div class="abs-center" style="margin-top: 100px;">
+<div style="margin-top: -150px">
     <center>
         <form id="loginForm" class="log-modal abs-center"
               method="post"
@@ -23,4 +23,5 @@
             <div id="submitButton" class="sbtn card-width-button" onclick="submitLogin(this)">SUBMIT</div>
         </form>
     </center>
+
 </div>

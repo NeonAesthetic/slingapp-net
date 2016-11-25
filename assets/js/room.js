@@ -38,12 +38,17 @@ var Room = {
         };
         Room.socket.onmessage = function(data){
             var message = JSON.parse(data.data);
-            var type = message.type;
+            if(message.toast){
+                Toast.pop(textNode(message.toast),2000);
+            }
+            var type = message.Type;
             switch (type){
-                case "chat":
+                case "Participant Joined":
                 {
-                    var text = message.text;
-                    var sender = message.sender;
+                    var user = message.user;
+                    var text = document.createElement("text");
+                    text.innerHTML = user + " has joined";
+                    Toast.pop(text, 3000);
                 }break;
 
                 case "join":
@@ -51,7 +56,9 @@ var Room = {
                     var name = message.name;
                 }break;
                 default:
-                    console.error(message);
+                    var text = document.createElement("text");
+                    text.innerHTML = message;
+                    Toast.pop(text, 3000);
             };
         }
     },
@@ -63,6 +70,14 @@ var Room = {
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;
+    },
+    createRoomCode:function (uses, expires) {
+        Room.socket.send(JSON.stringify({
+            action:"Create Room Code",
+            token:Account.data.LoginToken,
+            uses:uses,
+            expires:expires
+        }));
     },
     settings:{
         categoryPanel:{
@@ -77,9 +92,8 @@ var Room = {
 
 };
 
-function displayRoomCodes(){
+function showSettings(){
     Modal.create("Settings", "darken");
-    
 }
 
 function InitSettingsModal(){
@@ -128,7 +142,7 @@ function createInviteCode(e){
         dataType: 'JSON',
         data: {
             action: "gencode",
-            room:roomid,
+            room: roomid,
             token: token
         },
         success: function (data) {
@@ -142,7 +156,17 @@ function createInviteCode(e){
     });
 }
 function updateInvites(){
-
+    var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
+    var iCodeDiv = invitepanel.querySelector("#invite-codes");
+    iCodeDiv.innerHTML = "";
+    var num_codes = Room.data.RoomCodes.length;
+    for(var i = 0; i<num_codes; i++){
+        var tr = document.createElement("tr");
+        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Code + "</td>";
+        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Creator + "</td>";
+        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Expires + "</td>";
+        iCodeDiv.appendChild(tr);
+    }
 }
 
 function changeScreenName(){
@@ -167,6 +191,12 @@ function changeScreenName(){
             console.log(error);
         }
     });
+}
+
+function textNode(msg){
+    var text = document.createElement("text");
+    text.innerHTML = msg;
+    return text;
 }
 
 

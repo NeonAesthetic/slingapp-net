@@ -7,6 +7,10 @@
  * Time: 10:09 AM
  */
 
+const ERR_REQUIRES_AUTH = 0;
+const ERR_INVALID_TOKEN = 1;
+const ERR_ACCESS_DENIED = 2;
+
 require_once "./websockets.php";
 require_once "../Room.php";
 class RoomSocketServer extends WebSocketServer
@@ -20,11 +24,15 @@ class RoomSocketServer extends WebSocketServer
     private $_clients = [];
     protected function process($user, $message)
     {
+        /*************************************************************************************
+         *  SETUP ALL VARIABLES AND CACHED OBJECTS
+         *************************************************************************************/
         $resource = $user->requestedResource;
         preg_match("#/rooms/([0-9]+)#", $resource, $matches);
         $roomid = (int)$matches[1];
         $request = json_decode($message, true);
         $room = null;
+        $account = Account::Login($request['token']);
 
         echo "Request for RoomID: [$roomid]\nClient has requested action " . $request['action'] . "\n";
         if(!array_key_exists($roomid, $this->_rooms)){
@@ -35,15 +43,30 @@ class RoomSocketServer extends WebSocketServer
                 $room = false;
             }
             if($room){
-                echo "Added Room to cache";
+                echo "Added Room to cache\n";
                 $this->_rooms[$roomid] = $room;
                 $this->_clients[$roomid] = [];
                 $room = &$this->_rooms[$roomid];
             }else{
 
             }
+        }else{
+            echo "Retrieved Room from cache\n";
+            $room = &$this->_rooms[$roomid];
         }
         $response = null;
+        /** Make sure that the account has permissions to access the room */
+        if(!$room->accountInRoom($account))
+        {
+            $response = $this->generate_error_response(ERR_ACCESS_DENIED);
+            $this->send($user, $response);
+            return;
+        }
+
+        /*********************************************************************************************************
+         *              RESPOND TO MESSAGE ACTIONS
+         *********************************************************************************************************/
+
         switch ($request["action"]){
             case "Register":
             {
@@ -52,8 +75,9 @@ class RoomSocketServer extends WebSocketServer
                 if(!is_array($this->_clients[$roomid])){    //make sure clients for a room are an array
                     $this->_rooms[$roomid] = [];
                 }
-                $newUserID = Account::Login($request["token"])->getAccountID(); //get the id of the new participant
-                $response = $this->create_response("Participant Joined", ["user"=>$newUserID]);     //generate message
+                $newUserID = $account->getAccountID(); //get the id of the new participant
+                $nick = $account->getScreenName();
+                $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "toast"=>$nick . " has joined"]);     //generate message
                 foreach ($this->_clients[$roomid] as $participant){
                     $this->send($participant, $response);               //send message to all registered participant
                 }
@@ -89,4 +113,31 @@ class RoomSocketServer extends WebSocketServer
         $response["Type"] = $type;
         return json_encode($response);
     }
+
+    private function generate_error_response($error_type){
+        $response = ["Type"=>"Error", "ErrorCode"=>$error_type];
+        switch ($error_type){
+            case ERR_REQUIRES_AUTH:
+            {
+                $response["ErrorMessage"] = "This action requires authorization to complete";
+            }
+            break;
+
+            case ERR_INVALID_TOKEN:
+            {
+                $response["ErrorMessage"] = "The token provided does not exist in the database";
+            }
+            break;
+
+            case ERR_ACCESS_DENIED:
+            {
+                $response["ErrorMessage"] = "You are not authorized to perform this action";
+            }
+            break;
+            return json_encode($response);
+        }
+    }
+
+
 }
+

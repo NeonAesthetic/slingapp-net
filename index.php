@@ -89,6 +89,11 @@ if(!$account){
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
+        setTimeout(function () {
+            var text = document.createElement("text");
+            text.innerHTML = "Testing Toast";
+            Toast.pop(text,2000);
+        }, 2000)
     });
 </script>
 
@@ -263,6 +268,8 @@ if(!$account){
     function CreateRoom(event, element){
         var roomname = element.roomname.value;
         var token = GetToken();
+        var errordiv = element.querySelector("#error");
+        errordiv.innerHTML = "<div class='sling' style=''></div>";
         $.ajax({
             type: 'post',
             url: 'assets/php/components/room.php',
@@ -274,6 +281,7 @@ if(!$account){
             },
             success: function (data) {
                 console.log(data);
+                errordiv.innerHTML = "Success";
                 window.location = "/rooms/" + data.RoomID;
             },
             error: function (error) {

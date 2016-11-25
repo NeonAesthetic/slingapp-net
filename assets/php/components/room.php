@@ -28,6 +28,8 @@ switch ($p['action']) {
         $room = Room::GetFromCode($code);
         if($room){
             $account = Account::Login($p["token"]);
+            $screenname = Database::getRandomAnimal();
+            error_log($screenname);
             $room->addParticipant($account);
             echo $room->getJSON();
         }else{
