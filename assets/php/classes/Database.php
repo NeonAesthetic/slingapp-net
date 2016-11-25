@@ -26,14 +26,11 @@ class Database
     }
 
     public static function getRandomAnimal(){
-//        $sql = "SELECT (CEIL(RAND() * (SELECT COUNT(*) FROM Animals)))";
-//        $statement = Database::connect()->query($sql);
-//        $id = $statement->fetch()[0];
-//        echo $id . "<br>";
-        $sql = "SELECT Name FROM Animals WHERE AnimalID = (CEIL(RAND() * 32));";
+        $sql = "SELECT CONCAT('Anonymous ', Name) FROM Animals ORDER BY RAND() LIMIT 1;";
         $statement = Database::connect()->prepare($sql);
         if(!$statement->execute()){
-            var_dump($statement->errorInfo()[2]);
+            var_dump($statement->errorInfo());
         }
+        return $statement->fetch()[0];
     }
 }

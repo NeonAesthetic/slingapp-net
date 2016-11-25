@@ -65,6 +65,7 @@ class Room extends DatabaseObject
                     $this->_accounts[$row["AccountID"]] = new Account($row["AccountID"], $row["LoginToken"]);
                     $this->_accounts[$row["AccountID"]]->setRoomID($roomID);
                     $this->_accounts[$row["AccountID"]]->setParticipantID($row["ParticipantID"]);
+                    $this->_accounts[$row["AccountID"]]->setScreenName($row["ScreenName"]);
                 }
 
                 $this->_accounts = array_unique($this->_accounts);

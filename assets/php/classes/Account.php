@@ -449,6 +449,10 @@ class Account extends DatabaseObject
     {
         return $this->_screenName;
     }
+
+    public function setScreenName($sn){
+        $this->_screenName = $sn;
+    }
     /**
      * Function getEmail
      * @return mixed

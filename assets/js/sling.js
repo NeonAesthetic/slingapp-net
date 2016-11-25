@@ -25,14 +25,18 @@ var Resource = {
 };
 
 var Toast = {
-    pop:function(node, timeout){
+    pop:function(node, classname, timeout){
+        if(!timeout) timeout = 3000;
         var toast = document.createElement("div");
-        toast.className = "toast";
+        toast.className = "toast " + classname;
         toast.appendChild(node);
         document.body.appendChild(toast);
         setTimeout(function(){
             document.body.removeChild(toast);
         },timeout)
+    },
+    error:function (node, timeout) {
+        Toast.pop(node, "error", timeout);
     }
 };
 

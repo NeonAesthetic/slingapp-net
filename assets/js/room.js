@@ -29,6 +29,7 @@ var Room = {
         var url = "ws:localhost:8001/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);
+
         Room.socket.onopen = function(){
             Room.socket.send(JSON.stringify({
                 action:"Register",
@@ -60,6 +61,9 @@ var Room = {
                     text.innerHTML = message;
                     Toast.pop(text, 3000);
             };
+        };
+        Room.socket.onerror = function (error) {
+            Toast.error(textNode(error));
         }
     },
     sendMessage:function (message) {
@@ -163,7 +167,7 @@ function updateInvites(){
     for(var i = 0; i<num_codes; i++){
         var tr = document.createElement("tr");
         tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Code + "</td>";
-        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Creator + "</td>";
+        tr.innerHTML += "<td>" + snFromAccountID(Room.data.RoomCodes[i].Creator) + "</td>";
         tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Expires + "</td>";
         iCodeDiv.appendChild(tr);
     }
@@ -197,6 +201,15 @@ function textNode(msg){
     var text = document.createElement("text");
     text.innerHTML = msg;
     return text;
+}
+
+function snFromAccountID(id){
+    var len = Room.data.Accounts.length;
+    for(var i = 0; i<len; i++){
+        if(Room.data.Accounts[i].ParticipantID == id){
+            return Room.data.Accounts[i].ScreenName;
+        }
+    }
 }
 
 

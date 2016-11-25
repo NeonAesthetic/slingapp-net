@@ -13,4 +13,14 @@ CREATE PROCEDURE AddUser( IN vEmail VARCHAR(64),
   END
   ;
 
+DROP PROCEDURE RandAnimal;
+
+CREATE PROCEDURE AnonAnimal()
+  BEGIN
+    SELECT CONCAT('Anonymous ', Name) FROM Animals ORDER BY RAND() LIMIT 1;
+  END;
+;
+
+CALL AnonAnimal();
+
   CALL AddUser('test', 'test1', 'test2', 'phash', 'fdnfjsf', NOW(), NOW(), NOW());

@@ -7,4 +7,6 @@
  * Test Name: Random Animal
  */
 require_once "classes/Database.php";
-Database::getRandomAnimal();
+mark();
+echo Database::getRandomAnimal() . "<br>";
+mark("Get random animal");
