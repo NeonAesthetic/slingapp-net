@@ -33,6 +33,7 @@ class RoomSocketServer extends WebSocketServer
         $request = json_decode($message, true);
         $room = null;
         $account = Account::Login($request['token']);
+        $account->getParticipantInfo();
 
         echo "Request for RoomID: [$roomid]\nClient has requested action " . $request['action'] . "\n";
         if(!array_key_exists($roomid, $this->_rooms)){
@@ -77,7 +78,7 @@ class RoomSocketServer extends WebSocketServer
                 }
                 $newUserID = $account->getAccountID(); //get the id of the new participant
                 $nick = $account->getScreenName();
-                $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "toast"=>$nick . " has joined"]);     //generate message
+                $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "notify"=>$nick . " has joined"]);     //generate message
                 foreach ($this->_clients[$roomid] as $participant){
                     $this->send($participant, $response);               //send message to all registered participant
                 }

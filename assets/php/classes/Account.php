@@ -224,12 +224,28 @@ class Account extends DatabaseObject
         $this->_roomID = $rid;
     }
 
+    public function getParticipantInfo(){
+        $sql = "SELECT ParticipantID, RoomID, ScreenName 
+                FROM Participants 
+                WHERE AccountID = :accid";
+        $stmt = Database::connect()->prepare($sql);
+        $stmt->execute([
+            ":accid"=>$this->_accountID
+        ]);
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($results){
+            $this->_roomID = $results["RoomID"];
+            $this->_participantID = $results["ParticipantID"];
+            $this->_screenName = $results["ScreenName"];
+        }
+    }
+
     public function updateParticipant(){
         $sql = "INSERT INTO Participants 
                 (RoomID, AccountID, ScreenName)   
                 VALUES(:rmid, :accid, :sn)
                 ON DUPLICATE KEY
-                UPDATE RoomID = :rmid, ScreenName = :sn;";
+                UPDATE RoomID = :rmid, ScreenName = :sn, AccountID = :accid;";
         Database::connect()->prepare($sql)->execute([
             ":rmid" => $this->_roomID,
             ":sn" => $this->_screenName,

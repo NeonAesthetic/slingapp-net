@@ -13,7 +13,7 @@ CREATE PROCEDURE AddUser( IN vEmail VARCHAR(64),
   END
   ;
 
-DROP PROCEDURE RandAnimal;
+DROP PROCEDURE AnonAnimal;
 
 CREATE PROCEDURE AnonAnimal()
   BEGIN
@@ -21,6 +21,6 @@ CREATE PROCEDURE AnonAnimal()
   END;
 ;
 
-CALL AnonAnimal();
+CALL AnonAnimal(@dog);
 
   CALL AddUser('test', 'test1', 'test2', 'phash', 'fdnfjsf', NOW(), NOW(), NOW());

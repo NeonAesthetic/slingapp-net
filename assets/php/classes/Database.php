@@ -21,12 +21,14 @@ class Database
         }else{
             static::$_instance = new PDO('mysql:host=127.0.0.1;dbname=sling', "sling", '');
             static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//            static::$_instance->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
         }
         return static::$_instance;
     }
 
     public static function getRandomAnimal(){
-        $sql = "SELECT CONCAT('Anonymous ', Name) FROM Animals ORDER BY RAND() LIMIT 1;";
+        $id = mt_rand(1,32);
+        $sql = "SELECT Name FROM Animals WHERE AnimalID = $id;";
         $statement = Database::connect()->prepare($sql);
         if(!$statement->execute()){
             var_dump($statement->errorInfo());

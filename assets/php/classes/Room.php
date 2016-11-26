@@ -176,6 +176,9 @@ class Room extends DatabaseObject
     public function addParticipant(Account $account, $screenName = null)
     {
         $retval = false;
+        if($screenName == null){
+            $screenName = "Anonymous " . Database::getRandomAnimal();
+        }
 
         if(!array_key_exists($account->getAccountID(), $this->_accounts)){
             $account->setRoomID($this->_roomID);

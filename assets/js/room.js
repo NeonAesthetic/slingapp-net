@@ -28,7 +28,13 @@ var Room = {
         if(!Room.data) return;
         var url = "ws:localhost:8001/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
-        Room.socket = new WebSocket(url);
+        try{
+            Room.socket = new WebSocket(url);
+        }catch(e){
+            Toast.error(textNode(e));
+            console.error("wwwww");
+        }
+
 
         Room.socket.onopen = function(){
             Room.socket.send(JSON.stringify({
@@ -39,32 +45,24 @@ var Room = {
         };
         Room.socket.onmessage = function(data){
             var message = JSON.parse(data.data);
-            if(message.toast){
-                Toast.pop(textNode(message.toast),2000);
+            console.log(message);
+            if(message.notify){
+                Toast.pop(textNode(message.notify),3000);
             }
             var type = message.Type;
             switch (type){
-                case "Participant Joined":
-                {
-                    var user = message.user;
-                    var text = document.createElement("text");
-                    text.innerHTML = user + " has joined";
-                    Toast.pop(text, 3000);
-                }break;
-
                 case "join":
                 {
                     var name = message.name;
                 }break;
                 default:
-                    var text = document.createElement("text");
-                    text.innerHTML = message;
-                    Toast.pop(text, 3000);
+
             };
         };
         Room.socket.onerror = function (error) {
             Toast.error(textNode(error));
         }
+        setTimeout(function(){}, 5000);
     },
     sendMessage:function (message) {
         var json = {action:"Send Message",
@@ -183,9 +181,9 @@ function changeScreenName(){
         dataType: 'JSON',
         data: {
             action: "changename",
-            room:roomid,
+            room: roomid,
             token: token,
-            name:name
+            name: name
         },
         success: function (data) {
             Room.data.RoomCodes.push(data);
