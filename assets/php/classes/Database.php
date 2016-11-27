@@ -35,4 +35,8 @@ class Database
         }
         return $statement->fetch()[0];
     }
+
+    public static function getFlakeID(){
+        return str_pad(bindec(decbin(floor(microtime(true) * 1000000))), 20, "1494884", STR_PAD_LEFT);
+    }
 }
