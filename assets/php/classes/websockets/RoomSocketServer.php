@@ -33,7 +33,7 @@ class RoomSocketServer extends WebSocketServer
         $request = json_decode($message, true);
         $room = null;
         $account = Account::Login($request['token']);
-        $account->getParticipantInfo();
+        //$account->getParticipantInfo();
 
         echo "Request for RoomID: [$roomid]\nClient has requested action " . $request['action'] . "\n";
         if(!array_key_exists($roomid, $this->_rooms)){

@@ -11,11 +11,10 @@ require_once "classes/Room.php";
 
 $account = Account::CreateAccount();
 $token = $account->getToken();
-$room = Room::createRoom("Test Room", $token);
-//var_dump($room->getJSON(true)["Accounts"]);
-
-$room->addParticipant($token);
+$room = Room::createRoom("Test Room");
+$room->addParticipant($account, "host");
+var_dump($room->getJSON(true)["Accounts"]);
 
 echo count($room->getAccounts());
 
-//echo $room->getJSON();
+echo $room->getJSON();

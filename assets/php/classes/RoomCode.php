@@ -25,7 +25,7 @@ class RoomCode extends DatabaseObject
 {
     private $_code;
     private $_roomID;
-    private $_participantID;
+    private $_accountID;
     private $_expire_date;
     private $_uses;
 
@@ -33,22 +33,22 @@ class RoomCode extends DatabaseObject
      * RoomCode constructor.
      * @param $code
      * @param $roomID
-     * @param $participantID
+     * @param $accountID
      * @param null $uses
      * @param null $expires_in
      */
-    public function __construct($code, $roomID, $participantID, $uses = null, $expires_in = null)
+    public function __construct($code, $roomID, $accountID, $uses = null, $expires_in = null)
     {
         $this->_code = $code;
         $this->_roomID = $roomID;
-        $this->_participantID = $participantID;
+        $this->_accountID = $accountID;
         $this->_uses = $uses;
         $this->_expire_date = $expires_in;
     }
 
     /**
      * @param $roomID
-     * @param $participantID
+     * @param $accountID
      * @param null $uses
      * @param null $expires_in
      * @return RoomCode
@@ -56,7 +56,7 @@ class RoomCode extends DatabaseObject
      * to make sure the room code that is generated doesnt already exist in the
      * database. If it doesnt the function will then execute SQL to insert the code.
      */
-    public static function createRoomCode($roomID, $participantID, $uses = null, $expires_in = null)
+    public static function createRoomCode($roomID, $accountID, $uses = null, $expires_in = null)
     {
         do {
             $sql = "Select RoomCode
@@ -78,18 +78,18 @@ class RoomCode extends DatabaseObject
                 if (!$statement->execute([
                     ":code" => $code,
                     ":rid" => $roomID,
-                    ":createdby" => $participantID,
+                    ":createdby" => $accountID,
                     ":exp_date" => $expires_in,
                     ":rem_uses" => $uses
                 ])
                 ) {
                     throw new PDOException($statement->errorInfo()[2]);
                 } else {
-                    DatabaseObject::Log(__FILE__, "Create", "Participant with ID $participantID created Code $code");
+                    DatabaseObject::Log(__FILE__, "Create", "Account with ID $accountID created Code $code");
                 }
             }
         } while ($result);
-        return new RoomCode($code, $roomID, $participantID);
+        return new RoomCode($code, $roomID, $accountID);
     }
 
     /**
@@ -142,7 +142,7 @@ class RoomCode extends DatabaseObject
         $json = [];
         $json['Type'] = "RoomCodes";
         $json["Code"] = $this->_code;
-        $json["Creator"] = $this->_participantID;
+        $json["Creator"] = $this->_accountID;
         $json["Expires"] = $this->_expire_date;
         $json["UsesRemaining"] = $this->_uses;
 
