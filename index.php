@@ -211,8 +211,8 @@ if(!$account){
         button.className = "login-button";
         Modal.hide();
         isTokenSet();
-
     }
+
     function noprop(e) {
         e.stopPropagation();
         return false;

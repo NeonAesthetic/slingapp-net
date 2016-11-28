@@ -53,6 +53,7 @@ else{
     </div>
     <div class="module" id="controls" style="height: 80px; padding-left: 20px; width: 60%">
         <button class="btn btn-primary" onclick="showSettings()">SETTINGS</button>
+        <button style="margin-left: 540px;" class="btn btn-primary" onclick="leaveRoom()">HOME</button>
     </div>
     <div class="module" id="info" style="height: 80px; padding-left: 20px; width: calc(40% - 230px)">
         <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$roomid?>">slingapp.net/room/<?=$roomid?></a></span>

@@ -98,6 +98,11 @@ function showSettings(){
     Modal.create("Settings", "darken");
 }
 
+function leaveRoom() {
+    window.location = "/"
+
+}
+
 function InitSettingsModal(){
     Room.settings.categoryPanel.node = Resource.dictionary["Settings"].querySelector(".settings-left");
     Room.settings.optionsPanel = Resource.dictionary["Settings"].querySelector(".settings-right");
