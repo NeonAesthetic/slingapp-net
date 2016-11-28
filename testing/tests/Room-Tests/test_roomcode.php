@@ -13,32 +13,32 @@ require_once "classes/Room.php";
 
 
 //Test for generating a room code
-$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
-$room = Room::createRoom("Test-Room");
-$room->addParticipant($account, "host");
-$room->addRoomCode($account->getAccountID());
-$codes = $room->getRoomCodes();
-assert($codes[0]->getCode() != null, "Code generated correctly");
-
-// Test delete room code
-assert($codes[0]->delete() == true, "Code was deleted");
-
-cleanup();
- //Test expiration date and uses
-$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
-
-#$date = gmdate("Y-m-d H:i:s");
-#echo "date: $date";
-$date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
-#echo "<br>date: $date";
-
-$room = Room::createRoom("Test-Room");
-$room->addParticipant($account, "host");
-$room->addRoomCode($account->getAccountID(), 5, $date);
-
-$codes = $room->getRoomCodes();
-assert($codes[0]->getCode() != null, "Code generated correctly");
-cleanup();
+//$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
+//$room = Room::createRoom("Test-Room");
+//$room->addParticipant($account, "host");
+//$room->addRoomCode($account->getAccountID());
+//$codes = $room->getRoomCodes();
+//assert($codes[0]->getCode() != null, "Code generated correctly");
+//
+//// Test delete room code
+//assert($codes[0]->delete() == true, "Code was deleted");
+//
+//cleanup();
+// //Test expiration date and uses
+//$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
+//
+//#$date = gmdate("Y-m-d H:i:s");
+//#echo "date: $date";
+//$date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
+//#echo "<br>date: $date";
+//
+//$room = Room::createRoom("Test-Room");
+//$room->addParticipant($account, "host");
+//$room->addRoomCode($account->getAccountID(), 5, $date);
+//
+//$codes = $room->getRoomCodes();
+//assert($codes[0]->getCode() != null, "Code generated correctly");
+//cleanup();
 
 $date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
 
@@ -52,19 +52,16 @@ $account6 = Account::CreateAccount("roomtest@gmail.com", "first", "last", "pass"
 $account7 = Account::CreateAccount("roomtest2@gmail.com", "first", "last", "pass");
 $room = Room::createRoom("Too Many Accounts");
 $room->addParticipant($account1, "host");
-$room->addRoomCode($account->getAccountID(), 5, $date);
-
+$room->addRoomCode($account1->getAccountID(), 5, $date);
 $room->addParticipant($account2, "part1");
 $room->addParticipant($account3, "part2");
 $room->addParticipant($account4, "part3");
-$room->addParticipant($account5, "part4");
+$temp1 = $room->addParticipant($account5, "part4");
 $temp = $room->addParticipant($account6, "part5");
 $tooMany = $room->addParticipant($account7, "part6");
 
-var_dump($tooMany);
-
 //how to check for number of uses left?
-//assert($tooMany === false, "Tried adding a 6th participant with only 5 uses available in the room");
+assert($tooMany === false, "Tried adding a 6th participant with only 5 uses available in the room");
 
 function cleanup()
 {

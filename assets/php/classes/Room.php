@@ -23,6 +23,7 @@ require_once "Account.php";
  */
 class Room extends DatabaseObject
 {
+    /** @var RoomCode[] */
     private $_room_codes = [];
     /** @var Account[] */
     private $_accounts = [];
@@ -175,12 +176,15 @@ class Room extends DatabaseObject
             $screenName = "Anonymous " . Database::getRandomAnimal();
         }
 
-        if (!array_key_exists($account->getAccountID(), $this->_accounts)) {
+        if (!array_key_exists($account->getAccountID(), $this->_accounts) && ($this->_usesLeft === null || $this->_usesLeft > 0)) {
             $account->_roomID = $this->_roomID;
             $account->_screenName = $screenName;
             //$account->updateParticipant();
             $this->_accounts[$account->getAccountID()] = $account;
 
+            if($this->_usesLeft != null) {
+                $this->_usesLeft--;
+            }
 
             $sql = "INSERT INTO RoomAccount
                     (AccountID, RoomID)
@@ -292,6 +296,14 @@ class Room extends DatabaseObject
 //    }
     }
 
+    /**
+     * @return mixed
+     */
+    public function getUsesLeft()
+    {
+        return $this->_usesLeft;
+    }
+
     public function setParticipantInactive($accountID)
     {
         $retval = false;
@@ -388,6 +400,9 @@ class Room extends DatabaseObject
 
             $this->_room_codes[] = $retval = RoomCode::createRoomCode($this->_roomID, $accountID, $uses, $expires);
 
+            if($uses && $uses > $this->_usesLeft) {
+                $this->_usesLeft = $uses;
+            }
 //            $participantID = $this->_accounts[$accountID]->getParticipantID();
 //            $this->_room_codes[] = $retval = RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
         }
