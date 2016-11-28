@@ -52,19 +52,16 @@ $account6 = Account::CreateAccount("roomtest@gmail.com", "first", "last", "pass"
 $account7 = Account::CreateAccount("roomtest2@gmail.com", "first", "last", "pass");
 $room = Room::createRoom("Too Many Accounts");
 $room->addParticipant($account1, "host");
-$room->addRoomCode($account->getAccountID(), 5, $date);
-
+$room->addRoomCode($account1->getAccountID(), 5, $date);
 $room->addParticipant($account2, "part1");
 $room->addParticipant($account3, "part2");
 $room->addParticipant($account4, "part3");
-$room->addParticipant($account5, "part4");
+$temp1 = $room->addParticipant($account5, "part4");
 $temp = $room->addParticipant($account6, "part5");
 $tooMany = $room->addParticipant($account7, "part6");
 
-var_dump($tooMany);
-
 //how to check for number of uses left?
-//assert($tooMany === false, "Tried adding a 6th participant with only 5 uses available in the room");
+assert($tooMany === false, "Tried adding a 6th participant with only 5 uses available in the room");
 
 function cleanup()
 {
