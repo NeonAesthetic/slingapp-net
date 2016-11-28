@@ -59,7 +59,7 @@ class Account extends DatabaseObject
                                 $lastLogin = null, $joinDate = null, $roomID = null, $screenName = null, $active = true)
     {
 
-        error_log("INSTANTIATION ACCID: " . $accountID);
+//        error_log("INSTANTIATION ACCID: " . $accountID);
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;

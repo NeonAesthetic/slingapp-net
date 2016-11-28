@@ -7,10 +7,16 @@
  * Test Name: Simple Login
  */
 
-$t = $_COOKIE["Token"];
 
 require_once "classes/Account.php";
+mark();
+$a = Account::CreateAccount();
+mark("Create Account");
 
-$a = Account::Login($t);
+$token = $a->getToken();
 
-echo $a->getAccountID();
+mark();
+$account = Account::Login($token);
+mark("Login with Token");
+
+echo "Account ID: " . $a->getAccountID();

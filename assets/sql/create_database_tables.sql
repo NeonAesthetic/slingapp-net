@@ -1,3 +1,5 @@
+# CREATE USER AND DATABASE
+
 DROP USER 'sling'@'localhost';
 DROP DATABASE IF EXISTS sling;
 
@@ -14,6 +16,9 @@ GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 USE sling;
 
 
+
+
+#DROP ALL TABLES
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS Rooms;
 DROP TABLE IF EXISTS Accounts;
@@ -29,6 +34,8 @@ DROP TABLE IF EXISTS Animals;
 DROP TABLE IF EXISTS RoomAccount;
 SET FOREIGN_KEY_CHECKS = 1;
 
+
+#======================START CREATE TABLES ================================
 CREATE TABLE Rooms (
   RoomID   SERIAL,
   RoomName VARCHAR(32) NOT NULL,
@@ -117,10 +124,13 @@ CREATE TABLE RoomChat (
 CREATE TABLE Logs (
   Time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   IP          CHAR(15),
+  Snowflake   BIGINT UNSIGNED,
   File        VARCHAR(64),
   Action      VARCHAR(64),
   Description VARCHAR(256)
 );
+
+CREATE INDEX IDX_Logs_Snowflake ON Logs(Snowflake);
 
 CREATE TABLE Animals (
   AnimalID SERIAL,
@@ -161,4 +171,12 @@ VALUES
   ('Deer'),
   ('Fox'),
   ('Turtle'),
-  ('Harambe')
+  ('Harambe');
+
+
+#===================END CREATE TABLES====================
+
+
+
+#===================START FUNCTIONS/PROCEDURES============
+
