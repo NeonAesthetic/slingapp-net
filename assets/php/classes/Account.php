@@ -141,12 +141,16 @@ class Account extends DatabaseObject
         if ($password) {
             $sql = "SELECT *
                 FROM Accounts AS a 
-                  
+                  LEFT JOIN RoomAccount AS ra
+                    ON a.AccountID = ra.AccountID
+                  LEFT JOIN Rooms AS r
+                    ON ra.RoomID = r.RoomID
                 WHERE Email = :email";
+
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':email' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
-
+            
             if ($result && password_verify($password, $result['PasswordHash'])) {
                 if($result['RoomID'])   //if participating in room
                     $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
