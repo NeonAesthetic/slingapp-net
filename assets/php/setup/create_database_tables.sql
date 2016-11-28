@@ -162,11 +162,3 @@ VALUES
   ('Fox'),
   ('Turtle'),
   ('Harambe')
-
-
-
-
-
-
-
-
