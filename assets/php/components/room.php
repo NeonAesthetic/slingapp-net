@@ -15,7 +15,10 @@ $p = GetParams("action", "roomname", "screenname", "token", "code", "room");
 switch ($p['action']) {
     case "create":
         $room = Room::createRoom($p["roomname"]);
-        $room->addParticipant(Account::Login($p["token"]));
+        error_log($p["token"]);
+        $account = Account::Login($p["token"]);
+        error_log($account->getAccountID());
+        $room->addParticipant($account);
         if($room){
             echo $room->getJSON();
         }else{

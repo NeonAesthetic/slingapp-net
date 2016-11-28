@@ -37,7 +37,7 @@ CREATE TABLE Rooms (
 );
 
 CREATE TABLE Accounts (
-  AccountID    SERIAL,
+  AccountID    BIGINT UNSIGNED NOT NULL,
   Email        VARCHAR(64)     NULL UNIQUE,
   FirstName    VARCHAR(32)     NULL,
   LastName     VARCHAR(32)     NULL,

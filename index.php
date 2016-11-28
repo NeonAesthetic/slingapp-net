@@ -9,12 +9,21 @@ set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
 $token = $_COOKIE['Token'];
-$account = Account::Login($token);
-if(!$account){
-    $account = Account::CreateAccount();
-    $token = $account->getToken();
-    setcookie("Token", $token);
+$account = null;
+try{
+    $account = Account::Login($token);
+
+}catch (Exception $e) {
+    error_log($e);
+}finally{
+    if(!$account){
+        $account = Account::CreateAccount();
+        $token = $account->getToken();
+        setcookie("Token", $token);
+    }
 }
+
+
 ?>
 <html>
 <head>

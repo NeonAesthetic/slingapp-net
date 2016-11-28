@@ -58,6 +58,8 @@ class Account extends DatabaseObject
     public function __construct($accountID, $token, $tokenGen = null, $email = null, $fName = null, $lName = null,
                                 $lastLogin = null, $joinDate = null, $roomID = null, $screenName = null, $active = true)
     {
+
+        error_log("INSTANTIATION ACCID: " . $accountID);
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;
@@ -93,14 +95,16 @@ class Account extends DatabaseObject
 
         $token = md5(uniqid(mt_rand(), true));
         $currentDate = gmdate("Y-m-d H:i:s");
+        $accountID = Database::getFlakeID();
 
         $sql = "INSERT INTO Accounts 
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+                (AccountID, Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
+                VALUES(:accid, :email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
 
         $statement = Database::connect()->prepare($sql);
 
         if (!$statement->execute([
+            ":accid" => $accountID,
             ':email' => $email,
             ':fName' => $fName,
             ':lName' => $lName,
@@ -114,8 +118,6 @@ class Account extends DatabaseObject
             var_dump(Database::connect()->errorInfo());
             throw new Exception("Could not create account");
         }
-
-        $accountID = Database::connect()->lastInsertId();
 
         return new Account($accountID, $token, $currentDate, $email, $fName, $lName,
             $currentDate, $currentDate);
@@ -139,8 +141,7 @@ class Account extends DatabaseObject
         if ($password) {
             $sql = "SELECT *
                 FROM Accounts AS a 
-                  LEFT JOIN RoomAccount AS ra
-                    ON a.AccountID = ra.AccountID
+                  
                 WHERE Email = :email";
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':email' => $token_email));
@@ -163,25 +164,25 @@ class Account extends DatabaseObject
 
         } else {      //no password provided, lookup based on token
             $sql = "SELECT *
-                FROM Accounts AS a 
-                  LEFT JOIN RoomAccount AS ra
-                    ON a.AccountID = ra.AccountID
-                WHERE LoginToken = :logtok";
+                    FROM Accounts a 
+                      WHERE a.LoginToken = :logtok";
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':logtok' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
+//            var_dump($result);
 
             if ($result) {
-                if($result['RoomID'] != null) { //if participating in room
-                    echo "RoomID:: ", $result['RoomID'];
-                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
-                        $result['RoomID'], $result['ScreenName'], $result['Active']);
-                }
-                else {  //if not participating in room
+                error_log("[". __LINE__ ."]" . $result["AccountID"]);
+//                if($result['RoomID'] != null) { //if participating in room
+//                    echo "RoomID:: ", $result['RoomID'];
+//                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
+//                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
+//                        $result['RoomID'], $result['ScreenName'], $result['Active']);
+//                }
+//                else {  //if not participating in room
                     $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                         $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
-                }
+//                }
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE LoginToken = :token";
