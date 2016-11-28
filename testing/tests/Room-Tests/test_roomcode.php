@@ -13,32 +13,32 @@ require_once "classes/Room.php";
 
 
 //Test for generating a room code
-//$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
-//$room = Room::createRoom("Test-Room");
-//$room->addParticipant($account, "host");
-//$room->addRoomCode($account->getAccountID());
-//$codes = $room->getRoomCodes();
-//assert($codes[0]->getCode() != null, "Code generated correctly");
-//
-//// Test delete room code
-//assert($codes[0]->delete() == true, "Code was deleted");
-//
-//cleanup();
-// //Test expiration date and uses
-//$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
-//
-//#$date = gmdate("Y-m-d H:i:s");
-//#echo "date: $date";
-//$date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
-//#echo "<br>date: $date";
-//
-//$room = Room::createRoom("Test-Room");
-//$room->addParticipant($account, "host");
-//$room->addRoomCode($account->getAccountID(), 5, $date);
-//
-//$codes = $room->getRoomCodes();
-//assert($codes[0]->getCode() != null, "Code generated correctly");
-//cleanup();
+$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
+$room = Room::createRoom("Test-Room");
+$room->addParticipant($account, "host");
+$room->addRoomCode($account->getAccountID());
+$codes = $room->getRoomCodes();
+assert($codes[0]->getCode() != null, "Code generated correctly");
+
+// Test delete room code
+assert($codes[0]->delete() == true, "Code was deleted");
+
+cleanup();
+ //Test expiration date and uses
+$account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
+
+#$date = gmdate("Y-m-d H:i:s");
+#echo "date: $date";
+$date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
+#echo "<br>date: $date";
+
+$room = Room::createRoom("Test-Room");
+$room->addParticipant($account, "host");
+$room->addRoomCode($account->getAccountID(), 5, $date);
+
+$codes = $room->getRoomCodes();
+assert($codes[0]->getCode() != null, "Code generated correctly");
+cleanup();
 
 $date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
 
