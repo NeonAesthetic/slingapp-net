@@ -128,10 +128,17 @@ function InitSettingsModal(){
 function updateUsersHere(){
     var userPanel = Room.settings.optionsPanel.querySelector("#Users");
     var here = userPanel.querySelector("#users-here");
+    var you = userPanel.querySelector("#you");
     here.innerHTML = "";
-    var num_users = Room.data.Accounts.length;
-    for(var i = 0; i<num_users; i++){
-        here.innerHTML += "<span class='user'>" + Room.data.Accounts[i].ScreenName + "</span><br>";
+    var loggedInUserID = Account.data.ID;
+    console.log(loggedInUserID);
+    you.innerHTML = "<span class='user'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
+    for(var key in Room.data.Accounts){
+        if(Room.data.Accounts.hasOwnProperty(key)){
+            var account = Room.data.Accounts[key];
+            if(account.ID != loggedInUserID)
+                here.innerHTML += "<span class='user'>" + account.ScreenName + "</span><br>";
+        }
     }
 }
 
@@ -148,7 +155,7 @@ function createInviteCode(e){
             token: token
         },
         success: function (data) {
-            Room.data.RoomCodes.push(data);
+            Room.data.RoomCodes[data.Code] = data;
             alert(data.Code);
             updateInvites();
         },
@@ -161,13 +168,15 @@ function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
     iCodeDiv.innerHTML = "";
-    var num_codes = Room.data.RoomCodes.length;
-    for(var i = 0; i<num_codes; i++){
-        var tr = document.createElement("tr");
-        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Code + "</td>";
-        tr.innerHTML += "<td>" + snFromAccountID(Room.data.RoomCodes[i].Creator) + "</td>";
-        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Expires + "</td>";
-        iCodeDiv.appendChild(tr);
+    for(var code in Room.data.RoomCodes){
+        if(Room.data.RoomCodes.hasOwnProperty(code)){
+            var rc = Room.data.RoomCodes[code];
+            var tr = document.createElement("tr");
+            tr.innerHTML += "<td>" + rc.Code + "</td>";
+            tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
+            tr.innerHTML += "<td>" + rc.Expires + "</td>";
+            iCodeDiv.appendChild(tr);
+        }
     }
 }
 

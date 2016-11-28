@@ -21,15 +21,15 @@
             <h1>Users</h1>
             <hr>
             <h2>YOU</h2>
-            <div id="you">
+            <div id="you" style="padding: 15px;">
                 <span class="user"></span><button class="btn-circle" onclick="changeScreenName()">Change Nickname</button>
             </div>
             <h2>HERE NOW</h2>
-            <div id="users-here">
+            <div id="users-here" style="padding: 15px;">
 
             </div>
         </div>
-        <div id="Invites" class="settings-panel">
+        <div id="Invites" class="settings-panel" style="">
             <h1>Invites</h1>
             <hr>
             <table>
@@ -39,9 +39,11 @@
                     <td>Restrictions</td>
                 </tr>
             </table>
-            <table id="invite-codes">
+            <div style="overflow:scroll; height: 50%; border-top: 1px solid lightgrey">
+                <table id="invite-codes" style="">
 
-            </table>
+                </table>
+            </div>
             <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
             
         </div>

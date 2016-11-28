@@ -64,14 +64,30 @@ class Room extends DatabaseObject
                 if ($row["RoomCode"] != null)
                     $this->_room_codes[$row["RoomCode"]] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
                 if ($row["AccountID"] != null) {
-                    $this->_accounts[$row["AccountID"]] = Account::Login($row["LoginToken"]);
-                    //$this->_accounts[$row["AccountID"]] = new Account($row["AccountID"], $row["LoginToken"]);
-                    //$this->_accounts[$row["AccountID"]]->_roomID = $roomID;
-                    //$this->_accounts[$row["AccountID"]]->setParticipantID($row["ParticipantID"]);
-                    //$this->_accounts[$row["AccountID"]]->_screenName = $row["ScreenName"];
+//                    $this->_accounts[$row["AccountID"]] = Account::Login($row["LoginToken"]);
+                    /**
+                     *          THIS WORKS, PLS NO TOUCH
+                     */
+                    $this->_accounts[$row["AccountID"]] = new Account(
+                                                                        $row["AccountID"],
+                                                                        $row["LoginToken"],
+                                                                        $row["TokenGenDate"],
+                                                                        $row["Email"],
+                                                                        $row["FName"],
+                                                                        $row["LName"],
+                                                                        $row["LastLogin"],
+                                                                        $row["JoinDate"],
+                                                                        $row["RoomID"],
+                                                                        $row["ScreenName"],
+                                                                        $row["Active"]
+                                                                    );
+
+//                    $this->_accounts[$row["AccountID"]]->_roomID = $roomID;
+//                    $this->_accounts[$row["AccountID"]]->setParticipantID($row["ParticipantID"]);
+//                    $this->_accounts[$row["AccountID"]]->_screenName = $row["ScreenName"];
                 }
 
-                $this->_accounts = array_unique($this->_accounts);
+//                $this->_accounts = array_unique($this->_accounts);
             }
 
         } else {
@@ -450,12 +466,12 @@ class Room extends DatabaseObject
         $json["Type"] = "Room";
         $json['Accounts'] = [];
         foreach ($this->_accounts as $a) {
-            $json['Accounts'][] = json_decode($a->getJSON(), true);
+            $json['Accounts'][$a->getAccountID()] = $a->getJSON(true);
         }
 
         $json['RoomCodes'] = [];
         foreach ($this->_room_codes as $p) {
-            $json['RoomCodes'][] = json_decode($p->getJSON(), true);
+            $json['RoomCodes'][$p->getCode()] = $p->getJSON(true);
         }
 
         $json["RoomID"] = $this->_roomID;
