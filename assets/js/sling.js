@@ -3,6 +3,7 @@
  */
 console.info("Loaded sling.js");
 var Resource = {
+    info:{},
     dictionary:{},
     /**
      *
@@ -11,11 +12,12 @@ var Resource = {
      * @param callback - an optional function to call when the resource has been loaded
      */
     load:function (resource, name, callback) {
+        Resource.info[name] = {resource:resource, status:"Not Loaded"};
         get(resource, "", function(data){
             Resource.dictionary[name] = document.createElement("div");
             Resource.dictionary[name].innerHTML = data;
             if(callback) callback(data);
-            console.info("Finished loading " + name);
+            Resource.info[name].status = "Loaded";
         });
 
     },

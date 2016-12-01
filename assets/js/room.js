@@ -7,7 +7,7 @@ window.addEventListener("load", function () {
     Modal.init();
     Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
     Room.connect();
-
+    window.document.title = Room.data.RoomName;
 });
 
 var Chat = {
@@ -24,17 +24,12 @@ var Chat = {
 var Room = {
     data:null,
     socket:null,
+    connected:false,
     connect:function(){
         if(!Room.data) return;
         var url = "ws:localhost:8001/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
-        try{
-            Room.socket = new WebSocket(url);
-        }catch(e){
-            Toast.error(textNode(e));
-            console.error("wwwww");
-        }
-
+        Room.socket = new WebSocket(url);
 
         Room.socket.onopen = function(){
             Room.socket.send(JSON.stringify({
@@ -42,8 +37,10 @@ var Room = {
                 token:Account.data.LoginToken,
                 room:Room.data.ID
             }));
+            Room.connected = true;
         };
         Room.socket.onmessage = function(data){
+            console.info(data.data);
             var message = JSON.parse(data.data);
             console.log(message);
             if(message.notify){
@@ -51,24 +48,34 @@ var Room = {
             }
             var type = message.Type;
             switch (type){
-                case "join":
+                case "Message":
                 {
-                    var name = message.name;
+                    var text = message.text;
+                    var sender = message.sender;
+                    var messageLog = document.getElementById("chat-log");
+                    messageLog.innerHTML += text + "<br>";
                 }break;
                 default:
 
             };
         };
         Room.socket.onerror = function (error) {
-            Toast.error(textNode(error));
+            Toast.error(textNode("Room Connection Error"));
+            console.error(error);
         }
-        setTimeout(function(){}, 5000);
+        // setTimeout(function(){
+        //     if(!Room.connected){
+        //         Toast.error(textNode("Could not connect to Room"));
+        //     }
+        // }, 5000);
     },
     sendMessage:function (message) {
         var json = {action:"Send Message",
                     token:Account.data.LoginToken,
                     text:message};
-        Room.socket.send(JSON.stringify(json));
+        var mes = JSON.stringify(json);
+        console.log(mes);
+        Room.socket.send(mes);
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;
@@ -120,9 +127,6 @@ function InitSettingsModal(){
 
     updateUsersHere();
     updateInvites();
-
-    
-
 }
 
 function updateUsersHere(){
@@ -172,7 +176,7 @@ function updateInvites(){
         if(Room.data.RoomCodes.hasOwnProperty(code)){
             var rc = Room.data.RoomCodes[code];
             var tr = document.createElement("tr");
-            tr.innerHTML += "<td>" + rc.Code + "</td>";
+            tr.innerHTML += "<td><input class='form-control iv-code' onclick='this.select()' readonly value='" + rc.Code + "'></td>";
             tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
             tr.innerHTML += "<td>" + rc.Expires + "</td>";
             iCodeDiv.appendChild(tr);
@@ -219,4 +223,9 @@ function snFromAccountID(id){
     }
 }
 
+function sendMessage(){
+    var text = document.getElementById("send-box").querySelector("textarea").value;
+    console.log(text);
+    Room.sendMessage(text);
+}
 

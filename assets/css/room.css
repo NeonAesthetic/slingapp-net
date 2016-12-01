@@ -54,7 +54,7 @@
 
 }
 
-.send-box{
+#send-box{
     width: 98%;
     position: absolute;
     left: 0;
@@ -66,7 +66,34 @@
     font-size: 14px;
     resize: none;
     color: white;
+}
+
+#send-box textarea{
     padding: 10px;
+    width: 70%;
+    margin: 0;
+    float: left;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    resize: none;
+}
+
+#send-box button{
+    width: 25%;
+    margin: 0;
+    float: left;
+    height: 100%;
+}
+
+.iv-code{
+    font-size: 1em;
+    font-weight: 600;
+    width: 100px;
+    margin: 0;
+    text-align: center;
+    box-shadow: none;
+
 }
 
 @keyframes e {

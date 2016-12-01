@@ -176,7 +176,7 @@ class Account extends DatabaseObject
 //            var_dump($result);
 
             if ($result) {
-                error_log("[". __LINE__ ."]" . $result["AccountID"]);
+//                error_log("[". __LINE__ ."]" . $result["AccountID"]);
 //                if($result['RoomID'] != null) { //if participating in room
 //                    echo "RoomID:: ", $result['RoomID'];
 //                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
@@ -324,10 +324,10 @@ class Account extends DatabaseObject
 //            ':roomID' => $this->_roomID,
             ':screenName' => $this->_screenName,
             ':active' => $this->_active))
-        )
-            error_log("ACCOUNT UPDATE FAILURE: " . $statement->errorInfo()[2]);
-         else
-            error_log("UPDATE WORKED");
+        );
+//            error_log("ACCOUNT UPDATE FAILURE: " . $statement->errorInfo()[2]);
+
+//            error_log("UPDATE WORKED");
 
     }
 

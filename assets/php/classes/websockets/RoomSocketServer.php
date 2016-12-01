@@ -29,7 +29,7 @@ class RoomSocketServer extends WebSocketServer
          *************************************************************************************/
         $resource = $user->requestedResource;
         preg_match("#/rooms/([0-9]+)#", $resource, $matches);
-        $roomid = (int)$matches[1];
+        $roomid = $matches[1];
         $request = json_decode($message, true);
         $room = null;
         $account = Account::Login($request['token']);
@@ -60,7 +60,7 @@ class RoomSocketServer extends WebSocketServer
         if(!$room->accountInRoom($account))
         {
             $response = $this->generate_error_response(ERR_ACCESS_DENIED);
-            $this->send($user, $response);
+            $this->send($user, "err");
             return;
         }
 
@@ -71,6 +71,7 @@ class RoomSocketServer extends WebSocketServer
         switch ($request["action"]){
             case "Register":
             {
+                echo "In Register\n";
                 //User has just connected to the room, and requests to be notified of all changes to the room state
 
                 if(!is_array($this->_clients[$roomid])){    //make sure clients for a room are an array
@@ -91,9 +92,18 @@ class RoomSocketServer extends WebSocketServer
 
             case "Send Message":
             {
-
+                $text = $request['text'];
+                echo "MESSAGE: ".$text."\n";
+                $accountID = $account->getAccountID();
+                $response = $this->create_response("Message", ["Sender"=>$accountID, "text"=>$text]);     //generate message
+                foreach ($this->_clients[$roomid] as $participant){
+                    $this->send($participant, $response);               //send message to all registered participant
+                }
             }
             break;
+
+            default:
+                $response = $this->create_response("Error", ["message"=>"Invalid action"]);
         }
 
         $this->send($user, json_encode($response));
@@ -106,7 +116,7 @@ class RoomSocketServer extends WebSocketServer
 
     protected function closed($user)
     {
-        echo "Client has disconnected\n";
+        
     }
 
     private function create_response($type, array $optionals){

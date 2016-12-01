@@ -108,14 +108,17 @@ class Room extends DatabaseObject
      */
     public static function createRoom($roomName)
     {
-        $sql = "INSERT INTO Rooms (RoomName) VALUES (:name)";
+        $id = Database::getFlakeID();
+        $sql = "INSERT INTO Rooms (RoomID, RoomName) VALUES (:id, :name)";
         $statement = Database::connect()->prepare($sql);
-        if (!$statement->execute([":name" => $roomName])) {
-            throw new Exception("Could not create rooms");
+        if (!$statement->execute([
+            ":id" => $id,
+            ":name" => $roomName
+        ])) {
+            throw new Exception("Could not create room");
         }
 
-        $roomID = Database::connect()->lastInsertId();
-        $room = new Room($roomID);
+        $room = new Room($id);
         return $room;
     }
 

@@ -98,7 +98,7 @@ class RoomCode extends DatabaseObject
      */
     public static function generate_code()
     {
-        $chars = str_split("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+        $chars = str_split("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789");
         $max = count($chars) - 1;
         return $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)] . $chars[mt_rand(0, $max)];
     }

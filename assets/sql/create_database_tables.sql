@@ -37,7 +37,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 #======================START CREATE TABLES ================================
 CREATE TABLE Rooms (
-  RoomID   SERIAL,
+  RoomID   BIGINT UNSIGNED,
   RoomName VARCHAR(32) NOT NULL,
   Active   BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (RoomID)

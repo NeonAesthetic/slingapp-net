@@ -98,11 +98,7 @@ try{
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
-        setTimeout(function () {
-            var text = document.createElement("text");
-            text.innerHTML = "Testing Toast";
-            Toast.pop(text,2000);
-        }, 2000)
+        
     });
 </script>
 

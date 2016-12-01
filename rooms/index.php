@@ -52,7 +52,7 @@ else{
         <span class="vertical-text">SCREENS</span>
     </div>
     <div class="module" id="controls" style="height: 80px; padding-left: 20px; width: 60%">
-        <button class="btn btn-primary" onclick="showSettings()">SETTINGS</button>
+        <button class="btn btn-danger" onclick="showSettings()">SETTINGS</button>
     </div>
     <div class="module" id="info" style="height: 80px; padding-left: 20px; width: calc(40% - 230px)">
         <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$roomid?>">slingapp.net/room/<?=$roomid?></a></span>
@@ -61,7 +61,13 @@ else{
         Main Screen
     </div>
     <div class="module" id="chat" style="height: calc(100% - 100px); padding-left: 20px; width: calc(40% - 230px)">
-        <textarea rows="1" class="send-box"></textarea>
+        <div class="chat-log" id="chat-log">
+
+        </div>
+        <div id="send-box">
+            <textarea rows="1"></textarea>
+            <button onclick="sendMessage()">Send Message</button>
+        </div>
     </div>
 
 
