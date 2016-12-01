@@ -51,9 +51,21 @@ var Room = {
                 case "Message":
                 {
                     var text = message.text;
-                    var sender = message.sender;
+                    var sender = message.Sender;
+                    console.log(Room.data.Accounts[sender]);
                     var messageLog = document.getElementById("chat-log");
-                    messageLog.innerHTML += text + "<br>";
+                    var username = Room.data.Accounts[sender].ScreenName;
+                    var message = document.createElement("div");
+                    if (sender == Account.data.ID){
+                        message.className = "message mine";
+                        username += " (you)";
+                    }
+                    else {
+                        message.className = "message";
+                    }
+                    message.innerHTML = "<span class='user'>"+ username +"</span><br><span class='message-text'>" + text + "</span>";
+                    messageLog.appendChild(message);
+                    updateScroll();
                 }break;
                 default:
 
@@ -224,8 +236,18 @@ function snFromAccountID(id){
 }
 
 function sendMessage(){
-    var text = document.getElementById("send-box").querySelector("textarea").value;
-    console.log(text);
-    Room.sendMessage(text);
+    var tarea = document.getElementById("send-box").querySelector("input");
+    var text = tarea.value;
+    if (text != "")
+        Room.sendMessage(text);
+    tarea.focus();
+    tarea.value = "";
+
 }
+
+function updateScroll(){
+    var element = document.getElementById("chat-log");
+    element.scrollTop = element.scrollHeight;
+}
+
 

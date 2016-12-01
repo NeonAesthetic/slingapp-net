@@ -44,9 +44,9 @@ else{
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
-    <link rel="stylesheet" href="/assets/css/room.css">
+
 </head>
-<body style="background-color: #4286f4;">
+<body style="background-color: #222222;">
 <div class="module-container">
     <div class="module " id="screen-collection" style="width: 200px; ;">
         <span class="vertical-text">SCREENS</span>
@@ -65,8 +65,8 @@ else{
 
         </div>
         <div id="send-box">
-            <textarea rows="1"></textarea>
-            <button onclick="sendMessage()">Send Message</button>
+            <input onkeypress="if (event.keyCode == 13) sendMessage()" >
+            <button onclick="sendMessage()">SEND</button>
         </div>
     </div>
 
@@ -76,7 +76,7 @@ else{
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="/assets/js/sling.js"></script>
 <script src="/assets/js/room.js"></script>
-
+<link rel="stylesheet" href="/assets/css/room.css">
 <script>
     window.addEventListener("load", function () {
 
