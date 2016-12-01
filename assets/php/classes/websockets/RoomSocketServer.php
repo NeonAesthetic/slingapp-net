@@ -60,7 +60,7 @@ class RoomSocketServer extends WebSocketServer
         if(!$room->accountInRoom($account))
         {
             $response = $this->generate_error_response(ERR_ACCESS_DENIED);
-            $this->send($user, "err");
+            $this->send($user, $response);
             return;
         }
 
@@ -79,11 +79,8 @@ class RoomSocketServer extends WebSocketServer
                 }
                 $newUserID = $account->getAccountID(); //get the id of the new participant
                 $nick = $account->getScreenName();
-                if(!$nick){
-                    $account->_screenname = "Anonymous " . Database::getRandomAnimal();
-                    $nick = $account->getScreenName();
-                }
-                echo $account->getJSON() . "\n";
+
+                echo $nick;
                 $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "notify"=>$nick . " has joined"]);     //generate message
                 foreach ($this->_clients[$roomid] as $participant){
                     $this->send($participant, $response);               //send message to all registered participant
@@ -97,7 +94,7 @@ class RoomSocketServer extends WebSocketServer
 
             case "Send Message":
             {
-                $text = $request['text'];
+                $text = htmlspecialchars($request['text']);
                 echo "MESSAGE: ".$text."\n";
                 $accountID = $account->getAccountID();
                 $response = $this->create_response("Message", ["Sender"=>$accountID, "text"=>$text]);     //generate message

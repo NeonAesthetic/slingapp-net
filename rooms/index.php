@@ -60,7 +60,7 @@ else{
     <div class="module" id="main" style="height: 60%; padding-left: 20px; width: 60%">
         Main Screen
     </div>
-    <div class="module" id="chat" style="height: calc(100% - 100px); padding-left: 20px; width: calc(40% - 230px)">
+    <div class="module" id="chat" style="height: calc(100% - 100px); width: calc(40% - 230px)">
         <div class="chat-log" id="chat-log">
 
         </div>

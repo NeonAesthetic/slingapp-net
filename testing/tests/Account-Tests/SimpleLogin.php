@@ -10,7 +10,7 @@
 
 require_once "classes/Account.php";
 mark();
-$a = Account::CreateAccount();
+$a = Account::Login($_COOKIE["Token"]);
 mark("Create Account");
 
 $token = $a->getToken();
@@ -19,4 +19,5 @@ mark();
 $account = Account::Login($token);
 mark("Login with Token");
 
-echo "Account ID: " . $a->getAccountID();
+echo "Account ID: " . $a->getAccountID() . "<br>";
+echo "Account Screenname: ". $a->getScreenName();

@@ -168,12 +168,12 @@ class Account extends DatabaseObject
 
         } else {      //no password provided, lookup based on token
             $sql = "SELECT *
-                    FROM Accounts a 
-                      WHERE a.LoginToken = :logtok";
+                    FROM Accounts 
+                    WHERE LoginToken = :logtok";
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':logtok' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
-//            var_dump($result);
+
 
             if ($result) {
 //                error_log("[". __LINE__ ."]" . $result["AccountID"]);
@@ -183,9 +183,9 @@ class Account extends DatabaseObject
 //                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
 //                        $result['RoomID'], $result['ScreenName'], $result['Active']);
 //                }
-//                else {  //if not participating in room
-                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
+//                else {  //if not participating in roo
+                $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
+                    $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], 24, $result["ScreenName"], 1);
 //                }
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog

@@ -63,7 +63,7 @@ var Room = {
                     else {
                         message.className = "message";
                     }
-                    message.innerHTML = "<span class='user'>"+ username +"</span><br><span class='message-text'>" + text + "</span>";
+                    message.innerHTML = "<span class='user'>"+ username +"</span><br><pre class='message-text'>" + text + "</pre>";
                     messageLog.appendChild(message);
                     updateScroll();
                 }break;
