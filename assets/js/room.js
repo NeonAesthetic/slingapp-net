@@ -93,11 +93,15 @@ var Room = {
         }
     },
     sendMessage:function (message) {
-        var json = {action:"Send Message",
-                    token:Account.data.LoginToken,
-                    text:message};
+        if(message.length <= 2000){
+            var json = {action:"Send Message",
+                token:Account.data.LoginToken,
+                text:message};
 
-        Room.send(json);
+            Room.send(json);
+        }else{
+            alert("That message is too big!  Limit your messages to 2000 characters.");
+        }
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;

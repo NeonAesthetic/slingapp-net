@@ -43,7 +43,7 @@ class RoomSocketServer extends WebSocketServer
             $account = Account::Login($request['token']);
             $accountID = $account->getAccountID();
 
-            $this->Log($request['action'], "Client has access websocket endpoint", $account->getAccountID(), $roomid, "UNDEFINED");
+            $this->Log(LOG_ACCESSED_SOCKET, $request['action'], $account->getAccountID(), $roomid);
 
             if (!array_key_exists($roomid, $this->_rooms)) {
                 try {
@@ -53,7 +53,7 @@ class RoomSocketServer extends WebSocketServer
                     $room = false;
                 }
                 if ($room) {
-                    $this->Log("Cache Miss", "Add room to cache", $account->getAccountID(), $roomid, "UNDEFINED");
+                    $this->Log(LOG_CACHE_MISS, "Add room to cache", $account->getAccountID(), $roomid);
                     $this->_rooms[$roomid] = $room;
                     $this->_clients[$roomid] = [];
                     $room = &$this->_rooms[$roomid];
@@ -61,13 +61,13 @@ class RoomSocketServer extends WebSocketServer
 
                 }
             } else {
-                $this->Log("Cache Hit", "Room Found in cache", $account->getAccountID(), $roomid, "UNDEFINED");
+                $this->Log(LOG_CACHE_HIT, "Room Found in cache", $account->getAccountID(), $roomid);
                 $room = &$this->_rooms[$roomid];
             }
             $response = null;
             /** Make sure that the account has permissions to access the room */
             if (!$room->accountInRoom($account)) {
-                $this->Log("UNAUTHORIZED ACCESS", "Client has requested access to Room but is not authorized", $account->getAccountID(), $roomid, "UNDEFINED");
+                $this->Log(LOG_NOT_AUTHORIZED, "", $account->getAccountID(), $roomid, "UNDEFINED");
                 $response = $this->generate_error_response(ERR_ACCESS_DENIED);
                 $this->send($user, $response);
                 return;
@@ -100,15 +100,20 @@ class RoomSocketServer extends WebSocketServer
                     break;
 
                 case "Send Message": {
-                    $text = htmlspecialchars($request['text']);
-                    $accountID = $account->getAccountID();
-                    $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
-                    $response = $this->create_response("Message", ["Sender" => $accountID, "text" => $text]);     //generate message
-                    foreach ($this->_clients[$roomid] as $k => $participant) {
-                        echo $k . "\n";
-                        $this->send($participant, json_encode($response));               //send message to all registered participant
+                    if(strlen($request['text']) <= 2000){
+                        $this->Log(LOG_MESSAGE_SENT, "", $accountID, $roomid);
+                        $text = htmlspecialchars($request['text']);
+                        $accountID = $account->getAccountID();
+                        $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
+                        $response = $this->create_response("Message", ["Sender" => $accountID, "text" => $text]);     //generate message
+                        foreach ($this->_clients[$roomid] as $k => $participant) {
+                            echo $k . "\n";
+                            $this->send($participant, json_encode($response));               //send message to all registered participant
+                        }
+                        $response = $this->create_response("Confirmation", ["action" => $request['action'], "success" => true]);
+                    }else{
+                        $response = $this->create_response("Confirmation", ['action'=>$request['action'], 'success'=>false, "message"=>"Message over 2000 characters"]);
                     }
-                    $response = $this->create_response("Confirmation", ["action" => $request['action'], "success" => true]);
                 }
                     break;
 
@@ -118,7 +123,7 @@ class RoomSocketServer extends WebSocketServer
 
             $this->send($user, json_encode($response));
         }catch (Throwable $e){
-            $this->Log("Fatal Error", $e->getMessage(), $accountID, $roomid, "UNDEFINED");
+            $this->Log(LOG_ERROR, $e->getMessage(), $accountID, $roomid);
         }
     }
 
@@ -163,9 +168,9 @@ class RoomSocketServer extends WebSocketServer
         return $response;
     }
 
-    public function Log($action, $msg, $userid, $roomid, $ip){
-        echo "[" . date(DATE_ATOM) . "] " . $action . ": " . $msg . "\n";
-        DatabaseObject::Log(__FILE__, $action, $msg, $userid, $roomid, $ip);
+    public function Log($type, $msg, $userid, $roomid){
+        echo "[" . date(DATE_ATOM) . "] " . $type . ": " . $msg . "\n";
+        DatabaseObject::Log(__FILE__, $type, $msg, $userid, $roomid, NULL);
     }
 
     public function run() {

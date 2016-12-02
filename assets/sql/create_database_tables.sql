@@ -121,18 +121,45 @@ CREATE TABLE Messages (
   FOREIGN KEY (FileID) REFERENCES Files (FileID)
 );
 
+CREATE TABLE LogTypes(
+  TypeID          BIGINT UNSIGNED,
+  TypeName        VARCHAR(64)
+    PRIMARY KEY (TypeID)
+);
+
 CREATE TABLE Logs (
   Time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  IP          CHAR(15),
+  IP          CHAR(15) NULL,
+  File        VARCHAR(64),
+  TypeID      BIGINT UNSIGNED,
+  Description VARCHAR(256),
   AccountID   BIGINT UNSIGNED,
   RoomID      BIGINT UNSIGNED,
-  File        VARCHAR(64),
-  Action      VARCHAR(64),
-  Description VARCHAR(256)
+  FOREIGN KEY (TypeID) REFERENCES LogTypes(TypeID)
 );
 
 CREATE INDEX IDX_Logs_AccountID ON Logs(AccountID);
 CREATE INDEX IDX_Logs_RoomID ON Logs(RoomID);
+
+
+
+
+
+INSERT INTO LogTypes (TypeID, TypeName)
+    VALUES
+      (0, 'LOG_CACHE_HIT'),
+      (1, 'LOG_CACHE_MISS'),
+      (2, 'LOG_REGISTER'),
+      (3, 'LOG_MESSAGE_SENT'),
+      (4, 'LOG_ERROR_ACCOUNT_NOT_FOUND'),
+      (5, 'LOG_CREATE_ROOM'),
+      (6, 'LOG_CREATE_CODE'),
+      (7, 'LOG_CREATE_ACCOUNT'),
+      (8, 'LOG_NOT_AUTHENTICATED'),
+      (9, 'LOG_NOT_AUTHORIZED'),
+      (10, 'LOG_ACCESSED_SOCKET'),
+      (11, 'LOG_JOINED_ROOM'),
+      (12, 'LOG_ERROR')
 
 CREATE TABLE Animals (
   AnimalID SERIAL,
