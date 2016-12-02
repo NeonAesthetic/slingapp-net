@@ -124,11 +124,13 @@ CREATE TABLE Messages (
 CREATE TABLE Logs (
   Time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   IP          CHAR(15),
-  AccountID   BIGINT UNSIGNED,
-  RoomID      BIGINT UNSIGNED,
+  AccountID   BIGINT UNSIGNED NULL,
+  RoomID      BIGINT UNSIGNED NULL,
   File        VARCHAR(64),
   Action      VARCHAR(64),
-  Description VARCHAR(256)
+  Description VARCHAR(256),
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
+  FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
 );
 
 CREATE INDEX IDX_Logs_AccountID ON Logs(AccountID);
