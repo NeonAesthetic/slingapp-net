@@ -28,7 +28,12 @@ var Room = {
     connected:false,
     connect:function(){
         if(!Room.data) return;
-        var url = "wss:slingapp.net:8001/rooms/" + Room.data.RoomID;
+        var url = "wss:slingapp.net:8001/rooms/";
+        if(window.location.host === "localhost"){
+            url = "ws:localhost:8001/rooms/";
+        }
+        url += Room.data.RoomID;
+
         console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);
 
@@ -57,7 +62,14 @@ var Room = {
                     putMessage(sender, text);
 
                 }break;
-                default:
+
+                case "Register":{
+                    console.log(message);
+                }break;
+
+                default:{
+                    console.info(message);
+                }
 
             };
         };
@@ -71,13 +83,19 @@ var Room = {
         //     }
         // }, 5000);
     },
+    send:function (json) {
+        if(Room.connected){
+            Room.socket.send(JSON.stringify(json));
+        }else{
+            Toast.error(textNode("Socket not connected"));
+        }
+    },
     sendMessage:function (message) {
         var json = {action:"Send Message",
                     token:Account.data.LoginToken,
                     text:message};
-        var mes = JSON.stringify(json);
-        console.log(mes);
-        Room.socket.send(mes);
+
+        Room.send(json);
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;
