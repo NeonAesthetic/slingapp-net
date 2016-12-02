@@ -10,6 +10,8 @@
 const ERR_REQUIRES_AUTH = 0;
 const ERR_INVALID_TOKEN = 1;
 const ERR_ACCESS_DENIED = 2;
+const CR = "\r";
+const NL = "\n";
 
 require_once "classes/websockets/websockets.php";
 require_once "classes/Room.php";
@@ -154,6 +156,7 @@ class RoomSocketServer extends WebSocketServer
     }
 
     public function run() {
+
         $buffer = "";
         while(true) {
             if (empty($this->sockets)) {
