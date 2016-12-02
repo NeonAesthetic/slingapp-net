@@ -21,7 +21,8 @@ if(!$account){
 }
 if(!$room->accountInRoom($account))
 {
-    var_dump($room->getAccounts());
+    echo "Hi:";
+    error_log($room->accountInRoom($account));
     exit();
 }
 

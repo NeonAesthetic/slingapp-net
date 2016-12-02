@@ -175,10 +175,17 @@ class Room extends DatabaseObject
 
     public function accountInRoom(Account $account)
     {
-        $aID = $account->getAccountID();
-        if (array_key_exists($aID, $this->_accounts) && $this->_accounts[$aID]->getToken() == $account->getToken())
-            return true;
-        return false;
+        $id = $account->getAccountID();
+        $rid = $this->_roomID;
+        $sql = "SELECT COUNT(*) 
+                FROM RoomAccount
+                WHERE RoomID = :rid AND AccountID = :id";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([
+            ":id"=>$id,
+            ":rid"=>$rid
+        ]);
+        return $statement->fetch();
     }
 
     /**

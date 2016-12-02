@@ -28,7 +28,7 @@ var Room = {
     connected:false,
     connect:function(){
         if(!Room.data) return;
-        var url = "wss:slingapp.net:8001/rooms/";
+        var url = "wss:dev.slingapp.net/rooms/";
         if(window.location.host === "localhost"){
             url = "ws:localhost:8001/rooms/";
         }
