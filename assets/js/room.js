@@ -28,7 +28,7 @@ var Room = {
     connected:false,
     connect:function(){
         if(!Room.data) return;
-        var url = "ws:slingapp.net:8001/rooms/" + Room.data.RoomID;
+        var url = "wss:slingapp.net:8001/rooms/" + Room.data.RoomID;
         console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);
 
