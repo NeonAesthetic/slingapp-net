@@ -153,6 +153,69 @@ class RoomSocketServer extends WebSocketServer
         return json_encode($response);
     }
 
+    public function run() {
+        $buffer = "";
+        while(true) {
+            if (empty($this->sockets)) {
+                $this->sockets["m"] = $this->master;
+            }
+            $read = $this->sockets;
+            $write = $except = null;
+            $this->_tick();
+            $this->tick();
+            @socket_select($read,$write,$except,1); # suppress warnings with @
+            foreach ($read as $socket) {
+                if ($socket == $this->master) {
+                    $client = socket_accept($socket);
+                    if ($client === false) {
+//                        msg("SKT: Error at 'socket_accept()'. Reason: ".socket_strerror(socket_last_error()),ERR,CONT);
+                        continue;
+                    } else {
+                        $this->connect($client);
+                    }
+                } else {
+                    $numBytes = socket_recv($socket,$socketData,$this->maxBufferSize,0);
+                    if ($numBytes === false) {
+                        $sockErrNo = socket_last_error($socket);
+                        switch ($sockErrNo) {
+                            case 102: # ENETRESET    - Network dropped connection because of reset
+                            case 103: # ECONNABORTED - Software caused connection abort
+                            case 104: # ECONNRESET   - Connection reset by peer
+                            case 108: # ESHUTDOWN    - Can't send after transport endpoint shutdown - probably more of an error on our part, if we're trying to write after the socket is closed. Probably not a critical error, though
+                            case 110: # ETIMEDOUT    - Connection timed out
+                            case 111: # ECONNREFUSED - Connection refused - We shouldn't see this one, since we're listening... Still not a critical error
+                            case 112: # EHOSTDOWN    - Host is down - Again, we shouldn't see this, and again, not critical because it's just one connection and we still want to listen to/for others
+                            case 113: # EHOSTUNREACH - No route to host
+                            case 121: # EREMOTEIO    - Rempte I/O error - Their hard drive just blew up
+                            case 125: # ECANCELED    - Operation canceled
+//                                msg("SKT: Unusual disconnect on socket: ".$socket,WRN,CONT);
+                                $this->disconnect($socket,true,$sockErrNo); # disconnect before clearing error, in case someone with their own implementation wants to check for error conditions on the socket
+                                break;
+                            default:
+//                                msg("SKT: Error: ".socket_strerror($sockErrNo),WRN,CONT);
+                        }
+                    } elseif ($numBytes == 0) {
+//                        msg("SKT: Received 0 bytes but expected more",WRN,CONT);
+                        $this->disconnect($socket);
+//                        msg("SKT: Client disconnected. TCP connection lost: ".$socket,WRN,CONT);
+                    } else {
+                        $buffer .= $socketData;
+                        $user = $this->getUserBySocket($socket);
+                        if (!$user->handshake) {
+                            $tmp = str_replace(CR,"",$buffer);
+                            if (strpos($tmp,NL.NL) === false ) { continue; } # when client has not finished sending header, wait before sending upgrade response
+                            $this->doHandshake($user,$buffer);
+                        } else {
+                            # split packet into frame and send it to deframe
+                            $this->split_packet($numBytes,$buffer,$user);
+                        }
+                        $buffer = "";
+                    }
+                }
+            }
+        }
+    }
+
 
 }
 
