@@ -124,7 +124,8 @@ CREATE TABLE Messages (
 CREATE TABLE Logs (
   Time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   IP          CHAR(15),
-  Snowflake   BIGINT UNSIGNED,
+  AccountID   BIGINT UNSIGNED,
+  RoomID      BIGINT UNSIGNED,
   File        VARCHAR(64),
   Action      VARCHAR(64),
   Description VARCHAR(256)

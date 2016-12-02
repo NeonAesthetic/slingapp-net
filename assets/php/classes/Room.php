@@ -74,7 +74,7 @@ class Room extends DatabaseObject
                     $this->_accounts[$row["AccountID"]] = new Account(
                                                                         $row["AccountID"],
                                                                         $row["LoginToken"],
-                                                                        $row["TokenGenDate"],
+                                                                        $row["TokenGenTime"],
                                                                         $row["Email"],
                                                                         $row["FirstName"],
                                                                         $row["LastName"],

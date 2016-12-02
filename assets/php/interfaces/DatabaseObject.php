@@ -25,17 +25,19 @@ abstract class DatabaseObject
 
     public abstract function getJSON($as_array = false);
 
-    public static function Log($filename, $action, $description, $snowflake = null){
+    public static function Log($filename, $action, $description, $user, $room, $ip = null){
         $file = basename($filename);
-        $ip = $_SERVER["REMOTE_ADDR"];
+        if($ip == null)
+            $ip = $_SERVER["REMOTE_ADDR"];
 
-        $sql = "INSERT INTO Logs (IP, File, Action, Description, Snowflake) VALUES(:ip, :file, :action, :desc, :sf)";
+        $sql = "INSERT INTO Logs (IP, File, Action, Description, AccountID, RoomID) VALUES(:ip, :file, :action, :desc, :user, :room)";
         Database::connect()->prepare($sql)->execute([
             ":ip"=>$ip,
             ":file"=>$file,
             ":action"=>$action,
             ":desc"=>$description,
-            ":sf" => $snowflake
+            ":user" => $user,
+            ":room"=> $room
         ]);
     }
     

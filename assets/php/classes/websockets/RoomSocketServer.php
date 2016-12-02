@@ -15,6 +15,7 @@ const NL = "\n";
 
 require_once "classes/websockets/websockets.php";
 require_once "classes/Room.php";
+
 class RoomSocketServer extends WebSocketServer
 {
     protected $maxBufferSize = 4096;
@@ -37,7 +38,8 @@ class RoomSocketServer extends WebSocketServer
         $account = Account::Login($request['token']);
         //$account->getParticipantInfo();
 
-        echo "Request for RoomID: [$roomid]\nClient has requested action " . $request['action'] . "\n";
+        $this->Log($request['action'], "Client has access websocket endpoint", $account->getAccountID(), $roomid, "UNDEFINED");
+
         if(!array_key_exists($roomid, $this->_rooms)){
             try{
                 $room = new Room($roomid);
@@ -46,7 +48,7 @@ class RoomSocketServer extends WebSocketServer
                 $room = false;
             }
             if($room){
-                echo "Added Room to cache\n";
+                $this->Log("Cache Miss", "Add room to cache", $account->getAccountID(), $roomid, "UNDEFINED");
                 $this->_rooms[$roomid] = $room;
                 $this->_clients[$roomid] = [];
                 $room = &$this->_rooms[$roomid];
@@ -54,13 +56,14 @@ class RoomSocketServer extends WebSocketServer
 
             }
         }else{
-            echo "Retrieved Room from cache\n";
+            $this->Log("Cache Hit", "Room Found in cache", $account->getAccountID(), $roomid, "UNDEFINED");
             $room = &$this->_rooms[$roomid];
         }
         $response = null;
         /** Make sure that the account has permissions to access the room */
         if(!$room->accountInRoom($account))
         {
+            $this->Log("UNAUTHORIZED ACCESS", "Client has requested access to Room but is not authorized", $account->getAccountID(), $roomid, "UNDEFINED");
             $response = $this->generate_error_response(ERR_ACCESS_DENIED);
             $this->send($user, $response);
             return;
@@ -73,7 +76,7 @@ class RoomSocketServer extends WebSocketServer
         switch ($request["action"]){
             case "Register":
             {
-                echo "In Register\n";
+
                 //User has just connected to the room, and requests to be notified of all changes to the room state
 
                 if(!is_array($this->_clients[$roomid])){    //make sure clients for a room are an array
@@ -82,12 +85,11 @@ class RoomSocketServer extends WebSocketServer
                 $newUserID = $account->getAccountID(); //get the id of the new participant
                 $nick = $account->getScreenName();
 
-                echo $nick;
                 $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "notify"=>$nick . " has joined"]);     //generate message
                 foreach ($this->_clients[$roomid] as $participant){
-                    $this->send($participant, $response);               //send message to all registered participant
+                    $this->send($participant, json_encode($response));               //send message to all registered participant
                 }
-                $this->_clients[$roomid][$request["token"]] = $user;        //add the new user to the array
+                $this->_clients[$roomid][$newUserID] = $user;        //add the new user to the array
                 //generate message
                 $response = $this->create_response("Register", ["success"=>true]);
 
@@ -97,13 +99,14 @@ class RoomSocketServer extends WebSocketServer
             case "Send Message":
             {
                 $text = htmlspecialchars($request['text']);
-                echo "MESSAGE: ".$text."\n";
                 $accountID = $account->getAccountID();
                 $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
                 $response = $this->create_response("Message", ["Sender"=>$accountID, "text"=>$text]);     //generate message
-                foreach ($this->_clients[$roomid] as $participant){
-                    $this->send($participant, $response);               //send message to all registered participant
+                foreach ($this->_clients[$roomid] as $k=>$participant){
+                    echo $k . "\n";
+                    $this->send($participant, json_encode($response));               //send message to all registered participant
                 }
+                $response = $this->create_response("Confirmation", ["action"=>$request['action'], "success"=>true]);
             }
             break;
 
@@ -126,8 +129,8 @@ class RoomSocketServer extends WebSocketServer
 
     private function create_response($type, array $optionals){
         $response = $optionals;
-        $response["Type"] = $type;
-        return json_encode($response);
+        $response["type"] = $type;
+        return $response;
     }
 
     private function generate_error_response($error_type){
@@ -152,7 +155,12 @@ class RoomSocketServer extends WebSocketServer
             break;
 
         }
-        return json_encode($response);
+        return $response;
+    }
+
+    public function Log($action, $msg, $userid, $roomid, $ip){
+        echo "[" . date(DATE_ATOM) . "] " . $action . ": " . $msg . "\n";
+        DatabaseObject::Log(__FILE__, $action, $msg, $userid, $roomid, $ip);
     }
 
     public function run() {

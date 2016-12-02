@@ -46,25 +46,27 @@ var Room = {
             Room.connected = true;
         };
         Room.socket.onmessage = function(data){
-            // console.info(data);
             var message = JSON.parse(data.data);
             // console.log(message);
             if(message.notify){
                 Toast.pop(textNode(message.notify),3000);
             }
-            var type = message.Type;
+            var type = message.type;
             switch (type){
                 case "Message":
                 {
                     var text = message.text;
                     var sender = message.Sender;
-                    console.log(Room.data.Accounts[sender]);
                     putMessage(sender, text);
 
                 }break;
 
-                case "Register":{
-                    console.log(message);
+                case "Participant Joined":
+                {
+                    var accountID = message.id;
+                    var sn = message.nick;
+                    Room.data.Accounts[accountID] = {ScreenName:sn, ID:accountID};
+
                 }break;
 
                 default:{
