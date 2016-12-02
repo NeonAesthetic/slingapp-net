@@ -83,5 +83,6 @@ else{
     });
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room_json?>;
+    Messages = <?=$room->getMessages()?>;
 </script>
 

@@ -1,5 +1,6 @@
 body{
     background-color: #222222;
+    overflow-x: hidden;
 }
 
 .module{
@@ -79,6 +80,7 @@ body{
 .message{
     border-bottom: 1px solid #666;
     padding: 5px;
+    font-weight: 500;
 }
 
 .message-text{

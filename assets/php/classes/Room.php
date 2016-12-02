@@ -8,8 +8,9 @@
  * Time: 5:53 PM
  */
 require_once "interfaces/DatabaseObject.php";
-require_once "RoomCode.php";
+require_once "classes/RoomCode.php";
 require_once "Account.php";
+require_once "classes/Chat.php";
 
 //Needs setter for number of rooms code uses
 //Needs update screen name function
@@ -31,6 +32,7 @@ class Room extends DatabaseObject
     private $_roomName;
     private $_usesLeft;
     private $_expirationDate;
+    private $_chat;
     //pass account object to constructor or just the needed parameters to factor out the select statement
     /**
      * Function Constructor
@@ -44,6 +46,7 @@ class Room extends DatabaseObject
     public function __construct($roomID)
     {
         $this->_roomID = $roomID;
+        $this->_chat = new Chat($roomID);
 
         $sql = "SELECT * FROM Rooms
                 LEFT JOIN RoomAccount ra
@@ -483,5 +486,14 @@ class Room extends DatabaseObject
         if ($as_array)
             return $json;
         return json_encode($json);
+    }
+
+    public function addMessage($id, $room, $author, $content){
+        $this->_chat->addMessage($id, $room, $author, $content);
+    }
+    
+    public function getMessages(){
+        $this->_chat->getMessages(500);
+        return json_encode($this->_chat->_messages);
     }
 }

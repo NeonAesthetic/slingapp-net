@@ -8,6 +8,7 @@ window.addEventListener("load", function () {
     Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
     Room.connect();
     window.document.title = Room.data.RoomName;
+    repopulateMessages();
 });
 
 var Chat = {
@@ -40,9 +41,9 @@ var Room = {
             Room.connected = true;
         };
         Room.socket.onmessage = function(data){
-            console.info(data.data);
+            // console.info(data);
             var message = JSON.parse(data.data);
-            console.log(message);
+            // console.log(message);
             if(message.notify){
                 Toast.pop(textNode(message.notify),3000);
             }
@@ -53,19 +54,8 @@ var Room = {
                     var text = message.text;
                     var sender = message.Sender;
                     console.log(Room.data.Accounts[sender]);
-                    var messageLog = document.getElementById("chat-log");
-                    var username = Room.data.Accounts[sender].ScreenName;
-                    var message = document.createElement("div");
-                    if (sender == Account.data.ID){
-                        message.className = "message mine";
-                        username += " (you)";
-                    }
-                    else {
-                        message.className = "message";
-                    }
-                    message.innerHTML = "<span class='user'>"+ username +"</span><br><pre class='message-text'>" + text + "</pre>";
-                    messageLog.appendChild(message);
-                    updateScroll();
+                    putMessage(sender, text);
+
                 }break;
                 default:
 
@@ -250,4 +240,34 @@ function updateScroll(){
     element.scrollTop = element.scrollHeight;
 }
 
+function putMessage(sender, text, before){
+    var messageLog = document.getElementById("chat-log");
+    var username = Room.data.Accounts[sender].ScreenName;
+    var message = document.createElement("div");
+    if (sender == Account.data.ID){
+        message.className = "message mine";
+        username += " (you)";
+    }
+    else {
+        message.className = "message";
+    }
+    message.innerHTML = "<span class='user'>"+ username +"</span><br><span class='message-text'>" + text + "</span>";
+    if (before){
+        messageLog.insertBefore(message, messageLog.firstChild);
+    }else{
+        messageLog.appendChild(message);
+    }
+    updateScroll();
+}
 
+function repopulateMessages() {
+    var before = false;
+    for(var key in Messages){
+        if(Messages.hasOwnProperty(key)){
+            var sender = Messages[key].author;
+            var text = Messages[key].content;
+            putMessage(sender, text, before);
+            before = true;
+        }
+    }
+}

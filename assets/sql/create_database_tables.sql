@@ -108,16 +108,16 @@ CREATE TABLE Files (
   FOREIGN KEY (TypeID) REFERENCES MimeTypes (TypeID)
 );
 
-CREATE TABLE RoomChat (
-  RoomChatID    SERIAL,
+CREATE TABLE Messages (
+  MessageID     BIGINT UNSIGNED,
   RoomID        BIGINT UNSIGNED NOT NULL,
-  ParticipantID BIGINT UNSIGNED NOT NULL,
-  Message       VARCHAR(400)    NULL,
+  AccountID     BIGINT UNSIGNED NOT NULL,
+  Content       VARCHAR(2000) NULL,
   FileID        BIGINT UNSIGNED NULL,
-  SentTime      TIMESTAMP       NOT NULL,
-  PRIMARY KEY (RoomChatID),
+  SentTime      TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  PRIMARY KEY (MessageID),
   FOREIGN KEY (RoomID) REFERENCES Rooms (RoomID),
-  FOREIGN KEY (ParticipantID) REFERENCES Accounts (AccountID),
+  FOREIGN KEY (AccountID) REFERENCES Accounts (AccountID),
   FOREIGN KEY (FileID) REFERENCES Files (FileID)
 );
 

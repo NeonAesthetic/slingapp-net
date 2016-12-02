@@ -97,6 +97,7 @@ class RoomSocketServer extends WebSocketServer
                 $text = htmlspecialchars($request['text']);
                 echo "MESSAGE: ".$text."\n";
                 $accountID = $account->getAccountID();
+                $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
                 $response = $this->create_response("Message", ["Sender"=>$accountID, "text"=>$text]);     //generate message
                 foreach ($this->_clients[$roomid] as $participant){
                     $this->send($participant, $response);               //send message to all registered participant
@@ -147,8 +148,9 @@ class RoomSocketServer extends WebSocketServer
                 $response["ErrorMessage"] = "You are not authorized to perform this action";
             }
             break;
-            return json_encode($response);
+
         }
+        return json_encode($response);
     }
 
 
