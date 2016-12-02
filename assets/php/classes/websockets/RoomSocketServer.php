@@ -11,8 +11,8 @@ const ERR_REQUIRES_AUTH = 0;
 const ERR_INVALID_TOKEN = 1;
 const ERR_ACCESS_DENIED = 2;
 
-require_once "./websockets.php";
-require_once "../Room.php";
+require_once "classes/websockets/websockets.php";
+require_once "classes/Room.php";
 class RoomSocketServer extends WebSocketServer
 {
     protected $maxBufferSize = 4096;

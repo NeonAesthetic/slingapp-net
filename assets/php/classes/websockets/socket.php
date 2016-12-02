@@ -5,7 +5,7 @@
  * Date: 11/23/16
  * Time: 10:11 AM
  */
-require_once "RoomSocketServer.php";
+require_once "classes/websockets/RoomSocketServer.php";
 
 //error_log("HERE");
 $server = new RoomSocketServer("0.0.0.0", "8001");
