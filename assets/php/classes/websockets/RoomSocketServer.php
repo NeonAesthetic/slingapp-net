@@ -27,94 +27,99 @@ class RoomSocketServer extends WebSocketServer
     private $_clients = [];
     protected function process($user, $message)
     {
-        /*************************************************************************************
-         *  SETUP ALL VARIABLES AND CACHED OBJECTS
-         *************************************************************************************/
         $resource = $user->requestedResource;
         preg_match("#/rooms/([0-9]+)#", $resource, $matches);
         $roomid = $matches[1];
-        $request = json_decode($message, true);
-        $room = null;
-        $account = Account::Login($request['token']);
-        //$account->getParticipantInfo();
+        $accountID = null;
+        try {
 
-        $this->Log($request['action'], "Client has access websocket endpoint", $account->getAccountID(), $roomid, "UNDEFINED");
 
-        if(!array_key_exists($roomid, $this->_rooms)){
-            try{
-                $room = new Room($roomid);
-            }catch (Exception $e){
-                echo $e . "";
-                $room = false;
-            }
-            if($room){
-                $this->Log("Cache Miss", "Add room to cache", $account->getAccountID(), $roomid, "UNDEFINED");
-                $this->_rooms[$roomid] = $room;
-                $this->_clients[$roomid] = [];
+            /*************************************************************************************
+             *  SETUP ALL VARIABLES AND CACHED OBJECTS
+             *************************************************************************************/
+
+            $request = json_decode($message, true);
+            $room = null;
+            $account = Account::Login($request['token']);
+            $accountID = $account->getAccountID();
+
+            $this->Log($request['action'], "Client has access websocket endpoint", $account->getAccountID(), $roomid, "UNDEFINED");
+
+            if (!array_key_exists($roomid, $this->_rooms)) {
+                try {
+                    $room = new Room($roomid);
+                } catch (Exception $e) {
+                    echo $e . "";
+                    $room = false;
+                }
+                if ($room) {
+                    $this->Log("Cache Miss", "Add room to cache", $account->getAccountID(), $roomid, "UNDEFINED");
+                    $this->_rooms[$roomid] = $room;
+                    $this->_clients[$roomid] = [];
+                    $room = &$this->_rooms[$roomid];
+                } else {
+
+                }
+            } else {
+                $this->Log("Cache Hit", "Room Found in cache", $account->getAccountID(), $roomid, "UNDEFINED");
                 $room = &$this->_rooms[$roomid];
-            }else{
-
             }
-        }else{
-            $this->Log("Cache Hit", "Room Found in cache", $account->getAccountID(), $roomid, "UNDEFINED");
-            $room = &$this->_rooms[$roomid];
-        }
-        $response = null;
-        /** Make sure that the account has permissions to access the room */
-        if(!$room->accountInRoom($account))
-        {
-            $this->Log("UNAUTHORIZED ACCESS", "Client has requested access to Room but is not authorized", $account->getAccountID(), $roomid, "UNDEFINED");
-            $response = $this->generate_error_response(ERR_ACCESS_DENIED);
-            $this->send($user, $response);
-            return;
-        }
-
-        /*********************************************************************************************************
-         *              RESPOND TO MESSAGE ACTIONS
-         *********************************************************************************************************/
-
-        switch ($request["action"]){
-            case "Register":
-            {
-
-                //User has just connected to the room, and requests to be notified of all changes to the room state
-
-                if(!is_array($this->_clients[$roomid])){    //make sure clients for a room are an array
-                    $this->_rooms[$roomid] = [];
-                }
-                $newUserID = $account->getAccountID(); //get the id of the new participant
-                $nick = $account->getScreenName();
-
-                $response = $this->create_response("Participant Joined", ["id"=>$newUserID, "nick" => $nick, "notify"=>$nick . " has joined"]);     //generate message
-                foreach ($this->_clients[$roomid] as $participant){
-                    $this->send($participant, json_encode($response));               //send message to all registered participant
-                }
-                $this->_clients[$roomid][$newUserID] = $user;        //add the new user to the array
-                //generate message
-                $response = $this->create_response("Register", ["success"=>true]);
-
+            $response = null;
+            /** Make sure that the account has permissions to access the room */
+            if (!$room->accountInRoom($account)) {
+                $this->Log("UNAUTHORIZED ACCESS", "Client has requested access to Room but is not authorized", $account->getAccountID(), $roomid, "UNDEFINED");
+                $response = $this->generate_error_response(ERR_ACCESS_DENIED);
+                $this->send($user, $response);
+                return;
             }
-            break;
 
-            case "Send Message":
-            {
-                $text = htmlspecialchars($request['text']);
-                $accountID = $account->getAccountID();
-                $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
-                $response = $this->create_response("Message", ["Sender"=>$accountID, "text"=>$text]);     //generate message
-                foreach ($this->_clients[$roomid] as $k=>$participant){
-                    echo $k . "\n";
-                    $this->send($participant, json_encode($response));               //send message to all registered participant
+            /*********************************************************************************************************
+             *              RESPOND TO MESSAGE ACTIONS
+             *********************************************************************************************************/
+
+            switch ($request["action"]) {
+                case "Register": {
+
+                    //User has just connected to the room, and requests to be notified of all changes to the room state
+
+                    if (!is_array($this->_clients[$roomid])) {    //make sure clients for a room are an array
+                        $this->_rooms[$roomid] = [];
+                    }
+                    $newUserID = $account->getAccountID(); //get the id of the new participant
+                    $nick = $account->getScreenName();
+
+                    $response = $this->create_response("Participant Joined", ["id" => $newUserID, "nick" => $nick, "notify" => $nick . " has joined"]);     //generate message
+                    foreach ($this->_clients[$roomid] as $participant) {
+                        $this->send($participant, json_encode($response));               //send message to all registered participant
+                    }
+                    $this->_clients[$roomid][$newUserID] = $user;        //add the new user to the array
+                    //generate message
+                    $response = $this->create_response("Register", ["success" => true]);
+
                 }
-                $response = $this->create_response("Confirmation", ["action"=>$request['action'], "success"=>true]);
+                    break;
+
+                case "Send Message": {
+                    $text = htmlspecialchars($request['text']);
+                    $accountID = $account->getAccountID();
+                    $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
+                    $response = $this->create_response("Message", ["Sender" => $accountID, "text" => $text]);     //generate message
+                    foreach ($this->_clients[$roomid] as $k => $participant) {
+                        echo $k . "\n";
+                        $this->send($participant, json_encode($response));               //send message to all registered participant
+                    }
+                    $response = $this->create_response("Confirmation", ["action" => $request['action'], "success" => true]);
+                }
+                    break;
+
+                default:
+                    $response = $this->create_response("Error", ["message" => "Invalid action"]);
             }
-            break;
 
-            default:
-                $response = $this->create_response("Error", ["message"=>"Invalid action"]);
+            $this->send($user, json_encode($response));
+        }catch (Throwable $e){
+            $this->Log("Fatal Error", $e->getMessage(), $accountID, $roomid, "UNDEFINED");
         }
-
-        $this->send($user, json_encode($response));
     }
 
     protected function connected($user)
