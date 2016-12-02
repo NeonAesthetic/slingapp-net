@@ -131,7 +131,8 @@ CREATE TABLE Logs (
   Description VARCHAR(256)
 );
 
-CREATE INDEX IDX_Logs_Snowflake ON Logs(Snowflake);
+CREATE INDEX IDX_Logs_AccountID ON Logs(AccountID);
+CREATE INDEX IDX_Logs_RoomID ON Logs(RoomID);
 
 CREATE TABLE Animals (
   AnimalID SERIAL,
