@@ -66,7 +66,7 @@ var Room = {
                     var accountID = message.id;
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName:sn, ID:accountID};
-
+                    updateUsersHere();
                 }break;
 
                 default:{

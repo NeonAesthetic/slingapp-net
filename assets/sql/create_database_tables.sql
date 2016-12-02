@@ -123,8 +123,8 @@ CREATE TABLE Messages (
 
 CREATE TABLE LogTypes(
   TypeID          BIGINT UNSIGNED,
-  TypeName        VARCHAR(64)
-    PRIMARY KEY (TypeID)
+  TypeName        VARCHAR(64),
+  PRIMARY KEY (TypeID)
 );
 
 CREATE TABLE Logs (
@@ -162,7 +162,7 @@ INSERT INTO LogTypes (TypeID, TypeName)
       (9, 'LOG_NOT_AUTHORIZED'),
       (10, 'LOG_ACCESSED_SOCKET'),
       (11, 'LOG_JOINED_ROOM'),
-      (12, 'LOG_ERROR')
+      (12, 'LOG_ERROR');
 
 CREATE TABLE Animals (
   AnimalID SERIAL,
