@@ -265,6 +265,8 @@ function updateScroll(){
 }
 
 function putMessage(sender, text, before){
+    console.log(text);
+    text = text.replace(/(https?:[/][/])?([a-zA-Z-]+[.][a-z]+)/, "<a href='http://$2'>$1$2</a>");
     var messageLog = document.getElementById("chat-log");
     var username = Room.data.Accounts[sender].ScreenName;
     var message = document.createElement("div");

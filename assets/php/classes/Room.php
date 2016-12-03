@@ -480,6 +480,7 @@ class Room extends DatabaseObject
         $json['Accounts'] = [];
         foreach ($this->_accounts as $a) {
             $json['Accounts'][$a->getAccountID()] = $a->getJSON(true);
+            unset($json['Accounts'][$a->getAccountID()]["LoginToken"]);
         }
 
         $json['RoomCodes'] = [];

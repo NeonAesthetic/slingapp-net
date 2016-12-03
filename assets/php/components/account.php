@@ -26,7 +26,7 @@ switch ($p['action']) {
             $_SESSION['token'] = $token;
             $retval = true;
         } else {
-            DatabaseObject::Log(__FILE__, "Register Account-Tests", "Account-Tests could not be created");
+            Logger::Log(__FILE__, SLN_REGISTER, NULL, NULL, "Account Registration Unsuccessful");
             #echo "Registration was unsuccessful";
         }
         echo $retval;
@@ -100,7 +100,7 @@ switch ($p['action']) {
         }
     }break;
     default:
-        DatabaseObject::Log(__FILE__, "action not valid",
+        Logger::Log(__FILE__, "action not valid",
             "action wasn't valid");
 }
 /**

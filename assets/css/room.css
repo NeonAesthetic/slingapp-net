@@ -91,6 +91,10 @@ body{
     margin: 0;
 }
 
+.message-text a{
+    color: #80ccff;
+}
+
 #send-box input{
     padding: 10px;
     width: calc(100% - 60px);

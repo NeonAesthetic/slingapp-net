@@ -1,0 +1,102 @@
+[2016-12-03T19:48:06+00:00] Accessed File: 123.456.789.0
+[2016-12-03T19:53:05+00:00] Accessed File: 123.456.789.0
+[2016-12-03T19:53:31+00:00] Accessed File: 123.456.789.0
+[2016-12-03T19:56:08+00:00] Accessed File: 123.456.789.0
+[2016-12-03T19:58:29+00:00] Accessed File: Test Description
+[2016-12-03T19:58:30+00:00] Accessed File: Test Description
+[2016-12-03T19:58:30+00:00] Accessed File: Test Description
+[2016-12-03T19:59:15+00:00] Accessed File: Test Description
+[2016-12-03T19:59:17+00:00] Accessed File: Test Description
+[2016-12-03T19:59:41+00:00] Accessed File: Test Description
+[2016-12-03T20:00:01+00:00] Accessed File: Test Description
+[2016-12-03T20:00:02+00:00] Accessed File: Test Description
+[2016-12-03T20:00:03+00:00] Accessed File: Test Description
+[2016-12-03T20:00:03+00:00] Accessed File: Test Description
+[2016-12-03T20:00:03+00:00] Accessed File: Test Description
+[2016-12-03T20:00:03+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:04+00:00] Accessed File: Test Description
+[2016-12-03T20:00:05+00:00] Accessed File: Test Description
+[2016-12-03T20:00:05+00:00] Accessed File: Test Description
+[2016-12-03T20:00:05+00:00] Accessed File: Test Description
+[2016-12-03T20:00:05+00:00] Accessed File: Test Description
+[2016-12-03T20:00:05+00:00] Accessed File: Test Description
+[2016-12-03T20:10:50+00:00] : 
+[2016-12-03T20:12:03+00:00] : 
+[2016-12-03T20:15:22+00:00] : 
+[2016-12-03T20:15:30+00:00] : 
+[2016-12-03T20:17:03+00:00] : 
+[2016-12-03T20:23:04+00:00] Accessed Endpoint: Register
+[2016-12-03T20:23:04+00:00] Cache Miss: Add room to cache
+[2016-12-03T20:23:19+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:23:19+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:23:19+00:00] : 
+[2016-12-03T20:24:33+00:00] Accessed Endpoint: Register
+[2016-12-03T20:24:33+00:00] Cache Miss: Add room to cache
+[2016-12-03T20:24:36+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:24:36+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:24:36+00:00] Message Sent: 
+[2016-12-03T20:24:48+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:24:48+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:24:48+00:00] Message Sent: 
+[2016-12-03T20:24:52+00:00] Accessed Endpoint: Register
+[2016-12-03T20:24:52+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:35:20+00:00] Accessed Endpoint: Register
+[2016-12-03T20:35:20+00:00] Cache Miss: Add room to cache
+[2016-12-03T20:36:26+00:00] Accessed Endpoint: Register
+[2016-12-03T20:36:26+00:00] Cache Miss: Add room to cache
+[2016-12-03T20:39:03+00:00] Accessed Endpoint: Register
+[2016-12-03T20:39:03+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:40:56+00:00] Accessed Endpoint: Register
+[2016-12-03T20:40:56+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:42:34+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:42:34+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:42:34+00:00] Message Sent: 
+[2016-12-03T20:46:15+00:00] Accessed Endpoint: Register
+[2016-12-03T20:46:15+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:46:21+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:46:21+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:46:21+00:00] Message Sent: 
+[2016-12-03T20:46:48+00:00] Accessed Endpoint: Register
+[2016-12-03T20:46:48+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:47:49+00:00] Accessed Endpoint: Register
+[2016-12-03T20:47:49+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:48:00+00:00] Accessed Endpoint: Register
+[2016-12-03T20:48:00+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:48:55+00:00] Accessed Endpoint: Register
+[2016-12-03T20:48:55+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:49:07+00:00] Accessed Endpoint: Register
+[2016-12-03T20:49:07+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:49:50+00:00] Accessed Endpoint: Register
+[2016-12-03T20:49:50+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:49:54+00:00] Accessed Endpoint: Register
+[2016-12-03T20:49:54+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:50:14+00:00] Accessed Endpoint: Register
+[2016-12-03T20:50:14+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:50:17+00:00] Accessed Endpoint: Register
+[2016-12-03T20:50:17+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:50:28+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:50:28+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:50:28+00:00] Message Sent: 
+[2016-12-03T20:50:34+00:00] Accessed Endpoint: Register
+[2016-12-03T20:50:34+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:07+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:07+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:10+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:10+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:21+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:21+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:25+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:25+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:29+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:29+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:37+00:00] Accessed Endpoint: Send Message
+[2016-12-03T20:52:37+00:00] Cache Hit: Room Found in cache
+[2016-12-03T20:52:37+00:00] Message Sent: 
+[2016-12-03T20:52:42+00:00] Accessed Endpoint: Register
+[2016-12-03T20:52:42+00:00] Cache Hit: Room Found in cache

@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS Files;
 DROP TABLE IF EXISTS RoomChat;
 DROP TABLE IF EXISTS MimeTypes;
 DROP TABLE IF EXISTS Logs;
+DROP TABLE IF EXISTS LogTypes;
 DROP TABLE IF EXISTS Animals;
 DROP TABLE IF EXISTS RoomAccount;
 SET FOREIGN_KEY_CHECKS = 1;
@@ -128,6 +129,7 @@ CREATE TABLE LogTypes(
 );
 
 CREATE TABLE Logs (
+  LogID       SERIAL,
   Time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   IP          CHAR(15) NULL,
   File        VARCHAR(64),
@@ -150,19 +152,21 @@ CREATE INDEX IDX_Logs_RoomID ON Logs(RoomID);
 
 INSERT INTO LogTypes (TypeID, TypeName)
     VALUES
-      (0, 'LOG_CACHE_HIT'),
-      (1, 'LOG_CACHE_MISS'),
-      (2, 'LOG_REGISTER'),
-      (3, 'LOG_MESSAGE_SENT'),
-      (4, 'LOG_ERROR_ACCOUNT_NOT_FOUND'),
-      (5, 'LOG_CREATE_ROOM'),
-      (6, 'LOG_CREATE_CODE'),
-      (7, 'LOG_CREATE_ACCOUNT'),
-      (8, 'LOG_NOT_AUTHENTICATED'),
-      (9, 'LOG_NOT_AUTHORIZED'),
-      (10, 'LOG_ACCESSED_SOCKET'),
-      (11, 'LOG_JOINED_ROOM'),
-      (12, 'LOG_ERROR');
+      (0, 'SLN_CACHE_HIT'),
+      (1, 'SLN_CACHE_MISS'),
+      (2, 'SLN_REGISTER'),
+      (3, 'SLN_MESSAGE_SENT'),
+      (4, 'SLN_ERROR_ACCOUNT_NOT_FOUND'),
+      (5, 'SLN_CREATE_ROOM'),
+      (6, 'SLN_CREATE_CODE'),
+      (7, 'SLN_CREATE_ACCOUNT'),
+      (8, 'SLN_NOT_AUTHENTICATED'),
+      (9, 'SLN_NOT_AUTHORIZED'),
+      (10, 'SLN_ACCESSED_SOCKET'),
+      (11, 'SLN_JOINED_ROOM'),
+      (12, 'SLN_ERROR'),
+      (13, 'SLN_ACCESSED_FILE'),
+      (14, 'SLN_UPDATE');
 
 CREATE TABLE Animals (
   AnimalID SERIAL,

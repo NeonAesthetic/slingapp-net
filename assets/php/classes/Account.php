@@ -347,8 +347,7 @@ class Account extends DatabaseObject
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
             if (Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n updated password");
+                Logger::Log(__FILE__, SLN_UPDATE, $this->_accountID, NULL, "Password");
             }
         } else
             throw new Exception("Password must be between 6 - 30 characters");
@@ -413,7 +412,7 @@ class Account extends DatabaseObject
     public function getJSON($as_array = false)
     {
         $json = [];
-        $json['Type'] = "Account-Tests";
+        $json['Type'] = "Account";
         $json['Email'] = $this->_email;
         $json["FirstName"] = $this->_fName;
         $json["LastName"] = $this->_lName;
@@ -488,8 +487,8 @@ class Account extends DatabaseObject
                 if ($this->isNameValid($value)) {
                     $temp = $this->_lName;
                     $this->_lName = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                        "Account-Tests: $this->_accountID \n Updated Last Name From: $temp to: $value");
+//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                        "Account-Tests: $this->_accountID \n Updated Last Name From: $temp to: $value");
                 } else
                     throw new Exception("Last name is not valid, please try again.");
 
@@ -497,30 +496,30 @@ class Account extends DatabaseObject
             case "_token":
                 $this->_token = md5(uniqid(mt_rand(), true));
                 $this->_tokenGen = gmdate('Y-m-d H:i:s');
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n Updated token");
+//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                    "Account-Tests: $this->_accountID \n Updated token");
                 break;
             case "_roomid":
                 $temp = $this->_roomID;
                 $this->_roomID = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n Updated roomID from: $temp to: $value");
+//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                    "Account-Tests: $this->_accountID \n Updated roomID from: $temp to: $value");
                 break;
             case "_screenname":             //add validation check
                 $temp = $this->_screenName;
                 $this->_screenName = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n Updated screenname from: $temp to: $value");
+//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                    "Account-Tests: $this->_accountID \n Updated screenname from: $temp to: $value");
                 break;
             case "_active":
                 $temp = $this->_active;
                 $this->_active = $value;
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n Updated active from: $temp to: $value");
+//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                    "Account-Tests: $this->_accountID \n Updated active from: $temp to: $value");
                 break;
             default:
-                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                    "Account-Tests: $this->_accountID \n set method using: $name wasn't valid");
+//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                    "Account-Tests: $this->_accountID \n set method using: $name wasn't valid");
         }
 
         $this->update();

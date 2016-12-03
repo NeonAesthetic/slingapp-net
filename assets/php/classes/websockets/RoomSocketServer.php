@@ -7,14 +7,12 @@
  * Time: 10:09 AM
  */
 
-const ERR_REQUIRES_AUTH = 0;
-const ERR_INVALID_TOKEN = 1;
-const ERR_ACCESS_DENIED = 2;
 const CR = "\r";
 const NL = "\n";
 
 require_once "classes/websockets/websockets.php";
 require_once "classes/Room.php";
+require_once "components/StandardHeader.php";
 
 class RoomSocketServer extends WebSocketServer
 {
@@ -43,7 +41,7 @@ class RoomSocketServer extends WebSocketServer
             $account = Account::Login($request['token']);
             $accountID = $account->getAccountID();
 
-            $this->Log(LOG_ACCESSED_SOCKET, $request['action'], $account->getAccountID(), $roomid);
+            $this->Log(SLN_ACCESSED_ENDPOINT, $request['action'], $account->getAccountID(), $roomid);
 
             if (!array_key_exists($roomid, $this->_rooms)) {
                 try {
@@ -53,7 +51,7 @@ class RoomSocketServer extends WebSocketServer
                     $room = false;
                 }
                 if ($room) {
-                    $this->Log(LOG_CACHE_MISS, "Add room to cache", $account->getAccountID(), $roomid);
+                    $this->Log(SLN_CACHE_MISS, "Add room to cache", $account->getAccountID(), $roomid);
                     $this->_rooms[$roomid] = $room;
                     $this->_clients[$roomid] = [];
                     $room = &$this->_rooms[$roomid];
@@ -61,13 +59,12 @@ class RoomSocketServer extends WebSocketServer
 
                 }
             } else {
-                $this->Log(LOG_CACHE_HIT, "Room Found in cache", $account->getAccountID(), $roomid);
                 $room = &$this->_rooms[$roomid];
             }
             $response = null;
             /** Make sure that the account has permissions to access the room */
             if (!$room->accountInRoom($account)) {
-                $this->Log(LOG_NOT_AUTHORIZED, "", $account->getAccountID(), $roomid, "UNDEFINED");
+                $this->Log(SLN_NOT_AUTHORIZED, "", $account->getAccountID(), $roomid, "UNDEFINED");
                 $response = $this->generate_error_response(ERR_ACCESS_DENIED);
                 $this->send($user, $response);
                 return;
@@ -101,13 +98,12 @@ class RoomSocketServer extends WebSocketServer
 
                 case "Send Message": {
                     if(strlen($request['text']) <= 2000){
-                        $this->Log(LOG_MESSAGE_SENT, "", $accountID, $roomid);
+                        $this->Log(SLN_MESSAGE_SENT, "", $accountID, $roomid);
                         $text = htmlspecialchars($request['text']);
                         $accountID = $account->getAccountID();
                         $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
                         $response = $this->create_response("Message", ["Sender" => $accountID, "text" => $text]);     //generate message
                         foreach ($this->_clients[$roomid] as $k => $participant) {
-                            echo $k . "\n";
                             $this->send($participant, json_encode($response));               //send message to all registered participant
                         }
                         $response = $this->create_response("Confirmation", ["action" => $request['action'], "success" => true]);
@@ -124,6 +120,7 @@ class RoomSocketServer extends WebSocketServer
             $this->send($user, json_encode($response));
         }catch (Throwable $e){
             $this->Log(LOG_ERROR, $e->getMessage(), $accountID, $roomid);
+
         }
     }
 
@@ -146,13 +143,13 @@ class RoomSocketServer extends WebSocketServer
     private function generate_error_response($error_type){
         $response = ["Type"=>"Error", "ErrorCode"=>$error_type];
         switch ($error_type){
-            case ERR_REQUIRES_AUTH:
+            case SLN_NOT_AUTHORIZED:
             {
                 $response["ErrorMessage"] = "This action requires authorization to complete";
             }
             break;
 
-            case ERR_INVALID_TOKEN:
+            case SLN_NOT_AUTHENTICATED:
             {
                 $response["ErrorMessage"] = "The token provided does not exist in the database";
             }
@@ -169,8 +166,8 @@ class RoomSocketServer extends WebSocketServer
     }
 
     public function Log($type, $msg, $userid, $roomid){
-        echo "[" . date(DATE_ATOM) . "] " . $type . ": " . $msg . "\n";
-        DatabaseObject::Log(__FILE__, $type, $msg, $userid, $roomid, NULL);
+        echo "[" . date("Y-m-d H:i:s") . "] " . LogText[$type] . ": " . $msg . "\n";
+        Logger::Log(__FILE__, $type,  $userid, $roomid, $msg, NULL);
     }
 
     public function run() {

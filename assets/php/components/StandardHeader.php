@@ -13,7 +13,9 @@
 //  Import constants file?
 //
 //
-set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php");
+
+require_once "classes/Database.php";
+require_once "classes/logging/Logger.php";
 
 
 function GetParams(...$params){
@@ -26,5 +28,5 @@ function GetParams(...$params){
 
 function ApacheError($number){
     http_response_code($number);
-    header("Location: /assets/error/$number.html");
+    include "components/error_pages/$number.php";
 }
