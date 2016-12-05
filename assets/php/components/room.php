@@ -5,9 +5,8 @@
  * Date: 11/19/16
  * Time: 12:40 PM
  */
-
-
-require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
+set_include_path("C:\\Users\\Niceg\\slingapp-net\\assets\\php");
+require_once "components/StandardHeader.php";
 require_once "classes/Room.php";
 
 $p = GetParams("action", "roomname", "screenname", "token", "code", "room");

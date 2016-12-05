@@ -49,26 +49,74 @@ else{
 </head>
 <body style="background-color: #222222;">
 <div class="module-container">
-    <div class="module " id="screen-collection" style="width: 200px; ;">
-        <span class="vertical-text">SCREENS</span>
-    </div>
-    <div class="module" id="controls" style="height: 80px; padding-left: 20px; width: 60%">
-        <button class="btn btn-danger" onclick="showSettings()">SETTINGS</button>
-    </div>
-    <div class="module" id="info" style="height: 80px; padding-left: 20px; width: calc(40% - 230px)">
-        <span style="font-size: 16px;color: #333">Room Link: <a href="http://<?=$_SERVER['HTTP_HOST']?>/room/<?=$roomid?>">slingapp.net/room/<?=$roomid?></a></span>
-    </div>
-    <div class="module" id="main" style="height: 60%; padding-left: 20px; width: 60%">
-        Main Screen
-    </div>
-    <div class="module" id="chat" style="height: calc(100% - 100px); width: calc(40% - 230px)">
-        <div class="chat-log" id="chat-log">
-
+    <div class="roomMainBack">
+        <div class="roomMain" id="main" style="position: relative;" >
         </div>
-        <div id="send-box">
+        <div class="roomMain" id="main" style="position: relative;">
+        </div>
+    </div>
+    <div class="roomSideBack" id="screensList" style="left: 0">
+        <div class="roomSide " id="screen-title" style="height: 35px; text-align: center; background-color: white">
+            <span class="vertical-text" style=" background-color: white">USERS</span>
+        </div>
+        <div class="roomSide " id="screen-collection" style="background-color: white">
+            <div class="roomSideTitle">
+                <span class="vertical-text">Anonymous Cat</span>
+            </div>
+        </div>
+        <div class="roomSide " id="screen-collection" style="background-color: white">
+            <div class="roomSideTitle">
+                <span class="vertical-text">Anonymous Dog</span>
+            </div>
+        </div>
+        <div class="roomSide " id="screen-collection" style="background-color: white">
+            <div class="roomSideTitle">
+                <span class="vertical-text">Anonymous Penguin</span>
+            </div>
+        </div>
+    </div>
+    <div class="roomSideBack" id="voiceControls" style="position: fixed; bottom: 90px;right: 10px; float: left; width: 465px; height: 15%; margin: -80px auto; ">
+        <div class="roomSide " id="outterBox"style="height: 100%;">
+            <div class="roomSide " id="currentChannel" style="height: 30px; background-color: #333333">
+                <button class="buttonRoom" style="width: 45%; margin: auto 10px; min-width: 10%" onclick="showSettings()">MUTE</button>
+                <button class="buttonRoom" style="width: 45%; margin: auto 10px; min-width: 10%" onclick="showSettings()">CONNECT VOICE</button>
+            </div>
+            <div class="roomSide" id="channelSettings" style="height: 30px; background-color: #333333">
+
+                <button class="buttonRoom" style="width: 45%; margin: auto 10px; min-width: 10%" onclick="showSettings()">INVITE</button>
+                <button class="buttonRoom" style="width: 45%; margin: auto 10px; min-width: 10%" onclick="showSettings()">SETTINGS</button>
+            </div>
+        </div>
+    </div>
+<!---->
+<!--    <div class="roomSideBack" id="controls" style="text-align: center; height: 70px;  width: 60%; position: fixed; bottom:0;margin: auto 200px 10px 210px;">-->
+<!--        <div class="roomSide" style="height: 50px">-->
+<!--            <button class="buttonRoom" onclick="showSettings()">INVITE</button>-->
+<!--            <button class="buttonRoom" onclick="showSettings()">SETTINGS</button>-->
+<!--            <button class="buttonRoom" onclick="showSettings()">SHARE FILE</button>-->
+<!--            <button class="buttonRoom" onclick="showSettings()">LEAVE ROOM</button>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <div class="roomHeaderBack"style="height: 60px; border-radius: 2px;">
+        <div class="roomSide" style="height: 50px; ">
+            <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="showSettings()">SHARE SCREEN</button>
+            <div class="roomSideTitle" style="text-align: center; width: 30%; min-width:20%; height: 20px; margin: -25px auto 10px auto; background-color: #666">
+                <span class="vertical-text">ROOM TITLE</span>
+            </div>
+            <button class="buttonRoom" style="margin: -30px auto auto 67%; width: 30%; min-width: 50px;" onclick="showSettings()">LEAVE ROOM</button>
+        </div>
+    </div>
+
+
+    <div class="module" id="chat" style=" position: fixed; right: 10px; height: calc(100% - 160px); width: 465px; margin: 5px auto auto; background-color: #333333;">
+        <div class="chat-log" id="chat-log" style="background-color: #333333;"></div>
+        <div id="send-box" style="background-color: #333333; position: relative; width: 95%; margin: 3px 10px;">
             <input onkeypress="if (event.keyCode == 13) sendMessage()" >
             <button onclick="sendMessage()">SEND</button>
         </div>
+        <button class="buttonRoom" style="font-size: small; border-width: 1px; border-color: lightgray; margin: -10px auto auto 10px; width: 95%;height: 22px;
+                border-top-color: transparent; border-top-left-radius: 0; border-top-right-radius: 0; align-content: center" onclick="showSettings()">SHARE FILE</button>
     </div>
 
 
