@@ -85,7 +85,7 @@ class RoomCode extends DatabaseObject
                 ) {
                     throw new PDOException($statement->errorInfo()[2]);
                 } else {
-                    DatabaseObject::Log(__FILE__, "Create", "Account with ID $accountID created Code $code");
+                    Logger::Log(__FILE__, SLN_CREATE_CODE, $accountID, null, $code);
                 }
             }
         } while ($result);

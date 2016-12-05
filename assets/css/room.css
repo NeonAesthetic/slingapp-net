@@ -219,6 +219,14 @@ body{
     height: calc(100% - 40px);
 }
 
+#chat{
+    max-width: 100%;
+}
+
+#outerBox{
+    max-width: 100%;
+}
+
 ::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
