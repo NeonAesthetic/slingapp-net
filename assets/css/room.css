@@ -1,21 +1,29 @@
 body{
-    background-color: #222222;
+    background-color: #38474F;
     overflow-x: hidden;
 }
+     #grad1 {
+         height: 100%;
+         background: #38474F; /* For browsers that do not support gradients */
+         background: -webkit-linear-gradient(left, #38474F, black); /* For Safari 5.1 to 6.0 */
+         background: -o-linear-gradient(right, #38474F, black); /* For Opera 11.1 to 12.0 */
+         background: -moz-linear-gradient(right, #38474F, black); /* For Firefox 3.6 to 15 */
+         background: linear-gradient(to right, #38474F, black); /* Standard syntax (must be last) */
+     }
 .roomMain{
     height: 45%;
-    width: 95%;
+    width: 75%;
     background-color: #777;
-    position: absolute;
-    margin: 10px 0 0 -47.5%;
+    position: relative;
+    margin: 10px 0 0 -37.5%;
     border-color: #38474F;
     left: 50%;
 }
 .roomMainBack{
-    height: 87%;
+    height: 90%;
     width: 60%;
-    background-color: #333333;
-    margin: 100px auto 20px 210px;
+    background-color: rgba(0, 0,0, .2);
+    margin: 74px auto 20px 210px;
     position: fixed;
     float: left;
 }
@@ -33,7 +41,7 @@ body{
     border-width: 2px;
     height: 70px;
     width: 60%;
-    background-color: #333333;
+    background-color: rgba(0, 0,0, .4);
     margin: 5px auto auto 210px;
     position: fixed;
     float: left;
@@ -54,7 +62,7 @@ body{
 .roomSideBack{
     height: calc(100% - 20px);
     width: 195px;
-    background-color: #333333;
+    background-color: rgba(0, 0,0, .4);
     margin: 5px auto auto 10px;
     position: fixed;
     border-radius: 2px;

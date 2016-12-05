@@ -130,6 +130,9 @@ var Room = {
 function showSettings(){
     Modal.create("Settings", "darken");
 }
+function leaveRoom(){
+    window.location.replace("http://localhost")
+}
 
 function InitSettingsModal(){
     Room.settings.categoryPanel.node = Resource.dictionary["Settings"].querySelector(".settings-left");

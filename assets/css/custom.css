@@ -42,6 +42,10 @@ h4 {
     border-style: solid ;
     border-width: 1px;
 }
+.buttonRoom:hover{
+    background-color: #888888;
+}
+
 .buttonRoomNext{
     background-color: #222222;
     color: white;
