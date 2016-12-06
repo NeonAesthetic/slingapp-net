@@ -14,17 +14,17 @@ body{
     height: 45%;
     width: 75%;
     background-color: #777;
-    position: relative;
-    margin: 10px 0 0 -37.5%;
+    position: static;
     border-color: #38474F;
-    left: 50%;
+    float: left;
 }
 .roomMainBack{
-    height: 90%;
-    width: 60%;
+    height: 100%;
+    width: 100%;
     background-color: rgba(0, 0,0, .2);
-    margin: 74px auto 20px 210px;
-    position: fixed;
+    /*margin: 74px auto 20px 210px;*/
+    position: relative;
+    margin-right: 400px;
     float: left;
 }
 
@@ -40,10 +40,9 @@ body{
 .roomHeaderBack{
     border-width: 2px;
     height: 70px;
-    width: 60%;
+    width: calc(100% - 215px);
     background-color: rgba(0, 0,0, .4);
-    margin: 5px auto auto 210px;
-    position: fixed;
+    margin: 5px;
     float: left;
 }
 
@@ -60,12 +59,12 @@ body{
     border-width: 2px;
 }
 .roomSideBack{
-    height: calc(100% - 20px);
+    height: calc(100%);
     width: 195px;
     background-color: rgba(0, 0,0, .4);
     margin: 5px auto auto 10px;
-    position: fixed;
     border-radius: 2px;
+    float: left;
 }
 .roomSideTitle{
     height: 20%;
@@ -170,9 +169,10 @@ body{
 }
 
 .message{
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid #444;
     padding: 5px;
     font-weight: 500;
+    margin: 10px;
 }
 
 .message-text{
@@ -185,6 +185,33 @@ body{
 
 .message-text a{
     color: #80ccff;
+}
+
+.screen-container{
+    min-width: 400px;
+    height: 100%;
+    width: calc(100% - 250px);
+    float: left;
+}
+
+.screen{
+    position: relative;
+    left: 0;
+    height: calc(50% - 60px);
+    margin: 10px;
+
+}
+
+.screen .inner{
+    height: 100%;
+    margin: 0 auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right:0;
+    background-color: transparent;
+
+
 }
 
 #send-box input{
@@ -216,7 +243,7 @@ body{
     font-size: 12px;
     color: white;
     overflow-y: scroll;
-    height: calc(100% - 40px);
+    height: calc(70%);
 }
 
 #chat{

@@ -189,7 +189,6 @@ function createInviteCode(e){
         },
         success: function (data) {
             Room.data.RoomCodes[data.Code] = data;
-            alert(data.Code);
             updateInvites();
         },
         error: function (error) {

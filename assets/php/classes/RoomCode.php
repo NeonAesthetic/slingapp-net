@@ -19,7 +19,7 @@
 
 //set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 require_once "interfaces/DatabaseObject.php";
-require_once "Room.php";
+require_once "classes/Room.php";
 
 class RoomCode extends DatabaseObject
 {
