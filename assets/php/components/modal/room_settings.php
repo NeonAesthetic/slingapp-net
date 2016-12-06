@@ -13,8 +13,8 @@
         <div class="settings-header">
             ROOM SETTINGS
         </div>
-        <a class="selected" href="#Users">Users</a>
-        <a href="#Invites">Invite Codes</a>
+        <a id="UsersLink" class="selected" href="#Users">Users</a>
+        <a id="InvitesLink" href="#Invites">Invite Codes</a>
     </div>
     <div class="settings-right">
         <div id="Users" class="settings-panel active">

@@ -164,6 +164,7 @@ class RoomSocketServer extends WebSocketServer
         }
         return $response;
     }
+    
 
     public function Log($type, $msg, $userid, $roomid){
         echo "[" . date("Y-m-d H:i:s") . "] " . LogText[$type] . ": " . $msg . "\n";

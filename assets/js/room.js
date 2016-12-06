@@ -8,6 +8,7 @@ window.addEventListener("load", function () {
     Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
     Room.connect();
     window.document.title = Room.data.RoomName;
+    document.getElementById("r-title").innerHTML = Room.data.RoomName;
     repopulateMessages();
 });
 
@@ -289,6 +290,7 @@ function putMessage(sender, text, before){
 }
 
 function repopulateMessages() {
+
     var before = false;
     for(var key in Messages){
         if(Messages.hasOwnProperty(key)){
@@ -298,4 +300,10 @@ function repopulateMessages() {
             before = true;
         }
     }
+
+}
+
+function openInvites() {
+    Modal.create("Settings", "darken");
+    document.getElementById("InvitesLink").click();
 }

@@ -74,7 +74,7 @@ else{
             <div class="roomSide" style="height: 50px; ">
                 <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="showSettings()">SHARE SCREEN</button>
                 <div class="roomSideTitle" style="text-align: center; width: 30%; min-width:20%; height: 20px; margin: -25px auto 10px auto; background-color: rgba(0,0,0,0)">
-                    <span class="vertical-text">ROOM TITLE</span>
+                    <span class="vertical-text" id="r-title">ROOM TITLE</span>
                 </div>
                 <button class="buttonRoom" style="margin: -30px auto auto 67%; width: 30%; min-width: 50px;" onclick="leaveRoom()">LEAVE ROOM</button>
             </div>
@@ -118,14 +118,14 @@ else{
 
 <div class="panel" id="chat" style="height: 100%; position: absolute; right: 0;width: 400px; max-width:100%;margin: 5px auto auto; background-color: #333333;">
     <div id="chat-log" style="background-color: #333333;"></div>
-    <div id="send-box" style="background-color: #333333; position: relative; width: 95%; margin: 3px 10px;">
+    <div id="send-box" style="background-color: #333333; ">
         <input onkeypress="if (event.keyCode == 13) sendMessage()" >
         <button onclick="sendMessage()">SEND</button>
     </div>
-    <div  style="width: 100%; padding: 5px">
+    <div  style="width: 100%; ">
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">CONNECT VOICE</button>
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="showSettings()">INVITE</button>
+        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="connectVoice()">CONNECT VOICE</button>
+        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="openInvites()">INVITE</button>
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="showSettings()">SETTINGS</button>
     </div>
 </div>
