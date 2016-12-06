@@ -91,7 +91,7 @@ else{
             </div>
             <div class="screen" style="">
 
-                <video class="inner" ">
+                <video class="inner" ondblclick="fullScreen(this)">
                     <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">
                 </video>
 
