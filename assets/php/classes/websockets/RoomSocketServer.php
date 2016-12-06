@@ -12,6 +12,7 @@ const NL = "\n";
 
 require_once "classes/websockets/websockets.php";
 require_once "classes/Room.php";
+require_once "classes/logging/Logger.php";
 require_once "components/StandardHeader.php";
 
 class RoomSocketServer extends WebSocketServer
