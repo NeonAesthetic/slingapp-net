@@ -8,8 +8,10 @@
  */
 
 //add upgrade account from temp function
-require_once "Database.php";
+require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
+require_once "classes/logging/Logger.php";
+
 
 /**
  * This Class handles all Accounts .
@@ -465,8 +467,8 @@ class Account extends DatabaseObject
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     $temp = $this->_email;
                     $this->_email = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                        "Account-Tests: $this->_accountID \n Updated Email From: $temp to: $value");
+//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                        "Account-Tests: $this->_accountID \n Updated Email From: $temp to: $value");
                 } else
                     throw new Exception("Email is not valid, please try again.");
 
@@ -476,8 +478,8 @@ class Account extends DatabaseObject
                 if ($this->isNameValid($value)) {
                     $temp = $this->_fName;
                     $this->_fName = $value;
-                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-                        "Account-Tests: $this->_accountID \n Updated First Name From: $temp to: $value");
+//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
+//                        "Account-Tests: $this->_accountID \n Updated First Name From: $temp to: $value");
                 } else
                     throw new Exception("First name is not valid, please try again.");
 

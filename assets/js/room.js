@@ -48,7 +48,7 @@ var Room = {
         };
         Room.socket.onmessage = function(data){
             var message = JSON.parse(data.data);
-            // console.log(message);
+            console.log(message);
             if(message.notify){
                 Toast.pop(textNode(message.notify),3000);
             }
@@ -57,7 +57,7 @@ var Room = {
                 case "Message":
                 {
                     var text = message.text;
-                    var sender = message.Sender;
+                    var sender = message.sender;
                     putMessage(sender, text);
 
                 }break;
@@ -70,6 +70,13 @@ var Room = {
                     updateUsersHere();
                 }break;
 
+                case "Confirmation":
+                {
+                    if (message.success === false){
+                        Toast.error(textNode("Action: " + message.action + " failed"));
+                    }
+                }break;
+
                 default:{
                     console.info(message);
                 }
@@ -80,17 +87,17 @@ var Room = {
             Toast.error(textNode("Room Connection Error"));
             console.error(error);
         }
-        // setTimeout(function(){
-        //     if(!Room.connected){
-        //         Toast.error(textNode("Could not connect to Room"));
-        //     }
-        // }, 5000);
+        setTimeout(function(){
+            if(!Room.connected){
+                Toast.error(textNode("Could not connect to Room"));
+            }
+        }, 5000);
     },
     send:function (json) {
         if(Room.connected){
             Room.socket.send(JSON.stringify(json));
         }else{
-            Toast.error(textNode("Socket not connected"));
+            Room.connect();
         }
     },
     sendMessage:function (message) {

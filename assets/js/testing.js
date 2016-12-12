@@ -178,6 +178,7 @@ function addTestButtonEvents(){
     var tests = testdiv.querySelectorAll(".test");
     var foldersTestButtons = testdiv.querySelectorAll(".runtest");
     var folderContainers = testdiv.querySelectorAll(".test-folder");
+    var testCounts = testdiv.querySelectorAll(".tcount");
 
     tests.forEach(function(n){
         n.addEventListener("click", startTest);
@@ -195,6 +196,11 @@ function addTestButtonEvents(){
 
     foldersTestButtons.forEach(function (n) {
         n.addEventListener("click", runFolderTests);
+    });
+
+    testCounts.forEach(function (c) {
+        var numCont = document.getElementById(c.parentNode.getAttribute("href").slice(1)).querySelectorAll(".test").length;
+        c.innerHTML = numCont;
     })
 
 }

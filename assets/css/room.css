@@ -214,6 +214,10 @@ body{
 
 }
 
+.inner ::-webkit-media-controls{
+    display: none !important;
+}
+
 #send-box input{
     padding: 10px;
     width: calc(100% - 60px);

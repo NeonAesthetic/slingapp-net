@@ -83,7 +83,7 @@ else{
         <div class="screen-container">
             <div class="screen" style="">
                 <video class="inner" ondblclick="fullScreen(this)">
-                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">
+<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
                 </video>
 <!--                <div class="screen-bar" >-->
 <!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->
@@ -92,7 +92,7 @@ else{
             <div class="screen" style="">
 
                 <video class="inner" ondblclick="fullScreen(this)">
-                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">
+<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
                 </video>
 
 <!--                <div class="screen-bar" >-->
@@ -145,7 +145,12 @@ else{
     Messages = <?=$room->getMessages()?>;
 
     function fullScreen(element) {
-        element.webkitRequestFullscreen();
+        if (element == document.fullscreenElement){
+            element.webkitExitFullscreen();
+        }else{
+            element.webkitRequestFullscreen();
+
+        }
     }
 </script>
 
