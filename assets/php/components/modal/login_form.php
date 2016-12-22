@@ -6,21 +6,44 @@
  * Time: 3:41 PM
  */
 ?>
-<div style="margin-top: -150px">
+<div class="log-modal abs-center">
     <center>
-        <form id="loginForm" class="log-modal abs-center"
-              method="post"
-              onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
-            <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
-                <a href="#" style="color: #333; text-decoration: none" onclick="{hideLogin()}">✕</a>
-            </div>
-            <h1 id="loginFormHeader" style="color: #333">Login</h1>
 
+        <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
+            <a href="#" style="color: #333; text-decoration: none" onclick="{hideLogin()}">✕</a>
+        </div>
+        <form id="registerForm"
+              method="post"
+              onsubmit="return submitRegister(this);" onclick="return noprop(event)">
+
+            <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Create an Account</h2>
+            <input name="fname" class="form-control" placeholder="first name" type="text">
+            <input name="lname" class="form-control" placeholder="last name" type="text">
             <input name="email" class="form-control" placeholder="email" type="email">
             <input name="pass1" class="form-control" placeholder="password" type="password">
-            <div id="error" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
-            <hr>
-            <div id="submitButton" class="sbtn card-width-button" onclick="submitLogin(this)">SUBMIT</div>
+            <input name="pass2" class="form-control" placeholder="confirm password" type="password">
+<!--            <div class="checkbox col-sm-6">-->
+<!--                <label><input type="checkbox" value="">Remember Me</label>-->
+<!--            </div>-->
+            <div id="registererror" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
+            <div id="submitReg" class="sbtn card-width-button" onclick="submitRegister(this)">SIGN UP</div>
+        </form>
+        <div id="divider">
+        </div>
+
+        <form id="loginForm"
+              method="post"
+              onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
+
+            <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Login</h2>
+            <input name="email" class="form-control" placeholder="email" type="email">
+            <input name="pass1" class="form-control" placeholder="password" type="password">
+<!--            <div class="checkbox col-sm-6">-->
+<!--                <label><input type="checkbox" value="">Remember Me</label>-->
+<!--            </div>-->
+            <div id="loginerror" style="position: relative; top: 0; height: 30px; color: #333; font-size: large">
+                <br></div>
+            <div id="submitLogin" class="sbtn card-width-button" onclick="submitLogin(this)">LOGIN</div>
         </form>
     </center>
 

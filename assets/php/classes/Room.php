@@ -499,7 +499,7 @@ class Room extends DatabaseObject
     public function addMessage($id, $room, $author, $content){
         $this->_chat->addMessage($id, $room, $author, $content);
     }
-    
+
     public function getMessages(){
         $this->_chat->getMessages(500);
         return json_encode($this->_chat->_messages);

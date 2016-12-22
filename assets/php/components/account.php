@@ -19,18 +19,18 @@ switch ($p['action']) {
     case "register":     //value must equal the name(value) of the submit button from the HTML FORM to register
         $retval = false;
         if ($account = process($p)) {
-            $token = $account->getToken();
-            setcookie('token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
-//            echo "Cookie set: ";
-//            var_dump($_COOKIE);
-            $_SESSION['token'] = $token;
-            $retval = true;
-        } else {
+            $retval = $account->getJSON();
+        } else
             Logger::Log(__FILE__, SLN_REGISTER, NULL, NULL, "Account Registration Unsuccessful");
-            #echo "Registration was unsuccessful";
-        }
+
         echo $retval;
         break;
+    case "tempregister":
+        $account = Account::CreateAccount();
+
+        echo $account->getJSON();
+        break;
+
     case "login":
         $retval = json_encode(null);
         //if user pressed submit button, login is set to true, otherwise set to 0 (if they press back)
@@ -43,7 +43,6 @@ switch ($p['action']) {
             $account = Account::Login($p['email'], $p['pass1']);
             if ($account && isLoggedIn($p)) {
                 $token = $account->getToken();
-                setcookie('Token', $token, time() + (60 * 60 * 24), "/");   //set cookie for full day, access anywhere in domain
                 $_SESSION['token'] = $account->getToken();
                 #echo "Successfully logged in using password!";
                 $retval = $account->getJSON();
@@ -67,38 +66,26 @@ switch ($p['action']) {
     case "delete": {
     }
         break;
-    case "logout": {
-        unset($_COOKIE['token']);
-        setcookie('token', '', time() - (60 * 60 * 24), "/");
-//        $account = Account-Tests::Login($_SESSION['token']);
-//
-//        session_destroy();
-//        $GLOBALS['access'] = 0;
-//        $GLOBALS['login'] = 0;
-//
-//        echo "Logged out";
-    }
-        break;
+
     case "getcookie": {
     }
         break;
     case "newtoken": {
     }
         break;
-    case "nocookie":
-    {
+    case "nocookie": {
         $account = Account::CreateAccount();
         echo $account->getJSON();
     }
-    break;
-    case "tokenisvalid":
-    {
-        if(Account::Login($p['token']) != false){
-            echo json_encode(["valid"=>true]);
-        }else{
-            echo json_encode(["valid"=>true]);
+        break;
+    case "tokenisvalid": {
+        if (Account::Login($p['token']) != false) {
+            echo json_encode(["valid" => true]);
+        } else {
+            echo json_encode(["valid" => false]);
         }
-    }break;
+    }
+        break;
     default:
         Logger::Log(__FILE__, "action not valid",
             "action wasn't valid");
@@ -117,6 +104,7 @@ function process($p)
         $retval = Account::CreateAccount($p['email'], $p['fname'], $p["lname"], $p["pass1"]);
     return $retval;
 }
+
 /**
  * Function isLoggedIn
  * @param array [string]string
@@ -129,6 +117,7 @@ function isLoggedIn($p)
     ($GLOBALS['login']) ? verifyPost($p) : verifySession($p);
     return $GLOBALS['access'];
 }
+
 /**
  * Function VerifyPost
  * @param array [string]string
@@ -151,6 +140,7 @@ function verifyPost($p)
         echo $e;
     }
 }
+
 /**
  * Function verifySession
  * @param array [string]string
@@ -163,6 +153,7 @@ function verifySession($p)
     if (sessionExist() && verifyDatabase($p))
         $GLOBALS['access'] = 1;
 }
+
 function verifyDatabase($p)
 {
     $verify = false;
@@ -176,20 +167,24 @@ function verifyDatabase($p)
         $verify = true;
     return $verify;
 }
+
 function isDataValid($p)
 {
     $emailExp = "/[a-zA-Z0-9.]+@[a-zA-Z0-9]+.[a-zA-Z]+/";
     return preg_match($emailExp, $p['email']) && $p['pass1'] == $p['pass2'] ? 1 : 0;
 }
+
 function isTokenValid($token)
 {
     return (isset($_SESSION['token']) || $token == $_SESSION['token']) ? 1 : 0;
 }
+
 function registerSession($p)
 {
     $_SESSION['email'] = $p['email'];
     $_SESSION['pass1'] = $p['pass1'];
 }
+
 function sessionExist()
 {
     return (isset($_SESSION['email']) && isset($_SESSION['pass1'])) ? 1 : 0;

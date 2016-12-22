@@ -152,9 +152,9 @@ class Account extends DatabaseObject
             $statement = Database::connect()->prepare($sql);
             $statement->execute(array(':email' => $token_email));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($result && password_verify($password, $result['PasswordHash'])) {
-                if($result['RoomID'])   //if participating in room
+                if ($result['RoomID'])   //if participating in room
                     $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                         $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
                         $result['RoomID'], $result['ScreenName'], $result['Active']);
@@ -178,17 +178,9 @@ class Account extends DatabaseObject
 
 
             if ($result) {
-//                error_log("[". __LINE__ ."]" . $result["AccountID"]);
-//                if($result['RoomID'] != null) { //if participating in room
-//                    echo "RoomID:: ", $result['RoomID'];
-//                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-//                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
-//                        $result['RoomID'], $result['ScreenName'], $result['Active']);
-//                }
-//                else {  //if not participating in roo
                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                     $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], 24, $result["ScreenName"], 1);
-//                }
+
                 $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE LoginToken = :token";
@@ -202,76 +194,6 @@ class Account extends DatabaseObject
         }
         return $retval;
     }
-//    /**
-//     * Function LoginThroughID
-//     * @param $AccountID
-//     * @return Account|bool|null
-//     * This function allows a user to login based on the accountID
-//     * that is provided this function returns the account based on
-//     * the ID lookup that it performs in the Accounts table.
-//     */
-//    public static function LoginThroughID($AccountID)
-//    {
-//        $retval = null;
-//        $currentDate = gmdate("Y-m-d H:i:s");
-//        $sql = "SELECT *
-//            FROM Accounts
-//            WHERE AccountID = :accountID";
-//        $statement = Database::connect()->prepare($sql);
-//        $retval = $statement->execute(array(':accountID' => $AccountID));
-//        $result = $statement->fetch(PDO::FETCH_ASSOC);
-//
-//        if ($retval) {
-//            $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-//                $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
-//                $result['RoomID'], $result['ScreenName'], $result['Active']);
-//
-//            $sql = "UPDATE Accounts
-//                SET LastLogin = :lastLog
-//                WHERE AccountID = :accountID";
-//            //if account last login doesn't update don't return account
-//            if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':accountID' => $AccountID))) {
-//                $retval = null;
-//            }
-//        }
-//        return $retval;
-//    }
-
-//
-//    public function setRoomID($rid){
-//        $this->_roomID = $rid;
-//    }
-
-//    public function getParticipantInfo()
-//    {
-//        $sql = "SELECT RoomID, ScreenName
-//                FROM Accounts
-//                WHERE AccountID = :accid";
-//        $stmt = Database::connect()->prepare($sql);
-//        $stmt->execute([
-//            ":accid" => $this->_accountID
-//        ]);
-//        $results = $stmt->fetch(PDO::FETCH_ASSOC);
-//        if ($results) {
-//            $this->_roomID = $results["RoomID"];
-//            $this->_participantID = $results["ParticipantID"];
-//            $this->_screenName = $results["ScreenName"];
-//        }
-//    }
-
-//    public function updateParticipant()
-//    {
-//        $sql = "INSERT INTO Accounts
-//                (RoomID, AccountID, ScreenName)
-//                VALUES(:rmid, :accid, :sn)
-//                ON DUPLICATE KEY
-//                UPDATE RoomID = :rmid, ScreenName = :sn, AccountID = :accid;";
-//        Database::connect()->prepare($sql)->execute([
-//            ":rmid" => $this->_roomID,
-//            ":sn" => $this->_screenName,
-//            ":accid" => $this->_accountID
-//        ]);
-//    }
 
     /**
      * Function Delete
@@ -323,14 +245,9 @@ class Account extends DatabaseObject
             ':lastLog' => $this->_lastLogin,
             ':joinDate' => $this->_joinDate,
             ':accountID' => $this->_accountID,
-//            ':roomID' => $this->_roomID,
             ':screenName' => $this->_screenName,
             ':active' => $this->_active))
-        );
-//            error_log("ACCOUNT UPDATE FAILURE: " . $statement->errorInfo()[2]);
-
-//            error_log("UPDATE WORKED");
-
+        ) ;
     }
 
     /**
@@ -436,15 +353,11 @@ class Account extends DatabaseObject
         return $this->_screenName;
     }
 
-    // use magic setter
-//    public function setScreenName($sn){
-//        $this->_screenName = $sn;
-//    }
-//    /**
-//     * Function getEmail
-//     * @return mixed
-//     * This function allows the Current Account-Tests Email to be returned.
-//     */
+    /**
+     * Function getEmail
+     * @return mixed
+     * This function allows the Current Account-Tests Email to be returned.
+     */
     public function getEmail()
     {
         return $this->_email;
