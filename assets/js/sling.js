@@ -234,7 +234,7 @@ function showLogin() {
     document.getElementById("login-button").className += " open";
 
     setTimeout(function () {
-            Modal.create("Login Form", "")
+            Modal.create("Login Form", "", hideLogin)
         }, 700
     );
 }

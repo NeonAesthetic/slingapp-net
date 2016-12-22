@@ -8,11 +8,10 @@
 ?>
 <div class="log-modal abs-center">
     <center>
-
         <div style="position: absolute; left: 0; top: 0; margin: 5px; margin-top: 0">
             <a href="#" style="color: #333; text-decoration: none" onclick="{hideLogin()}">✕</a>
         </div>
-        <form id="registerForm"
+        <form id="registerForm" class="full-height"
               method="post"
               onsubmit="return submitRegister(this);" onclick="return noprop(event)">
 
@@ -26,12 +25,12 @@
 <!--                <label><input type="checkbox" value="">Remember Me</label>-->
 <!--            </div>-->
             <div id="registererror" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
-            <div id="submitReg" class="sbtn card-width-button" onclick="submitRegister(this)">SIGN UP</div>
         </form>
-        <div id="divider">
-        </div>
 
-        <form id="loginForm"
+    <div id="divider">
+    </div>
+
+        <form id="loginForm" class="full-height"
               method="post"
               onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
 
@@ -43,8 +42,11 @@
 <!--            </div>-->
             <div id="loginerror" style="position: relative; top: 0; height: 30px; color: #333; font-size: large">
                 <br></div>
-            <div id="submitLogin" class="sbtn card-width-button" onclick="submitLogin(this)">LOGIN</div>
         </form>
-    </center>
+    <div style="width: 100%; float: left">
 
+        <div id="submitReg" class="card-width-button" style="width: 50%; float:left" onclick="noprop(event);submitRegister(this)">SIGN UP</div>
+        <div id="submitLogin" class="card-width-button" style="width: 50%; float:left" onclick="noprop(event);submitLogin(this)">LOGIN</div>
+    </div>
+    </center>
 </div>
