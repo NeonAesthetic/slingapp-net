@@ -47,10 +47,9 @@ require_once "classes/Account.php";
     </div>
 </nav>
 
-<div class="container-fluid"
-     style="background-color: rgba(255,255,255,1); text-align: center; padding: 50px; ">
+<div style="background-color: rgba(255,255,255,1); text-align: center; ">
 
-    <h1 style="width:100%; text-align: center;">Sharing so easy you'll never go back</h1>
+    <h1 style="width:100%; text-align: center; padding-top: -10%;">Sharing so easy you'll never go back</h1>
     <div class="wrapper">
         <div id="screenshot" class="screenshot">
         </div>
@@ -90,7 +89,6 @@ require_once "classes/Account.php";
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
-        Resource.load("/assets/php/components/modal/register_form.php", "Register Form");
 
         var sbtns = document.getElementsByClassName("sbtn");
         for (var i = sbtns.length - 1; i >= 0; i--) {
