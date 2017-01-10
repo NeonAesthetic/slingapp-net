@@ -76,7 +76,7 @@ abstract class WebSocketServer
                 return;
             }
 
-            switch($request["action"]){
+            switch($request["action"]) {
                 case "Send Message":
                 {
                     echo "ws: chat\n";

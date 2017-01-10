@@ -21,8 +21,7 @@ class RoomSocketServer extends WebSocketServer
     /**
      * @var Room[]
      */
-
-
+    
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
         //User has just connected to the room, and requests to be notified of all changes to the room state
