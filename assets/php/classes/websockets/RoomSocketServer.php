@@ -30,15 +30,17 @@ class RoomSocketServer extends WebSocketServer
      */
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
-        //User has just connected to the room, and requests to be notified of all changes to the room state
+
         $room_id     = $room->getRoomID();
-        $new_user_id = $account->getAccountID(); //get the id of the new participant
+        $new_user_id = $account->getAccountID();
         $nick        = $account->getScreenName();
 
-        if (!is_array($this->_clients[$room_id])) {    //make sure clients for a room are an array
+        //make sure clients for a room are an array
+        if (!is_array($this->_clients[$room_id])) {
             $this->_clients[$room_id] = [];
         }
 
+        //generate message
         $response = $this->create_response(
             "Participant Joined",
             [
@@ -46,16 +48,17 @@ class RoomSocketServer extends WebSocketServer
                 "nick" => $nick,
                 "notify" => $nick . " has joined"
             ]
-        );     //generate message
+        );
 
-
+        //send message to all registered participant
         foreach ($this->_clients[$room_id] as $k=>$participant) {
-            $this->send($participant, $response);               //send message to all registered participant
+            $this->send($participant, $response);
         }
 
-        $this->_clients[$room_id][$new_user_id] = $user_socket;        //add the new user to the array
+        //add the new user to the array
+        $this->_clients[$room_id][$new_user_id] = $user_socket;
 
-        //generate message
+        //generate message for newly registered client
         $response = $this->create_response(
             "Register",
             [
@@ -67,11 +70,11 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_client_chat($user_socket, $message, Room &$room, Account &$account)
     {
-        if(strlen($message['text']) <= 2000){
+        $account_id = $account->getAccountID();
+        $room_id    = $room->getRoomID();
+        $text       = htmlspecialchars($message['text']);
 
-            $account_id = $account->getAccountID();
-            $room_id    = $room->getRoomID();
-            $text       = htmlspecialchars($message['text']);
+        if(strlen($text) <= 2000){
 
             $this->Log(SLN_MESSAGE_SENT, "", $account_id, $room_id);
 
