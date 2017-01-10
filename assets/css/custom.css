@@ -1,20 +1,94 @@
-
-
-
-.card{
-    border-radius: 2px;
-    border: 1px solid lightgrey;
-    margin: 3px;
-    padding: 20px;
-    box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
-    background-color: white;
-    float: left;
-    min-width: 256px;
-    width: 512px;
-    max-width: calc(100% - 6px);;
+form{
+    margin: 0;
 }
 
-.btn-main{
+.navbar-brand {
+    transform: translateX(-50%);
+    left: 50%;
+    position: absolute;
+    color: white;
+    font-size: 2em;
+}
+
+.navbar {
+    background-color: #38474F;
+    padding-right: 50px;
+    z-index: -10;
+}
+
+.card {
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    background-color: #fefefe;
+    float: left;
+    min-width: 300px;
+    overflow: hidden;
+}
+
+.buttonRoom {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #999;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+    min-width: 100px;
+    border-color: #777;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    display: inline-block;
+}
+
+.buttonRoom:hover {
+    background-color: #444;
+    color: white;
+    border-color: white;
+}
+
+.buttonRoomNext {
+    background-color: #222222;
+    color: white;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+    width: 25%;
+    min-width: 100px;
+    border-color: white;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.buttonRoomPrev {
+    background-color: #222222;
+    color: white;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+    width: 25%;
+    min-width: 100px;
+    border-color: white;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.btn-room {
+    /*background-color: red;*/
+    /*color: white;*/
+    /*font-size: 1em;*/
+    /*border-radius: 10px;*/
+    /*border: 6px;*/
+    /*border-color: #222222;*/
+    /*float: none;*/
+    /*padding: 2px;*/
+    /*height: 30px;*/
+    /*width: 140px;*/
+}
+
+.btn-main {
     font-size: 2em;
     border-radius: 50px;
     border: 2px solid white;
@@ -24,21 +98,20 @@
     padding: 10px;
 }
 
-.btn-main:hover:active{
+.btn-main:hover:active {
     /*box-shadow: 0px 2px 10px rgba(0,0,0,.4) inset;*/
-    background-color: rgba(255,255,255,1);
+    background-color: rgba(255, 255, 255, 1);
     color: black;
     /*border-color: black;*/
 
 }
 
-
-.btn-main:hover{
-    background-color: rgba(255,255,255, 0.1);
+.btn-main:hover {
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
-.mp-form{
+.mp-form {
     font-size: 2em;
     border-radius: 50px;
     border: 2px solid white;
@@ -48,31 +121,32 @@
     padding: 10px;
 }
 
-.mp-form:hover{
-    background-color: rgba(255,255,255, 0.1);
+.mp-form:hover {
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
-.mp-form:focus{
+.mp-form:focus {
     background-color: white;
     color: black;
 }
 
-.screenshot{
+.screenshot {
     /*border: 1px solid black;*/
     position: absolute;
     top: 0;
     bottom: 0;
     right: 0;
-    left: 0;
+    left: 20%;
+    width: 60%;
     background-image: url("/assets/images/screen.png");
-    background-size: cover;
-    /*max-height: 70vh;*/
+    background-size: contain;
+    background-repeat: no-repeat;
 
     /*-webkit-box-reflect: below 0px -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.3) 0%, transparent 50%, transparent 100%);*/
 }
 
-.btn-circle{
+.btn-circle {
     border-radius: 3px;
     padding: 6px;
     margin-right: 10px;
@@ -83,7 +157,7 @@
 }
 
 .wrapper {
-    max-width: 800px;
+    /*max-width: 60vw;*/
     width: 100%;
 
     /* whatever width you want */
@@ -93,6 +167,7 @@
     right: 0;
     margin: 0 auto;
 }
+
 .wrapper:after {
     padding-top: 65%;
     /* 16:9 ratio */
@@ -100,3 +175,372 @@
     content: '';
 }
 
+.login-button {
+    position: relative;
+    border: 2px solid black;
+    border-radius: 50px;
+    background-color: white;
+    width: 500vw;
+    height: 500vw;
+    max-width: 100px;
+    max-height: 40px;
+    font-size: 1.5em;
+    line-height: 75%;
+    padding-top: 5%;
+}
+
+#reg {
+    font-size:  0.5em;
+}
+
+.label {
+    float: left;
+    color: black;
+    /*margin-left: 15%;*/
+}
+
+.rememberMe {
+    position: relative;
+    float: left;
+    margin-left: 15%;
+}
+.login-div {
+    position: absolute;
+    right: 100px;
+    top: 100px;
+    padding: 20px;
+}
+
+.register-link {
+    margin: 10px;
+    display: inline-block;
+}
+
+.login-button:active {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) inset;
+}
+
+.open {
+    animation: 1s open forwards;
+}
+
+.close {
+    animation: 1s open backwards;
+}
+
+.form-control {
+    margin: 10px;
+    max-width: 300px;
+    border-radius: 50px;
+}
+
+.nomargin{
+    margin:0;
+}
+
+
+
+@keyframes open {
+    0% {
+        max-width: 100px;
+        max-height: 40px;
+        border-radius: 50px;
+    }
+    5% {
+        border-radius: 50%;
+        max-width: 100px;
+        max-height: 100px;
+        margin-top: -40px;
+        margin-right: -0px;
+    }
+    100% {
+        max-height: 300vw;
+        max-width: 300vw;
+        margin-right: -150vw;
+        margin-top: -150vw;
+        border-radius: 100%;
+        color: transparent;
+        background-color: #38474F;
+    }
+}
+
+.log-modal {
+    border: 1px solid #888;
+    border-radius: 2px;
+    position: absolute;
+    width: 700px;
+    background-color: #fefefe;
+    box-shadow: 3px 3px 20px rgba(0, 0, 0, .5);
+    text-align: center;
+}
+
+.createrm-modal{
+    border: 1px solid #888;
+    border-radius: 2px;
+    position: absolute;
+    max-width: 400px;
+    width: 400px;
+
+    background-color: #fefefe;
+    box-shadow: 3px 3px 20px rgba(0,0,0,.5);
+    text-align: center;
+}
+
+#registerForm {
+    float: left;
+    width: 50%;
+}
+
+#loginForm {
+    float:left;
+    width: 50%;
+}
+
+.full-height{
+    position: relative;
+    height: 100%;
+}
+
+#divider {
+    position:absolute;
+    left:50%;
+    top:0%;
+    bottom:0%;
+    border-left:1px solid lightgrey;
+}
+
+.card-width-button {
+    width: 100%;
+    color: #666;
+    font-size: 2em;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 15px;
+    position: relative;
+    background-color: rgba(0,0,0,0.1);
+    bottom: 0;
+}
+
+.card-width-button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.drip {
+    position: absolute;
+    animation: 1s drip2 forwards;
+    height: 100px;
+    width: 100px;
+    border-radius: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    transform-origin: center center;
+}
+
+.sbtn {
+    position:relative;
+    width: 50%;
+}
+
+.sling {
+    background-image: url("/assets/images/sling64.png");
+    background-size: contain;
+    animation: 1.1s spin infinite;
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+
+.text-abs {
+    z-index: 2;
+    position: absolute;
+    color: black;
+    font-size: 42px;
+    font-weight: bold;
+    top: 40%;
+}
+#modal {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999999999999999999;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.noborder {
+    border: none;
+}
+
+.darken {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.abs-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.flex {
+    display: flex;
+}
+
+.settings-left {
+    max-width: 400px;
+    width: 30%;
+    margin: 0;
+    background-color: #333;
+    float: left;
+    color: white;
+
+    padding-bottom: 15px;
+    /*padding: 10px;*/
+}
+
+.settings-left a {
+    font-size: 1.2em;
+    color: #aaa;
+    width: 100%;
+    display: inline-block;
+    padding: 5px 15px 5px 15px;
+}
+
+.settings-left a.selected {
+    border-left: 3px solid #fefefe;
+    color: white;
+}
+
+.settings-left a:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.settings-left a:active {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.settings-header {
+    padding: 15px;
+    font-size: 1.5em;
+    border-bottom: 1px solid #222;
+}
+
+.settings-panel {
+
+    position: absolute;
+    top: 0;
+    z-index: 0;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+}
+
+.settings-panel h1 {
+    width: 100%;
+    text-align: center;
+    margin: 10px;
+    font-size: 2em;
+}
+
+.settings-panel h2 {
+    margin: 10px;
+    font-size: 1em;
+    color: #666666;
+}
+
+.active {
+    z-index: 9999999;
+}
+
+.settings-right {
+    float: left;
+    width: 70%;
+    background-color: white;
+    position: relative;
+
+}
+
+.toast {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    bottom: 0;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid lightgrey;
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
+    background-color: white;
+    width: 200px;
+    overflow: visible;
+    overflow-wrap: break-word;
+    overflow-clip: wrap;
+    padding: 15px;
+    animation: 0.3s toast-pop forwards;
+}
+
+.toast.error {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: white;
+    font-weight: 600;
+}
+
+#Invites table {
+    width: 100%;
+}
+
+#Invites td {
+    padding: 5px;
+    width: 32%;
+}
+
+@keyframes spin {
+    from {
+    }
+    to {
+        transform: rotate(720deg)
+    }
+}
+
+@keyframes drip {
+    from {
+        border-radius: 100%
+    }
+    to {
+        height: 500px;
+        width: 500px;
+        background-color: transparent;
+        margin-left: -250px;
+        margin-top: -250px;
+        border-radius: 100%
+    }
+}
+
+@keyframes drip2 {
+    from {
+        transform: scale(.01)
+    }
+    to {
+        transform: scale(5);
+        background-color: transparent
+    }
+}
+
+@keyframes toast-pop {
+    from {
+        margin-bottom: 0;
+    }
+    to {
+        margin-bottom: 100px;
+    }
+}

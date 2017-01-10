@@ -1,6 +1,61 @@
+
+
+
 .running{
     animation: pulse 1.8s infinite ease-in-out;
 }
+
+.test-output-container{
+    border-bottom: 1px inset #555;
+    margin-bottom: 10px;
+}
+
+.ico-area{
+    height: 32px;
+    width: 32px;
+    font-size: 30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 5px;
+}
+
+.tname{
+    max-width: calc(100% - 42px);
+}
+
+.tcount{
+    font-size: 14px;
+    width: 28px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid lightgray;
+    float: right;
+    font-weight: 600;
+}
+
+.t-btn{
+    border: 1px solid lightgray;
+    padding: 4px 10px 4px 10px;
+    border-radius: 50px;
+    height: 28px;
+    margin: -4px -5px 0 10px;
+}
+
+.runtest{
+    float: right;
+}
+
+.runtest:hover{
+    background-color: rgba(0,0,0,0.05);
+}
+
+.runtest:active{
+    background-color: rgba(0,0,0,0.1);
+ }
+
+
 
 .test-fail{
     color: #ff5555;
@@ -24,3 +79,102 @@ body{
     background-color: #fff;
     padding: 3px;
 }
+
+.tfile{
+    color: #AAA;
+}
+
+.timing-value{
+    color: #80ccff;
+}
+
+.spinner {
+    margin: 100px auto;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.spinner > div {
+    background-color: #333;
+    height: 100%;
+    width: 6px;
+    display: inline-block;
+
+    -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    animation: sk-stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+
+@-webkit-keyframes sk-stretchdelay {
+    0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+    20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes sk-stretchdelay {
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }  20% {
+           transform: scaleY(1.0);
+           -webkit-transform: scaleY(1.0);
+       }
+}
+
+
+
+.context-menu{
+    position: absolute;
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.5);
+    background-color: #fefefe;
+    min-width: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+}
+
+.context-menu a{
+    width: 100%;
+    display: inline-block;
+    text-decoration: none;
+    padding: 3px 20px 3px 20px;
+
+}
+
+.context-menu a:hover{
+    background-color: #4286f4;
+    color: white;
+    cursor: pointer;
+}
+
+.context-menu p{
+    padding: 5px 20px 5px 20px;
+
+    border-bottom: 1px solid lightgrey;
+    width: 100%;
+}
+
+.context-menu hr{
+    margin: 5px;
+}
+

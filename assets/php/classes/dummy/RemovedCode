@@ -1,0 +1,59 @@
+REMOVED FROM ACCOUNT
+//    public static function createTempAccount()
+//    {
+//        $retval = null;
+//        $token = md5(uniqid(mt_rand(), true));
+//        $currentDate = gmdate("Y-m-d H:i:s");
+//
+//        $sql = "INSERT INTO Accounts
+//                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
+//                VALUES(:email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+//
+//        $statement = Database::connect()->prepare($sql);
+//
+//        if ($statement->execute([
+//            ':email' => null,
+//            ':fName' => null,
+//            ':lName' => null,
+//            ':passHash' => null,
+//            ':logTok' => $token,
+//            ':tokGen' => $currentDate,
+//            ':lastLog' => $currentDate,
+//            ':joinDate' => $currentDate,
+//        ])
+//        ) {
+//            $accountID = Database::connect()->lastInsertId();
+//
+//            $sql = "SELECT *
+//                    FROM Accounts AS a
+//                      JOIN Participants AS p
+//                        ON a.AccountID = p.AccountID
+//                    WHERE Email IS NULL";
+//
+//            Database::connect()->prepare($sql)->execute();
+//
+//            $account = new Account($accountID, $token, $currentDate);
+//            $retval = $account;
+//        }
+//        return $retval;
+//    }
+
+ROOM
+Constructor:
+//
+//                    foreach($this->_room_codes as $rc) {
+//                        echo "Room CODE::::::$$::: ", $rc->getCode();
+//                    }
+                    #var_dump($this->_accounts);
+//                $this->_room_codes = array_unique($this->_room_codes);
+//                $this->_accounts[] = array_unique($this->_accounts);
+
+ROOM
+//    public function getParticipants(){
+//
+//        foreach ($this->_accounts as $p) {
+//            $participants[] = $p[0];
+//        }
+//
+//        var_dump($participants);
+//    }
