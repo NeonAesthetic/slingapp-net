@@ -21,24 +21,47 @@ class RoomSocketServer extends WebSocketServer
     /**
      * @var Room[]
      */
-    
+
+    /**
+     * @param $user_socket
+     * @param $message
+     * @param Room $room
+     * @param Account $account
+     */
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
         //User has just connected to the room, and requests to be notified of all changes to the room state
-        $room_id = $room->getRoomID();
-        if (!is_array($this->_clients[$roomid])) {    //make sure clients for a room are an array
-            $this->_rooms[$roomid] = [];
-        }
-        $newUserID = $account->getAccountID(); //get the id of the new participant
-        $nick = $account->getScreenName();
+        $room_id     = $room->getRoomID();
+        $new_user_id = $account->getAccountID(); //get the id of the new participant
+        $nick        = $account->getScreenName();
 
-        $response = $this->create_response("Participant Joined", ["id" => $newUserID, "nick" => $nick, "notify" => $nick . " has joined"]);     //generate message
-        foreach ($this->_clients[$roomid] as $k=>$participant) {
+        if (!is_array($this->_clients[$room_id])) {    //make sure clients for a room are an array
+            $this->_clients[$room_id] = [];
+        }
+
+        $response = $this->create_response(
+            "Participant Joined",
+            [
+                "id" => $new_user_id,
+                "nick" => $nick,
+                "notify" => $nick . " has joined"
+            ]
+        );     //generate message
+
+
+        foreach ($this->_clients[$room_id] as $k=>$participant) {
             $this->send($participant, $response);               //send message to all registered participant
         }
-        $this->_clients[$roomid][$newUserID] = $user_socket;        //add the new user to the array
+
+        $this->_clients[$room_id][$new_user_id] = $user_socket;        //add the new user to the array
+
         //generate message
-        $response = $this->create_response("Register", ["success" => true]);
+        $response = $this->create_response(
+            "Register",
+            [
+                "success" => true
+            ]
+        );
         $this->send($user_socket, $response);
     }
 
@@ -46,19 +69,49 @@ class RoomSocketServer extends WebSocketServer
     {
         if(strlen($message['text']) <= 2000){
 
-            $accountID = $account->getAccountID();
-            $roomid = $room->getRoomID();
-            $this->Log(SLN_MESSAGE_SENT, "", $accountID, $roomid);
-            $text = htmlspecialchars($message['text']);
-            $accountID = $account->getAccountID();
-            $room->addMessage(Database::getFlakeID(), $room->getRoomID(), $accountID, $text);
-            $response = $this->create_response("Message", ["sender" => $accountID, "text" => $text]);     //generate message
-            foreach ($this->_clients[$roomid] as $k => $participant) {
-                $this->send($participant, $response);               //send message to all registered participant
+            $account_id = $account->getAccountID();
+            $room_id    = $room->getRoomID();
+            $text       = htmlspecialchars($message['text']);
+
+            $this->Log(SLN_MESSAGE_SENT, "", $account_id, $room_id);
+
+            $room->addMessage(
+                Database::getFlakeID(),
+                $room_id,
+                $account_id,
+                $text);
+
+            $response = $this->create_response(
+                "Message",
+                [
+                    "sender" => $account_id,
+                    "text" => $text
+                ]
+            );
+
+            //generate message
+            foreach ($this->_clients[$room_id] as $client_account_id => $client_socket) {
+                //send message to all registered participant
+                $this->send($client_socket, $response);
             }
-            $response = $this->create_response("Confirmation", ["action" => $message['action'], "success" => true]);
+
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    "action" => $message['action'],
+                    "success" => true
+                ]
+            );
+
         }else{
-            $response = $this->create_response("Confirmation", ['action'=>$message['action'], 'success'=>false, "message"=>"Message over 2000 characters"]);
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Message over 2000 characters"
+                ]
+            );
         }
         $this->send($user_socket, $response);
     }
