@@ -25,7 +25,7 @@ class RoomSocketServer extends WebSocketServer
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
         //User has just connected to the room, and requests to be notified of all changes to the room state
-        $roomid = $room->getRoomID();
+        $room_id = $room->getRoomID();
         if (!is_array($this->_clients[$roomid])) {    //make sure clients for a room are an array
             $this->_rooms[$roomid] = [];
         }

@@ -33,70 +33,69 @@ abstract class WebSocketServer
 
     protected function process($user, $message)
     {
-        $resource = $user->requestedResource;
-        preg_match("#/rooms/([0-9]+)#", $resource, $matches);
-        $roomid = $matches[1];
-        $accountID = null;
+        $requested_resource = $user->requestedResource;
+        preg_match("#/rooms/([0-9]+)#", $requested_resource, $matches);
+        $client_room_id = $matches[1];
+        $client_account_id = null;
         try {
             /*************************************************************************************
              *  SETUP ALL VARIABLES AND CACHED OBJECTS
              *************************************************************************************/
 
-            $request = json_decode($message, true);
-            $room = null;
-            $account = Account::Login($request['token']);
-            $accountID = $account->getAccountID();
+            $message_object = json_decode($message, true);
+            $client_room = null;
+            $client_account = Account::Login($message_object['token']);
+            $client_account_id = $client_account->getAccountID();
 
-            $this->Log(SLN_ACCESSED_ENDPOINT, $request['action'], $account->getAccountID(), $roomid);
+            $this->Log(SLN_ACCESSED_ENDPOINT, $message_object['action'], $client_account_id, $client_room_id);
 
-            if (!array_key_exists($roomid, $this->_rooms)) {
+            if (!array_key_exists($client_room_id, $this->_rooms)) {
                 try {
-                    $room = new Room($roomid);
+                    $client_room = new Room($client_room_id);
                 } catch (Exception $e) {
                     echo $e . "";
-                    $room = false;
+                    $client_room = false;
                 }
-                if ($room) {
-                    $this->Log(SLN_CACHE_MISS, "Add room to cache", $account->getAccountID(), $roomid);
-                    $this->_rooms[$roomid] = $room;
-                    $this->_clients[$roomid] = [];
+                if ($client_room) {
+                    $this->Log(SLN_CACHE_MISS, "Add room to cache", $client_account_id, $client_room_id);
+                    $this->_rooms[$client_room_id] = $client_room;
+                    $this->_clients[$client_room_id] = [];
 
                 } else {
 
                 }
             }
-            $room = &$this->_rooms[$roomid];
+            $client_room = &$this->_rooms[$client_room_id];
 
             $response = null;
             /** Make sure that the account has permissions to access the room */
-            if (!$room->accountInRoom($account)) {
-                $this->Log(SLN_NOT_AUTHORIZED, "", $account->getAccountID(), $roomid);
+            if (!$client_room->accountInRoom($client_account)) {
+                $this->Log(SLN_NOT_AUTHORIZED, "", $client_account_id, $client_room_id);
                 $response = $this->generate_error_response(ERR_ACCESS_DENIED);
                 $this->send($user, $response);
                 return;
             }
 
-            switch($request["action"]) {
+            switch($message_object["action"]) {
                 case "Send Message":
                 {
-                    echo "ws: chat\n";
-                    $this->on_client_chat($user, json_decode($message, true), $room, $account);
+                    $this->on_client_chat($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Register":
                 {
-                    $this->on_client_join($user, json_decode($message, true), $room, $account);
+                    $this->on_client_join($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Create Room Code":
                 case "Delete Room Code":
                 {
-                    $this->on_alter_roomcode($user, json_decode($message, true), $room, $account);
+                    $this->on_alter_roomcode($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Change Name":
                 {
-                    $this->on_client_namechange($user, json_decode($message, true), $room, $account);
+                    $this->on_client_namechange($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Connect Voice":
