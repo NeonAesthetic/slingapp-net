@@ -60,22 +60,24 @@ function runJSTest(div, output, callback){
     get(base + testScript, "", function (data, responsetype) {
         preparation.innerHTML = data;
         data = preparation.querySelector("script").innerHTML;
-        var logger = {};
-        logger.log = function(msg){
+        var testObject = {};
+        testObject.log = function(msg){
             output.innerHTML+=msg + "<br>";
+        };
+        testObject.end = function (pass) {
+            testObject.end = function () {
+
+            };
+            evalTest(div, pass, null, callback);
         };
         try{
             eval(data);
-            test(logger);
-
-            passed = true;
+            test(testObject);
         }catch(exception){
             console.log(exception);
         }finally {
 
         }
-        // console.log(output, passed);
-        evalTest(div, passed, null, callback);
 
     });
 

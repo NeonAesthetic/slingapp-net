@@ -11,22 +11,25 @@
 ?>
 
 <script>
-function test(console){
-    console.log("Socket");
+function test(test){
+    test.log("Socket");
     var url = "ws://localhost:8001/rooms/socket.php";
     var Socket = new WebSocket(url);
     Socket.onopen = function(){
-        console.log("Connected to server");
+        test.log("Connected to server");
         Socket.send("Hello");
+        test.end(true)
+        return
     };
     Socket.onmessage = function(evt){
         var message = evt.data;
-        console.log(message);
+        test.log(message);
     };
+    setTimeout(function () {
+        test.end(false);
+    }, 2000);
 }
 
-
-//    assert(1==2, "assert that 1 == 2");
 
 
 </script>
