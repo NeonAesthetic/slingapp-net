@@ -8,22 +8,24 @@
  * Description: Logs an action and fetches the log from the database.
  */
 
-require_once "interfaces/DatabaseObject.php";
-require_once "classes/Database.php";
-
-DatabaseObject::Log(__FILE__, "Testing", "Test Description");
-
-$stmt = Database::connect()->query("SELECT * FROM Logs WHERE Action='Testing'");
+require_once "classes/logging/Logger.php";
+mark();
+Logger::Log(__FILE__, SLN_ACCESSED_FILE, NULL, NULL, "Test Description", "123.456.789.0");
+mark("Log one item");
+$stmt = Database::connect()->query("SELECT * FROM Logs WHERE File='log_testing.php'");
 if(!$stmt) var_dump(Database::connect()->errorInfo());
 $results = $stmt->execute();
 $results = $stmt->fetch(PDO::FETCH_ASSOC);
-foreach ($results as $k=>$v){
-    echo $k . ": ". $v. "<br>";
+if($results){
+    foreach ($results as $k=>$v){
+        echo $k . ": ". $v. "<br>";
+    }
 }
+
 
 function cleanup(){
     try{
-        Database::connect()->exec("DELETE FROM Logs WHERE Action = 'Testing'");
+        Database::connect()->exec("DELETE FROM Logs WHERE File = 'log_testing.php'");
     }catch(Exception $e){
 
     }

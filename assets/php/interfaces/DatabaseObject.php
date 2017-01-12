@@ -10,6 +10,7 @@
 
 require_once "classes/Database.php";
 
+
 abstract class DatabaseObject
 {
 
@@ -25,17 +26,20 @@ abstract class DatabaseObject
 
     public abstract function getJSON($as_array = false);
 
-    public static function Log($filename, $action, $description){
-        $file = basename($filename);
-        $ip = $_SERVER["REMOTE_ADDR"];
-
-        $sql = "INSERT INTO Logs (IP, File, Action, Description) VALUES(:ip, :file, :action, :desc)";
-        Database::connect()->prepare($sql)->execute([
-            ":ip"=>$ip,
-            ":file"=>$file,
-            ":action"=>$action,
-            ":desc"=>$description
-        ]);
-    }
+//    public static function Log($filename, $type, $description, $user, $room, $ip = false){
+//        $file = basename($filename);
+//        if($ip == true)
+//            $ip = $_SERVER["REMOTE_ADDR"];
+//
+//        $sql = "INSERT INTO Logs (IP, File, TypeID, Description, AccountID, RoomID) VALUES(:ip, :file, :action, :desc, :user, :room)";
+//        Database::connect()->prepare($sql)->execute([
+//            ":ip"=>$ip,
+//            ":file"=>$file,
+//            ":action"=>$type,
+//            ":desc"=>$description,
+//            ":user" => $user,
+//            ":room"=> $room
+//        ]);
+//    }
     
 }

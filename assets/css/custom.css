@@ -17,8 +17,8 @@ h4 {
 }
 
 .card{
-    border-radius: 5px;
-    border: 1px solid lightgrey;
+    border-radius: 6px;
+    border: 10px solid black;
     margin: 3px;
     padding: 20px;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
@@ -26,6 +26,65 @@ h4 {
     float: left;
     min-width: 400px;
     overflow: hidden;
+}
+
+.buttonRoom{
+    background-color: #333333;
+    color: white;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+
+    min-width: 100px;
+    border-color: #777;
+    border-radius: 4px;
+    border-style: solid ;
+    border-width: 1px;
+    display: inline-block;
+}
+.buttonRoom:hover{
+    background-color: #888888;
+}
+
+.buttonRoomNext{
+    background-color: #222222;
+    color: white;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+    width: 25%;
+    min-width: 100px;
+    border-color: white;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.buttonRoomPrev{
+    background-color: #222222;
+    color: white;
+    font-size: 1em;
+    float: left;
+    padding: 2px;
+    height: 30px;
+    width: 25%;
+    min-width: 100px;
+    border-color: white;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.btn-room{
+    /*background-color: red;*/
+    /*color: white;*/
+    /*font-size: 1em;*/
+    /*border-radius: 10px;*/
+    /*border: 6px;*/
+    /*border-color: #222222;*/
+    /*float: none;*/
+    /*padding: 2px;*/
+    /*height: 30px;*/
+    /*width: 140px;*/
 }
 
 .btn-main{
@@ -347,7 +406,7 @@ h4 {
     margin: 0 auto;
     bottom: 0;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid lightgrey;
     box-shadow: 2px 2px 20px rgba(0,0,0,0.8);
     background-color: white;
@@ -359,8 +418,11 @@ h4 {
     animation: 0.3s toast-pop forwards;
 }
 
-.toast .error{
-    background-color: #ff5555;
+.toast.error{
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: white;
+    font-weight: 600;
 }
 
 #Invites table{

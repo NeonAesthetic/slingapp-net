@@ -10,11 +10,8 @@ $roomid = $_GET["room"];
 require_once realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/components/StandardHeader.php";
 require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
-
 $room = new Room($roomid);
 $account = Account::Login($token);
-
-
 if(!$account){
     header("HTTP/1.1 401 Unauthorized");
     header("Location: /assets/error/401.html");
@@ -24,17 +21,12 @@ if(!$room->accountInRoom($account))
     var_dump($room->getAccounts());
     exit();
 }
-
 if($room){
     $room_json = $room->getJSON();
 }
 else{
 //    ApacheError(404);
 }
-
-
-
-
 ?>
 <html>
 <head>
@@ -74,9 +66,7 @@ else{
 
 <script>
     window.addEventListener("load", function () {
-
     });
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room_json?>;
 </script>
-

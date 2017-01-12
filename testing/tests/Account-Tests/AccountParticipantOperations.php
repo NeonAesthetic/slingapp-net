@@ -21,46 +21,45 @@ require_once "classes/Room.php";
     assert($account == false, "Invalid login returns false");
     mark("Invalid User/pass login");
 
-    //login with an invalid token
-    $account = Account::Login("test token");
+//login with an invalid token
+$account = Account::Login("test token");
 //var_dump($account);
-    assert($account == false, "Invalid login returns false");
-    mark("Invalid token login");
+assert($account == false, "Invalid login returns false");
+mark("Invalid token login");
 
-    //login with an existing account
-    $password = password_hash('pass', PASSWORD_BCRYPT);
-    $token = '654f1f13d2fa0a49a28d297a10a35f56';
-    //create temp account for successful login
-    $sql = "INSERT INTO Accounts
+//login with an existing account
+$password = password_hash('pass', PASSWORD_BCRYPT);
+$token = '654f1f13d2fa0a49a28d297a10a35f56';
+//create temp account for successful login
+$sql = "INSERT INTO Accounts
                 (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
                 VALUES('testemail@test.com', 'first', 'last', :pass, :token, '2016-11-10 07:47:06', '2016-11-10 07:47:06', '2016-11-10 07:47:06')";
-    $statement = Database::connect()->prepare($sql);
-    if (!$statement) var_dump(Database::connect()->errorInfo());
+$statement = Database::connect()->prepare($sql);
+if (!$statement) var_dump(Database::connect()->errorInfo());
+$statement->execute(array(':pass' => $password, ':token' => $token));
 
-    $statement->execute(array(':pass' => $password, ':token' => $token));
+mark();
+$account = Account::Login("testemail@test.com", "pass");
+mark("login with email/pass");
+$first = $account->getName()["First"];
+$last = $account->getName()['Last'];
+$email = $account->getEmail();
+assert($first == "first", "First name is first");
+assert($last == "last", "Last name is last");
+assert($email == "testemail@test.com", "Email is testemail@test.com");
 
-    mark();
-    $account = Account::Login("testemail@test.com", "pass");
-    mark("login with email/pass");
-    $first = $account->getName()["First"];
-    $last = $account->getName()['Last'];
-    $email = $account->getEmail();
-    assert($first == "first", "First name is first");
-    assert($last == "last", "Last name is last");
-    assert($email == "testemail@test.com", "Email is testemail@test.com");
+//login with an existing session
+mark();
+$account = Account::Login("654f1f13d2fa0a49a28d297a10a35f56");
+mark("login with token");
+$first = $account->getName()["First"];
+$last = $account->getName()['Last'];
+$email = $account->getEmail();
+assert($first == "first", "First name is first");
+assert($last == "last", "Last name is last");
+assert($email == "testemail@test.com", "Email is testemail@test.com");
 
-    //login with an existing session
-    mark();
-    $account = Account::Login("654f1f13d2fa0a49a28d297a10a35f56");
-    mark("login with token");
-    $first = $account->getName()["First"];
-    $last = $account->getName()['Last'];
-    $email = $account->getEmail();
-    assert($first == "first", "First name is first");
-    assert($last == "last", "Last name is last");
-    assert($email == "testemail@test.com", "Email is testemail@test.com");
-
-    cleanup();
+cleanup();
 }
 /***********************************************************************************************************************
  *          CREATE NEW ACCOUNT
@@ -72,7 +71,6 @@ require_once "classes/Room.php";
 
     $first_name = $account->getName()["First"];
     $last_name = $account->getName()["Last"];
-    $id = $account->getJSON(true)["ID"];
     assert($first_name == "Bob", "First name is Bob");
     assert($last_name == "Marley", "Last name is Marley");
 
@@ -82,7 +80,6 @@ require_once "classes/Room.php";
 
     cleanup();
 }
-
 
 /***********************************************************************************************************************
  *          Set Account-Tests
@@ -161,7 +158,8 @@ require_once "classes/Room.php";
     $screenname = $account->getScreenName();
     $token = $account->getToken();
     $accountID = $account->getAccountID();
-    $json = $account->getJSON(true);
+
+    $json = $account->getJSON(true);    //how to use json_decode with parameter is false?
 
     #var_dump($json);
 
@@ -185,33 +183,15 @@ require_once "classes/Room.php";
     cleanup();
 }
 /***********************************************************************************************************************
- *          Create Participant in new room without account
- **********************************************************************************************************************/
-{
-    $room = Room::createRoomWithoutAccount("roomName", "screenName");
-
-    assert($room != null, "Room created successfully without account");
-    cleanup();
-}
-/***********************************************************************************************************************
  *          Add Participant to already existing account
  **********************************************************************************************************************/
 {
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
 //how to pass $account object and allow to call methods after passing to function?
-    $room = Room::createRoom("roomName", $account->getToken(), "screenName");
+    $room = Room::createRoom("roomName");
+    $room->addParticipant($account, "host");
     assert($room != null, "Add participant with preexisting account");
 
-    cleanup();
-}
-/***********************************************************************************************************************
- *          Update Participant ScreenName
- **********************************************************************************************************************/
-{
-    $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-    $room = Room::createRoom("roomName", $account->getToken(), "screenName");
-    $account->_ScreenName = "BobMar";
-    assert($account->getScreenName() == "BobMar", "Update Participant ScreenName to BobMar");
     cleanup();
 }
 /***********************************************************************************************************************
@@ -220,7 +200,9 @@ require_once "classes/Room.php";
 {
     //Created room with temp account and current accounts joined
     mark();
-    $room = Room::createRoomWithoutAccount("roomName", "host");
+    $account = Account::CreateAccount();
+    $room = Room::createRoom("roomName");
+    $room->addParticipant($account, "host");
     mark("Create Room");
     mark();
     $account1 = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
@@ -229,28 +211,29 @@ require_once "classes/Room.php";
     $account4 = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     $account5 = Account::CreateAccount("newer@gmail.com", "Bob", "Marley", "password");
     mark("Create 6 Accounts");
-    $room->addParticipant($account1->getToken(), "part1");
-    $room->addParticipant($account2->getToken(), "part2");
-    $room->addParticipant($account3->getToken(), "part3");
-    $room->addParticipant($account4->getToken(), "part4");
-    $room->addParticipant($account5->getToken(), "part5");
+    $room->addParticipant($account1, "part1");
+    $room->addParticipant($account2, "part2");
+    $room->addParticipant($account3, "part3");
+    $room->addParticipant($account4, "part4");
+    $room->addParticipant($account5, "part5");
     $room->getParticipants();
     cleanup();
 
     //Created room with current account and mixed accounts joined
     mark();
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-    $room = Room::createRoom("roomName", $account->getToken(), "screenName");
+    $room = Room::createRoom("roomName");
+    $room->addParticipant($account, "Host");
     $account1 = Account::CreateAccount();
     $account2 = Account::CreateAccount();
     $account3 = Account::CreateAccount();
     $account4 = Account::CreateAccount("email@test.com", "Bob", "Marley", "password");
     $account5 = Account::CreateAccount("newer@gmail.com", "Bob", "Marley", "password");
-    $room->addParticipant($account1->getToken(), "part1");
-    $room->addParticipant($account2->getToken(), "part2");
-    $room->addParticipant($account3->getToken(), "part3");
-    $room->addParticipant($account4->getToken(), "part4");
-    $room->addParticipant($account5->getToken(), "part5");
+    $room->addParticipant($account1, "part1");
+    $room->addParticipant($account2, "part2");
+    $room->addParticipant($account3, "part3");
+    $room->addParticipant($account4, "part4");
+    $room->addParticipant($account5, "part5");
     mark("Created room and 6 participants joined");
 
     assert($room->getParticipants() != null, "GetParticipants does not return null");
@@ -262,7 +245,8 @@ require_once "classes/Room.php";
  **********************************************************************************************************************/
 {
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
-    $room = Room::createRoom("roomName", $account->getToken(),  "screenName");
+    $room = Room::createRoom("roomName");
+    $room->addParticipant($account);
     mark();
 
     assert($room->deleteParticipant($account->getAccountID()), "Participant deleted successfully");
@@ -273,16 +257,18 @@ require_once "classes/Room.php";
 function cleanup()
 {
     try {
-        $sql = "SELECT RoomID, a.AccountID
-                                    FROM Accounts AS a
-                                    LEFT JOIN Participants AS p
-                                        ON a.AccountID = p.AccountID
-                                    WHERE (Email = 'testemail@test.com')
-                                    OR (Email = 'email@test.com')
-                                    OR (Email = 'replace@test.com')
-                                    OR (Email = 'testnewemail@test.com')
-                                    OR (Email = 'newer@gmail.com')
-                                    OR (Email IS NULL)";
+        $sql = "SELECT r.RoomID, a.AccountID
+                FROM Accounts AS a
+                LEFT JOIN RoomAccount AS ra
+                    ON a.AccountID = ra.AccountID
+                LEFT JOIN Rooms AS r
+                    ON ra.RoomID = r.RoomID
+                WHERE (Email = 'testemail@test.com')
+                OR (Email = 'email@test.com')
+                OR (Email = 'replace@test.com')
+                OR (Email = 'testnewemail@test.com')
+                OR (Email = 'newer@gmail.com')
+                OR (Email IS NULL)";
         $statement = Database::connect()->prepare($sql);
         $statement->execute();
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -294,7 +280,7 @@ function cleanup()
                 WHERE RoomID = :roomID";
                 Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
                 $sql = "DELETE
-                FROM Participants
+                FROM RoomAccount
                 WHERE RoomID = :roomID";
                 Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
                 $sql = "DELETE

@@ -7,7 +7,8 @@ window.addEventListener("load", function () {
     Modal.init();
     Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
     Room.connect();
-
+    window.document.title = Room.data.RoomName;
+    repopulateMessages();
 });
 
 var Chat = {
@@ -24,17 +25,17 @@ var Chat = {
 var Room = {
     data:null,
     socket:null,
+    connected:false,
     connect:function(){
         if(!Room.data) return;
-        var url = "ws:localhost:8001/rooms/" + Room.data.RoomID;
-        console.log("Attempting to connect to ", url);
-        try{
-            Room.socket = new WebSocket(url);
-        }catch(e){
-            Toast.error(textNode(e));
-            console.error("wwwww");
+        var url = "wss:dev.slingapp.net/rooms/";
+        if(window.location.host === "localhost"){
+            url = "ws:localhost:8001/rooms/";
         }
+        url += Room.data.RoomID;
 
+        console.log("Attempting to connect to ", url);
+        Room.socket = new WebSocket(url);
 
         Room.socket.onopen = function(){
             Room.socket.send(JSON.stringify({
@@ -42,33 +43,65 @@ var Room = {
                 token:Account.data.LoginToken,
                 room:Room.data.ID
             }));
+            Room.connected = true;
         };
         Room.socket.onmessage = function(data){
             var message = JSON.parse(data.data);
-            console.log(message);
+            // console.log(message);
             if(message.notify){
                 Toast.pop(textNode(message.notify),3000);
             }
-            var type = message.Type;
+            var type = message.type;
             switch (type){
-                case "join":
+                case "Message":
                 {
-                    var name = message.name;
+                    var text = message.text;
+                    var sender = message.Sender;
+                    putMessage(sender, text);
+
                 }break;
-                default:
+
+                case "Participant Joined":
+                {
+                    var accountID = message.id;
+                    var sn = message.nick;
+                    Room.data.Accounts[accountID] = {ScreenName:sn, ID:accountID};
+                    updateUsersHere();
+                }break;
+
+                default:{
+                    console.info(message);
+                }
 
             };
         };
         Room.socket.onerror = function (error) {
-            Toast.error(textNode(error));
+            Toast.error(textNode("Room Connection Error"));
+            console.error(error);
         }
-        setTimeout(function(){}, 5000);
+        // setTimeout(function(){
+        //     if(!Room.connected){
+        //         Toast.error(textNode("Could not connect to Room"));
+        //     }
+        // }, 5000);
+    },
+    send:function (json) {
+        if(Room.connected){
+            Room.socket.send(JSON.stringify(json));
+        }else{
+            Toast.error(textNode("Socket not connected"));
+        }
     },
     sendMessage:function (message) {
-        var json = {action:"Send Message",
-                    token:Account.data.LoginToken,
-                    text:message};
-        Room.socket.send(JSON.stringify(json));
+        if(message.length <= 2000){
+            var json = {action:"Send Message",
+                token:Account.data.LoginToken,
+                text:message};
+
+            Room.send(json);
+        }else{
+            alert("That message is too big!  Limit your messages to 2000 characters.");
+        }
     },
     getRoomCodes:function(){
         return Room.data.RoomCodes;
@@ -96,6 +129,9 @@ var Room = {
 
 function showSettings(){
     Modal.create("Settings", "darken");
+}
+function leaveRoom(){
+    window.location.replace("http://localhost")
 }
 
 function leaveRoom() {
@@ -125,18 +161,22 @@ function InitSettingsModal(){
 
     updateUsersHere();
     updateInvites();
-
-    
-
 }
 
 function updateUsersHere(){
     var userPanel = Room.settings.optionsPanel.querySelector("#Users");
     var here = userPanel.querySelector("#users-here");
+    var you = userPanel.querySelector("#you");
     here.innerHTML = "";
-    var num_users = Room.data.Accounts.length;
-    for(var i = 0; i<num_users; i++){
-        here.innerHTML += "<span class='user'>" + Room.data.Accounts[i].ScreenName + "</span><br>";
+    var loggedInUserID = Account.data.ID;
+    console.log(loggedInUserID);
+    you.innerHTML = "<span class='user'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
+    for(var key in Room.data.Accounts){
+        if(Room.data.Accounts.hasOwnProperty(key)){
+            var account = Room.data.Accounts[key];
+            if(account.ID != loggedInUserID)
+                here.innerHTML += "<span class='user'>" + account.ScreenName + "</span><br>";
+        }
     }
 }
 
@@ -153,8 +193,7 @@ function createInviteCode(e){
             token: token
         },
         success: function (data) {
-            Room.data.RoomCodes.push(data);
-            alert(data.Code);
+            Room.data.RoomCodes[data.Code] = data;
             updateInvites();
         },
         error: function (error) {
@@ -166,13 +205,15 @@ function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
     iCodeDiv.innerHTML = "";
-    var num_codes = Room.data.RoomCodes.length;
-    for(var i = 0; i<num_codes; i++){
-        var tr = document.createElement("tr");
-        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Code + "</td>";
-        tr.innerHTML += "<td>" + snFromAccountID(Room.data.RoomCodes[i].Creator) + "</td>";
-        tr.innerHTML += "<td>" + Room.data.RoomCodes[i].Expires + "</td>";
-        iCodeDiv.appendChild(tr);
+    for(var code in Room.data.RoomCodes){
+        if(Room.data.RoomCodes.hasOwnProperty(code)){
+            var rc = Room.data.RoomCodes[code];
+            var tr = document.createElement("tr");
+            tr.innerHTML += "<td><input class='form-control iv-code' onclick='this.select()' readonly value='" + rc.Code + "'></td>";
+            tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
+            tr.innerHTML += "<td>" + rc.Expires + "</td>";
+            iCodeDiv.appendChild(tr);
+        }
     }
 }
 
@@ -215,4 +256,51 @@ function snFromAccountID(id){
     }
 }
 
+function sendMessage(){
+    var tarea = document.getElementById("send-box").querySelector("input");
+    var text = tarea.value;
+    if (text != "")
+        Room.sendMessage(text);
+    tarea.focus();
+    tarea.value = "";
 
+}
+
+function updateScroll(){
+    var element = document.getElementById("chat-log");
+    element.scrollTop = element.scrollHeight;
+}
+
+function putMessage(sender, text, before){
+    console.log(text);
+    text = text.replace(/(https?:[/][/])?([a-zA-Z-]+[.][a-z]+)/, "<a href='http://$2'>$1$2</a>");
+    var messageLog = document.getElementById("chat-log");
+    var username = Room.data.Accounts[sender].ScreenName;
+    var message = document.createElement("div");
+    if (sender == Account.data.ID){
+        message.className = "message mine";
+        username += " (you)";
+    }
+    else {
+        message.className = "message";
+    }
+    message.innerHTML = "<span class='user'>"+ username +"</span><br><span class='message-text'>" + text + "</span>";
+    if (before){
+        messageLog.insertBefore(message, messageLog.firstChild);
+    }else{
+        messageLog.appendChild(message);
+    }
+    updateScroll();
+}
+
+function repopulateMessages() {
+    var before = false;
+    for(var key in Messages){
+        if(Messages.hasOwnProperty(key)){
+            var sender = Messages[key].author;
+            var text = Messages[key].content;
+            putMessage(sender, text, before);
+            before = true;
+        }
+    }
+}

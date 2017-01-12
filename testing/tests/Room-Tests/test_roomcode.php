@@ -14,8 +14,9 @@ require_once "classes/Room.php";
 
 //Test for generating a room code
 $account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
-$room = Room::createRoom("Test-Room", $account->getToken(), "Screen Name");
-
+$room = Room::createRoom("Test-Room");
+$room->addParticipant($account, "host");
+$room->addRoomCode($account->getAccountID());
 $codes = $room->getRoomCodes();
 assert($codes[0]->getCode() != null, "Code generated correctly");
 
@@ -23,7 +24,7 @@ assert($codes[0]->getCode() != null, "Code generated correctly");
 assert($codes[0]->delete() == true, "Code was deleted");
 
 cleanup();
-// Test expiration date and uses
+ //Test expiration date and uses
 $account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
 
 #$date = gmdate("Y-m-d H:i:s");
@@ -31,7 +32,9 @@ $account = Account::CreateAccount("email@test.com", "Ryan", "Polasky", "pass");
 $date = gmdate("Y-m-d H:i:s", strtotime("+10 seconds"));
 #echo "<br>date: $date";
 
-$room = Room::createRoom("Test-Room", $account->getToken(), "Screen Name", 5, $date);
+$room = Room::createRoom("Test-Room");
+$room->addParticipant($account, "host");
+$room->addRoomCode($account->getAccountID(), 5, $date);
 
 $codes = $room->getRoomCodes();
 assert($codes[0]->getCode() != null, "Code generated correctly");
@@ -47,31 +50,37 @@ $account4 = Account::CreateAccount("testnewemail@test.com", "first", "last", "pa
 $account5 = Account::CreateAccount("roomtest@test.com", "first", "last", "pass");
 $account6 = Account::CreateAccount("roomtest@gmail.com", "first", "last", "pass");
 $account7 = Account::CreateAccount("roomtest2@gmail.com", "first", "last", "pass");
-$room = Room::createRoom( "Too Many Accounts", $account1->getToken(), "host", 5, $date);
-$room->addParticipant($account2->getToken(), "part1");
-$room->addParticipant($account3->getToken(), "part2");
-$room->addParticipant($account4->getToken(), "part3");
-$room->addParticipant($account5->getToken(), "part4");
-$room->addParticipant($account6->getToken(), "part5");
-$tooMany = $room->addParticipant($account7->getToken(), "part6");
+$room = Room::createRoom("Too Many Accounts");
+$room->addParticipant($account1, "host");
+$room->addRoomCode($account1->getAccountID(), 5, $date);
+$room->addParticipant($account2, "part1");
+$room->addParticipant($account3, "part2");
+$room->addParticipant($account4, "part3");
+$temp1 = $room->addParticipant($account5, "part4");
+$temp = $room->addParticipant($account6, "part5");
+$tooMany = $room->addParticipant($account7, "part6");
 
+//how to check for number of uses left?
 assert($tooMany === false, "Tried adding a 6th participant with only 5 uses available in the room");
 
 function cleanup()
 {
     try {
-        $sql = "SELECT RoomID, a.AccountID
-                                    FROM Accounts AS a
-                                    LEFT JOIN Participants AS p
-                                        ON a.AccountID = p.AccountID
-                                    WHERE (Email = 'testemail@test.com')
-                                    OR (Email = 'email@test.com')
-                                    OR (Email = 'replace@test.com')
-                                    OR (Email = 'testnewemail@test.com')
-                                    OR (Email = 'roomtest@gmail.com')
-                                    OR (Email = 'roomtest@test.com')
-                                    OR (Email = 'roomtest2@gmail.com')
-                                    OR (Email IS NULL)";
+        $sql = "SELECT r.RoomID, a.AccountID
+                FROM Accounts AS a
+                LEFT JOIN RoomAccount AS ra
+                    ON a.AccountID = ra.AccountID
+                LEFT JOIN Rooms AS r
+                    ON ra.RoomID = r.RoomID
+                WHERE (Email = 'testemail@test.com')
+                OR (Email = 'email@test.com')
+                OR (Email = 'replace@test.com')
+                OR (Email = 'testnewemail@test.com')
+                OR (Email = 'newer@gmail.com')
+                OR (Email = 'roomtest@gmail.com')
+                OR (Email = 'roomtest@test.com')
+                OR (Email = 'roomtest2@gmail.com')
+                OR (Email IS NULL)";
         $statement = Database::connect()->prepare($sql);
         $statement->execute();
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -83,7 +92,7 @@ function cleanup()
                 WHERE RoomID = :roomID";
                 Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
                 $sql = "DELETE
-                FROM Participants
+                FROM RoomAccount
                 WHERE RoomID = :roomID";
                 Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
                 $sql = "DELETE

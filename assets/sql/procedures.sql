@@ -13,14 +13,32 @@ CREATE PROCEDURE AddUser( IN vEmail VARCHAR(64),
   END
   ;
 
-DROP PROCEDURE AnonAnimal;
-
-CREATE PROCEDURE AnonAnimal()
+CREATE PROCEDURE RoomLogs(IN vRoomID BIGINT UNSIGNED)
   BEGIN
-    SELECT CONCAT('Anonymous ', Name) FROM Animals ORDER BY RAND() LIMIT 1;
+    SELECT *
+    FROM Logs
+      JOIN Accounts a
+      ON a.AccountID = Logs.AccountID
+    WHERE RoomID = vRoomID
+    ORDER BY Time ASC;
   END;
-;
 
-CALL AnonAnimal(@dog);
+CREATE PROCEDURE UsersLogs(IN vAccountID BIGINT UNSIGNED)
+  BEGIN
+    SELECT *
+    FROM Logs
+      JOIN Accounts a
+        ON a.AccountID = Logs.AccountID
+    WHERE Logs.AccountID = vAccountID
+    ORDER BY Time ASC;
+  END;
 
-  CALL AddUser('test', 'test1', 'test2', 'phash', 'fdnfjsf', NOW(), NOW(), NOW());
+CREATE PROCEDURE UserMessages(IN vAccountID BIGINT UNSIGNED)
+  BEGIN
+    SELECT *
+    FROM Messages m
+      JOIN Accounts a
+        ON a.AccountID = m.AccountID
+    WHERE m.AccountID = vAccountID
+    ORDER BY MessageID ASC;
+  END;
