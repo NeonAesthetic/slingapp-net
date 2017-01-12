@@ -11,37 +11,22 @@ require_once "interfaces/DatabaseObject.php";
 
 class File
 {
+    var $typeID;
     var $mime;
-    var $blob;
 
     public function __construct($filePath)
     {
-        $this->blob = fopen($filePath, 'rb');
-
-//        echo "basedir: ", getcwd();
-        $fileName = basename($filePath);
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-
+        //        echo "basedir: ", getcwd();
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
         $this->LookupMIME($ext);
 
         $sql = "SELECT * FROM mimetypes WHERE MimeType = :mime";
-
 
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":mime" => $this->mime]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "INSERT INTO files (Data, Filename, TypeID)
-                VALUES(:data, :filename, :typeID)";
-
-        $statement = Database::connect()->prepare($sql);
-
-//        PDO::PARAM_LOB allows for mapping data as stream
-        $statement->bindParam(":data", $this->blob, PDO::PARAM_LOB);
-        $statement->bindParam(":filename", $fileName);
-        $statement->bindParam("typeID", $result["TypeID"]);
-
-        $statement->execute();
+        $this->typeID = $result['TypeID'];
     }
 
     private function LookupMIME($ext) {
@@ -49,7 +34,7 @@ class File
         switch (strtolower($ext)) {
             case "pdf":
                 $this->mime = "pdf";
-            break;
+                break;
 
             case "tiff":
             case "bmp":
@@ -57,7 +42,7 @@ class File
             case "jpeg":
             case "jpg":
                 $this->mime = "image";
-            break;
+                break;
 
             case "264":
             case "3gp":
@@ -67,7 +52,7 @@ class File
             case "avc":
             case "mp4":
                 $this->mime = "video";
-            break;
+                break;
 
             case "tar":
             case "tar.gz":
@@ -87,18 +72,25 @@ class File
             case "rar":
             case "zip":
                 $this->mime = "archive";
-            break;
+                break;
 
             default:
                 $this->mime = "text";
         }
     }
-
     /**
      * @return string
      */
     public function getMime()
     {
         return $this->mime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTypeID()
+    {
+        return $this->typeID;
     }
 }
