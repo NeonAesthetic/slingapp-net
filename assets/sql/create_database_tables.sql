@@ -210,6 +210,15 @@ VALUES
   ('Turtle'),
   ('Harambe');
 
+INSERT INTO mimetypes (MimeType)
+VALUES
+  ('pdf'),
+  ('audio'),
+  ('video'),
+  ('image'),
+  ('text'),
+  ('archive');
+
 
 #===================END CREATE TABLES====================
 
