@@ -88,14 +88,21 @@ class Account extends DatabaseObject
      * a new account with the Sling Application.
      * This Function executes the SQL DML Statement Insert to add a new account to the database.
      */
-    public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null)
+    public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null, $xToken = null)
     {
         if ($password)
             $tempPassHash = password_hash($password, PASSWORD_BCRYPT);
         else
             $tempPassHash = null;
 
-        $token = md5(uniqid(mt_rand(), true));
+        if ($xToken) {
+            $token = $xToken;
+            $token[0] = '1';
+        } else {
+            $token = md5(uniqid(mt_rand(), true));
+            $token = ($email) ? "1" . $token : "0" . $token;    // 1 is permanent account, 0 is temp
+        }
+
         $currentDate = gmdate("Y-m-d H:i:s");
         $accountID = Database::getFlakeID();
 

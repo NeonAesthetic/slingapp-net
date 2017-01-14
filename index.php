@@ -9,6 +9,12 @@ set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
 
+    //Create temporary account if token doesn't exist
+    if(!isset($_COOKIE["Token"])) {
+        echo("Creating Account ");
+        $account = Account::CreateAccount();
+        setcookie("Token", $account->getToken(), time()+2592000);   //expires in 30 days
+    }
 ?>
 <html>
 <head>
@@ -38,7 +44,7 @@ require_once "classes/Account.php";
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <button id="login-button" class="login-button" onclick="(GetToken()) ? logout() : showLogin()"
+                    <button id="login-button" class="login-button" onclick="(isLoggedIn()) ? logout() : showLogin()"
                             style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
                     </button>
                 </li>
@@ -83,7 +89,7 @@ require_once "classes/Account.php";
 <script>
     /** PAGE SETUP HERE **/
 
-    isLoggedIn(GetToken());
+    isLoggedIn();
 
     window.addEventListener("load", function () {
         Modal.init();

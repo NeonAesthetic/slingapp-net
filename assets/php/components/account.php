@@ -100,8 +100,10 @@ switch ($p['action']) {
 function process($p)
 {
     $retval = false;
-    if (isTokenValid($p['token']) && isDataValid($p))
-        $retval = Account::CreateAccount($p['email'], $p['fname'], $p["lname"], $p["pass1"]);
+//    if (isTokenValid($p['token']) && isDataValid($p))
+
+    if (isDataValid($p))
+        $retval = Account::CreateAccount($p['email'], $p['fname'], $p['lname'], $p['pass1'], $p['token']);
     return $retval;
 }
 
@@ -174,10 +176,10 @@ function isDataValid($p)
     return preg_match($emailExp, $p['email']) && $p['pass1'] == $p['pass2'] ? 1 : 0;
 }
 
-function isTokenValid($token)
-{
-    return (isset($_SESSION['token']) || $token == $_SESSION['token']) ? 1 : 0;
-}
+//function isTokenValid($token)
+//{
+//    return (isset($_SESSION['token']) || $token == $_SESSION['token']) ? 1 : 0;
+//}
 
 function registerSession($p)
 {
