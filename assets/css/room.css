@@ -146,18 +146,18 @@ body{
 }
 
 #send-box{
-    width: 98%;
+    width: calc(100% - 10px);
     position: relative;
     left: 0;
     bottom: 0;
     border: 1px solid lightgrey;
     border-radius: 5px;
-    margin: 1%;
     background-color: #555;
     font-size: 12px;
     overflow: hidden;
     color: white;
     height: 40px;
+    margin: 5px;
 }
 
 .mine .user{
@@ -214,6 +214,10 @@ body{
 
 }
 
+.inner ::-webkit-media-controls{
+    display: none !important;
+}
+
 #send-box input{
     padding: 10px;
     width: calc(100% - 60px);
@@ -243,11 +247,12 @@ body{
     font-size: 12px;
     color: white;
     overflow-y: scroll;
-    height: calc(70%);
+    height: calc(80%);
 }
 
 #chat{
     max-width: 100%;
+    padding: 5px;
 }
 
 #outerBox{

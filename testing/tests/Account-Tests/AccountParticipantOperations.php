@@ -5,12 +5,13 @@
  * Date: 11/10/16
  * Time: 9:17 AM
  *
- * Test Name: All Account-Tests Tests
+ * Test Name: NOINCLUDE
  * Description: Runs all the tests required to make sure Account-Tests works as intended: Login, Create, set, get, update
  */
 
 require_once "classes/Account.php";
 require_once "classes/Room.php";
+require_once "classes/Database.php";
 
 /***********************************************************************************************************************
  *          TEST LOGIN STATIC METHOD
@@ -256,6 +257,7 @@ cleanup();
 }
 function cleanup()
 {
+    require_once "classes/Database.php";
     try {
         $sql = "SELECT r.RoomID, a.AccountID
                 FROM Accounts AS a

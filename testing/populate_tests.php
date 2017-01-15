@@ -10,7 +10,7 @@ function map_test_dir($dir){
             <a href='#<?=basename($testfile)?>-container' id="<?=basename($testfile)?>-button" title="<?=basename($testfile)?> directory" name="folder" data-toggle="collapse" aria-expanded="false" container="<?=basename($testfile)?>-container" class='list-group-item test-folder' style="">
                 <span class="tname"><?=basename($testfile)?></span>
                 <span class='tfile'></span>
-                <div class="t-btn tcount" title="Contains <?=$num_containing?> objects"><?=$num_containing?></div>
+                <div class="t-btn tcount" title="Contains <?=$num_containing?> objects"></div>
                 <div class="t-btn runtest" title="Run all contained tests">RUN</div>
             </a>
             <div class="collapse test-container" id="<?=basename($testfile)?>-container" button="<?=basename($testfile)?>-button" style="border-left: 1px dashed #ddd; padding-left: 8px;">

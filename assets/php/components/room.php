@@ -11,6 +11,7 @@ require_once "classes/Room.php";
 
 $p = GetParams("action", "roomname", "screenname", "token", "code", "room");
 
+
 switch ($p['action']) {
     case "create":
         $room = Room::createRoom($p["roomname"]);

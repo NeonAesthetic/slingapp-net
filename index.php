@@ -8,21 +8,6 @@
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
-$token = $_COOKIE['Token'];
-$account = null;
-try{
-    $account = Account::Login($token);
-
-}catch (Exception $e) {
-    error_log($e);
-}finally{
-    if(!$account){
-        $account = Account::CreateAccount();
-        $token = $account->getToken();
-        setcookie("Token", $token);
-    }
-}
-
 
 ?>
 <html>
@@ -36,50 +21,53 @@ try{
 </head>
 <body style="overflow: hidden; ">
 
+<nav class="navbar " style="z-index: 999999">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <!--        Needs hamburger icon-->
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
 
-
-<nav class="navbar navbar-fixed-top" style="z-index: 999999">
-
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-
-        <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-blackboard" style="font-size: 24px"> </span>SLING</a>
-    </div>
-    <div id="navbar" class="navbar-collapse collapse">
-        <ul class="nav navbar-right">
-            <li>
-                <button id="login-button" class="login-button" onclick="showLogin()" style="margin: 5px;">Login</button>
-
-            </li>
-        </ul>
+            <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-blackboard"
+                                                   style="font-size: 24px"> </span>SLING</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <button id="login-button" class="login-button" onclick="(GetToken()) ? logout() : showLogin()"
+                            style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
-<div class="container-fluid"
-     style="background-color: rgba(255,255,255,1); text-align: center; padding: 50px;; ">
-    <a class="register-link" href="/register/" style="position: absolute; top: 0; right: 0; margin: 60px;">Register</a>
+<div style="background-color: rgba(255,255,255,1); text-align: center; ">
 
-    <h1 style="width:100%; text-align: center;">Sharing so easy you'll never go back</h1>
+    <h1 style="width:100%; text-align: center; padding-top: -10%;">Sharing so easy you'll never go back</h1>
     <div class="wrapper">
-        <div class="screenshot">
+        <div id="screenshot" class="screenshot">
         </div>
     </div>
 
 </div>
 
-<div class="container-fluid" style="text-align: center; position: fixed; bottom: 0; width: 100%; padding: 10px; background: #38474F;">
-    <div class="" style="margin: 0 auto;">
-        <button class="btn-main" style=" width: 200px; margin: 30px; display: inline-block"
+<div class="container-fluid"
+     style="text-align: center; position: fixed; bottom: 0; width: 100%; background: #38474F;">
+    <div style="margin: 0 auto;">
+        <button class="btn-main"
+                style=" width: 200px; margin: 15px; margin-left: 30px; margin-right: 30px; display: inline-block"
                 onclick="Modal.create('Create Room Modal', 'darken', null)">
             Create Room
         </button>
 
-        <form class="" style="margin: 30px; display: inline-block" onsubmit="joinroom(event, this);">
+        <form class="" style="margin: 15px; margin-left: 30px; margin-right: 30px; display: inline-block"
+              onsubmit="joinroom(event, this);">
             <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;"
                    value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
         </form>
@@ -94,16 +82,15 @@ try{
 <!-- use enter button to submit login info-->
 <script>
     /** PAGE SETUP HERE **/
+
+    isLoggedIn(GetToken());
+
     window.addEventListener("load", function () {
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
-        
-    });
-</script>
 
-<script>
-
+<<<<<<< HEAD
     loggedIn = isTokenSet();
 
     function toggleform(e) {
@@ -223,6 +210,8 @@ try{
         return false;
     }
     window.addEventListener("load", function () {
+=======
+>>>>>>> a9f9072d6ca63112d57778b8e2ee2d51feb039df
         var sbtns = document.getElementsByClassName("sbtn");
         for (var i = sbtns.length - 1; i >= 0; i--) {
             console.log(sbtns[i]);
@@ -240,63 +229,5 @@ try{
             })
         }
     });
-
-
-    function isTokenSet() {
-        var allcookies = document.cookie;
-        var button = document.getElementById("login-button");
-        var loggedin = false;
-        var name;
-        var value;
-
-        cookiearray = allcookies.split(';');
-
-        for (var i = 0; i < cookiearray.length; i++) {
-            name = cookiearray[i].split('=')[0];
-            value = cookiearray[i].split('=')[1];
-            if (name == 'token' && value != '') {//check if token has value and is valid
-                button.innerHTML = "Logout";
-                loggedin = true;
-            }
-        }
-        if(!loggedin)
-            button.innerHTML = "Login";
-
-        return loggedin;
-    }
-
-    function getCookie(){
-        console.log(document.cookie)
-//        return document
-    }
-    
-    function CreateRoom(event, element){
-        var roomname = element.roomname.value;
-        var token = GetToken();
-        var errordiv = element.querySelector("#error");
-        errordiv.innerHTML = "<div class='sling' style=''></div>";
-        $.ajax({
-            type: 'post',
-            url: 'assets/php/components/room.php',
-            dataType: 'JSON',
-            data: {
-                action: "create",
-                roomname: roomname,
-                token:token
-            },
-            success: function (data) {
-                console.log(data);
-                errordiv.innerHTML = "Success";
-                window.location = "/rooms/" + data.RoomID;
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-        event.stopPropagation();
-        event.preventDefault();
-        return false;
-
-    }
 </script>
 </html>

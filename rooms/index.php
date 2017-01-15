@@ -16,6 +16,7 @@ if(!$account){
     header("HTTP/1.1 401 Unauthorized");
     header("Location: /assets/error/401.html");
 }
+
 if(!$room->accountInRoom($account))
 {
     var_dump($room->getAccounts());
@@ -38,6 +39,7 @@ else{
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/room.css">
 </head>
+
 <body style="background-color: #4286f4;">
 <div class="module-container">
     <div class="module " id="screen-collection" style="width: 200px; ;">
@@ -55,10 +57,12 @@ else{
     </div>
     <div class="module" id="chat" style="height: calc(100% - 100px); padding-left: 20px; width: calc(40% - 230px)">
         <textarea rows="1" class="send-box"></textarea>
+
+        </div>
     </div>
 
 
-</div>
+
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="/assets/js/sling.js"></script>
@@ -69,4 +73,6 @@ else{
     });
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room_json?>;
+
 </script>
+
