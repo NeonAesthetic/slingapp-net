@@ -11,9 +11,8 @@ require_once "classes/Account.php";
 
     //Create temporary account if token doesn't exist
     if(!isset($_COOKIE["Token"])) {
-        echo("Creating Account ");
         $account = Account::CreateAccount();
-        setcookie("Token", $account->getToken(), time()+2592000);   //expires in 30 days
+        setcookie("Token", $account->getToken(), time()+31104000);   //expires in 1 year
     }
 ?>
 <html>

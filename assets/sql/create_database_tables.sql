@@ -11,12 +11,7 @@ CREATE DATABASE sling
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
-# Was in accounts?
-#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
 USE sling;
-
-
-
 
 #DROP ALL TABLES
 

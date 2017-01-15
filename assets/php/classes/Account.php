@@ -10,7 +10,7 @@
 //add upgrade account from temp function
 require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
-require_once "classes/logging/Logger.php";
+//require_once "classes/logging/Logger.php";
 
 
 /**
@@ -61,7 +61,6 @@ class Account extends DatabaseObject
                                 $lastLogin = null, $joinDate = null, $roomID = null, $screenName = null, $active = true)
     {
 
-//        error_log("INSTANTIATION ACCID: " . $accountID);
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;
@@ -273,7 +272,7 @@ class Account extends DatabaseObject
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
             if (Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
-                Logger::Log(__FILE__, SLN_UPDATE, $this->_accountID, NULL, "Password");
+                //Logger::Log(__FILE__, SLN_UPDATE, $this->_accountID, NULL, "Password");
             }
         } else
             throw new Exception("Password must be between 6 - 30 characters");
