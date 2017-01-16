@@ -11,6 +11,7 @@ CREATE DATABASE sling
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
+<<<<<<< HEAD
 --# Was in accounts?
 --#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
 USE sling;
@@ -19,6 +20,11 @@ USE sling;
 
 
 --#DROP ALL TABLES
+=======
+USE sling;
+
+#DROP ALL TABLES
+>>>>>>> 2ae8c41ab8e19d4a426c568667ff12a14fd5aaee
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS Rooms;
@@ -209,6 +215,15 @@ VALUES
   ('Fox'),
   ('Turtle'),
   ('Harambe');
+
+INSERT INTO mimetypes (MimeType)
+VALUES
+  ('pdf'),
+  ('audio'),
+  ('video'),
+  ('image'),
+  ('text'),
+  ('archive');
 
 
 #===================END CREATE TABLES====================

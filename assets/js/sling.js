@@ -239,10 +239,14 @@ function showLogin() {
     );
 }
 
-function isLoggedIn(boolVal) {
+function isLoggedIn() {
+    var token = GetToken();
     var login = document.getElementById("login-button");
     var screenshot = document.getElementById("screenshot");
-    login.innerHTML = (boolVal) ? "logout" : "Login<span id='reg'><br>or sign up</span>";
+    var loggedIn = (token && token[0] == '1');
+    login.innerHTML = (loggedIn) ? "Logout" : "Login<span id='reg'><br>or sign up</span>";
+
+    return loggedIn;
 }
 
 function hideLogin(data) {
@@ -257,12 +261,15 @@ function hideRegister(data) {
 
 function submitRegister() {
     var form = document.getElementById("registerForm");
-
     var first = form.elements["fname"].value;
     var last = form.elements["lname"].value;
     var email = form.elements["email"].value;
     var pass1 = form.elements["pass1"].value;
     var pass2 = form.elements["pass2"].value;
+    var token = GetToken();
+
+    console.log(token);
+
     var error = document.getElementById("registererror");
         error.innerHTML = "<div class='sling' style=''></div>";
     return $.ajax({
@@ -275,7 +282,8 @@ function submitRegister() {
             lname: last,
             email: email,
             pass1: pass1,
-            pass2: pass2
+            pass2: pass2,
+            token: token
         },
         success: function (data) {
             var button = document.getElementById("login-button");

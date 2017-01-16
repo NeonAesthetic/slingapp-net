@@ -13,7 +13,7 @@
         </div>
         <form id="registerForm" class="full-height"
               method="post"
-              onsubmit="return submitRegister(this);" onclick="return noprop(event)">
+              onsubmit="return submitRegister();" onclick="return noprop(event)">
 
             <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Create an Account</h2>
             <input name="fname" class="form-control" placeholder="first name" type="text">

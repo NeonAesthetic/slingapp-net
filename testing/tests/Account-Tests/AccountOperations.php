@@ -5,7 +5,7 @@
  * Date: 11/10/16
  * Time: 9:17 AM
  *
- * Test Name: NOINCLUDE
+ * Test Name: Account Operations
  * Description: Runs all the tests required to make sure Account-Tests works as intended: Login, Create, set, get, update
  */
 
