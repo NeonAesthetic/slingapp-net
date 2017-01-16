@@ -9,11 +9,6 @@ set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
 
-    //Create temporary account if token doesn't exist
-    if(!isset($_COOKIE["Token"])) {
-        $account = Account::CreateAccount();
-        setcookie("Token", $account->getToken(), time()+31104000);   //expires in 1 year
-    }
 ?>
 <html>
 <head>

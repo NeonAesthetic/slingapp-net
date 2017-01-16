@@ -240,7 +240,14 @@ function showLogin() {
 }
 
 function isLoggedIn() {
-    var token = GetToken();
+
+    var token;
+
+    if(!(token = GetToken()))
+        tempRegister();
+    else
+        CheckTokenValidity(token, tempRegister());
+
     var login = document.getElementById("login-button");
     var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
@@ -268,7 +275,7 @@ function submitRegister() {
     var pass2 = form.elements["pass2"].value;
     var token = GetToken();
 
-    console.log(token);
+    // console.log(token);
 
     var error = document.getElementById("registererror");
         error.innerHTML = "<div class='sling' style=''></div>";
@@ -308,10 +315,9 @@ function tempRegister() {
         url: 'assets/php/components/account.php',
         dataType: 'JSON',
         data: {
-            action: "tempregister"
+            action: "nocookie"
         },
         success: function (data) {
-
             SetCookie("Token", data.LoginToken, 7);
             Modal.hide();
             return data;
@@ -381,29 +387,6 @@ function DeleteCookie(key) {
     document.cookie = key +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-function AssureCookie(){
-    var token = GetToken();
-
-    CheckTokenValidity(token, function (valid) {
-        if(!valid){
-            $.ajax({
-                type: 'post',
-                url: '/assets/php/components/account.php',
-                dataType: 'JSON',
-                data: {
-                    action: "nocookie"
-                },
-                success: function (data) {
-                    SetCookie("Token", data.LoginToken, 7);
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        }
-    });
-}
-
 function CheckTokenValidity(token, callback){
     $.ajax({
         type: 'post',
@@ -470,11 +453,8 @@ function CreateRoom(event, element) {
     var roomname = element.roomname.value;
     var token;
 
-    if (!(token = GetToken())) {
+    if (!(token = GetToken()))
         tempRegister();
-        SetCookie("Token", token, 7);
-        console.log("token: ", token);
-    }
 
     var errordiv = element.querySelector("#error");
 
