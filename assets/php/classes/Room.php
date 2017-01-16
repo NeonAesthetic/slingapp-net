@@ -82,7 +82,7 @@ class Room extends DatabaseObject
                                                                         $row["JoinDate"],
                                                                         $row["RoomID"],
                                                                         $row["ScreenName"],
-                                                                        $row["Active"]
+                                                                        $row["AccountActive"]
                                                                     );
 
 //                    $this->_accounts[$row["AccountID"]]->_roomID = $roomID;
@@ -244,7 +244,7 @@ class Room extends DatabaseObject
                   JOIN Rooms AS r
                     ON ra.RoomID = r.RoomID
                 SET ScreenName = NULL,
-                a.Active = 0,
+                a.AccountActive = 0,
                 r.Active = 0
                 WHERE r.RoomID = :roomid";
 
@@ -277,7 +277,7 @@ class Room extends DatabaseObject
     {
         $sql = "UPDATE Accounts
                 SET ScreenName = NULL,
-                Active = 0
+                AccountActive = 0
                 WHERE AccountID = :accid";
 
         if (Database::connect()->prepare($sql)->execute([":accid" => $accountID])) {

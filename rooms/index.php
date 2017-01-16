@@ -12,6 +12,7 @@ require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 $room = new Room($roomid);
 $account = Account::Login($token);
+
 if(!$account){
     header("HTTP/1.1 401 Unauthorized");
     header("Location: /assets/error/401.html");

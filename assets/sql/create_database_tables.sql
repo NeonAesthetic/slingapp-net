@@ -62,7 +62,7 @@ CREATE TABLE Accounts (
   LastLogin    DATETIME,
   JoinDate     DATETIME,
   ScreenName   VARCHAR(20)     NULL,
-  Active       BOOLEAN DEFAULT TRUE,
+  AccountActive       BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (AccountID)
 );
 

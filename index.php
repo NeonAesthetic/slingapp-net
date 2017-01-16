@@ -9,12 +9,8 @@ set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
 
-    //Create temporary account if token doesn't exist
-    if(!isset($_COOKIE["Token"])) {
-        $account = Account::CreateAccount();
-        setcookie("Token", $account->getToken(), time()+31104000);   //expires in 1 year
-    }
 ?>
+<!DOCTYPE html>
 <html>
 <head>
     <title>
@@ -86,7 +82,6 @@ require_once "classes/Account.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
-    /** PAGE SETUP HERE **/
 
     isLoggedIn();
 
