@@ -10,6 +10,7 @@ require_once "components/Components.php";
 require_once "classes/Account.php";
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
     <title>
@@ -81,7 +82,6 @@ require_once "classes/Account.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!-- use enter button to submit login info-->
 <script>
-    /** PAGE SETUP HERE **/
 
     isLoggedIn();
 

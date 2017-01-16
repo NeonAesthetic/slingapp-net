@@ -277,10 +277,9 @@ class Account extends DatabaseObject
             $sql = "UPDATE Accounts
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
-            if (Database::connect()->prepare($sql)->execute([':passHash' => $hashedPass, ':accountID' => $this->_accountID])) {
+            if (Database::connect()->prepare($sql)->execute([':passHash' => $hashedPass,
+                                                             ':accountID' => $this->_accountID]))
                 $retval = true;
-                //Logger::Log(__FILE__, SLN_UPDATE, $this->_accountID, NULL, "Password");
-            }
         } else
             throw new Exception("Password must be between 6 - 30 characters");
 

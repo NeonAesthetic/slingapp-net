@@ -197,7 +197,9 @@ function get(url, parameters, callback){
     xhr.send();
 }
 
-// Login functions //
+/******************************************************************************************************************
+                                                // ACCOUNT FUNCTIONS //
+******************************************************************************************************************/
 function submitLogin() {
     var form = document.getElementById("loginForm");
     var email = form.elements["email"].value;
@@ -229,7 +231,6 @@ function submitLogin() {
     });
 }
 
-
 function showLogin() {
     document.getElementById("login-button").className += " open";
 
@@ -258,11 +259,6 @@ function isLoggedIn() {
 
 function hideLogin(data) {
     var button = document.getElementById("login-button").className = "login-button";
-    Modal.hide();
-}
-
-function hideRegister(data) {
-    var button = document.getElementById("register-button").className = "login-button";
     Modal.hide();
 }
 
@@ -328,15 +324,6 @@ function tempRegister() {
     });
 }
 
-function showRegister() {
-    document.getElementById("register-button").className += " open";
-
-    setTimeout(function () {
-            Modal.create("Register Form", "")
-        }, 700
-    );
-}
-
 function logout() {
     DeleteCookie("Token");
     document.getElementById("login-button").innerHTML = "Login<span id='reg'><br>or sign up</span>";
@@ -353,8 +340,72 @@ function validateCredentials(data) {
         loginError.innerHTML = "Username or password is Incorrect";
         return false;
     }
-
 }
+
+/******************************************************************************************************************
+                                              // ROOM FUNCTIONS //
+ ******************************************************************************************************************/
+function joinroom(event, f) {
+    event.preventDefault();
+    console.log(f);
+    var code = f["room"].value;
+    $.ajax({
+        type: 'post',
+        url: 'assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "join",
+            token: GetToken(),
+            code: code
+        },
+        success: function (data) {
+            var roomid = data.RoomID;
+            console.log(data);
+            window.location = "/rooms/" + roomid;
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+
+    return false;
+}
+
+function CreateRoom(event, element) {
+    var roomname = element.roomname.value;
+    var token;
+
+    if (!(token = GetToken()))
+        tempRegister();
+
+    var errordiv = element.querySelector("#error");
+
+    errordiv.innerHTML = "<div class='sling' style=''></div>";
+    $.ajax({
+        type: 'post',
+        url: 'assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "create",
+            roomname: roomname,
+            token: token
+        },
+        success: function (data) {
+            errordiv.innerHTML = "Success";
+            window.location = "/rooms/" + data.RoomID;
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+    event.stopPropagation();
+    event.preventDefault();
+}
+
+
+/******************************************************************************************************************
+                                            // COOKIE FUNCTIONS //
+ ******************************************************************************************************************/
 
 function GetToken() {
     var cstring = document.cookie;
@@ -367,9 +418,8 @@ function GetToken() {
     });
     if (tokenstr != null) {
         var keynval = tokenstr.split("=");
-        var key = keynval[0];
+        // var key = keynval[0];
         rvalue = keynval[1];
-        // console.log(keynval);
     }
     else
         rvalue = null;
@@ -405,6 +455,10 @@ function CheckTokenValidity(token, callback){
     });
 }
 
+/******************************************************************************************************************
+                                            // MISC FUNCTIONS //
+ ******************************************************************************************************************/
+
 function toggleform(e) {
     if (e.value === "Join a Room") {
         e.value = "";
@@ -418,93 +472,11 @@ function toggleform(e) {
     } else {
     }
 }
-function joinroom(event, f) {
-    event.preventDefault();
-    console.log(f);
-    var code = f["room"].value;
-    $.ajax({
-        type: 'post',
-        url: 'assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "join",
-            token: GetToken(),
-            code: code
-        },
-        success: function (data) {
-            var roomid = data.RoomID;
-            console.log(data);
-            window.location = "/rooms/" + roomid;
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-
-    return false;
-}
 
 function noprop(e) {
     e.stopPropagation();
     return false;
 }
-
-function CreateRoom(event, element) {
-    var roomname = element.roomname.value;
-    var token;
-
-    if (!(token = GetToken()))
-        tempRegister();
-
-    var errordiv = element.querySelector("#error");
-
-    //console.log("roomname: ", roomname, "token:", token);
-    errordiv.innerHTML = "<div class='sling' style=''></div>";
-    $.ajax({
-        type: 'post',
-        url: 'assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "create",
-            roomname: roomname,
-            token: token
-        },
-        success: function (data) {
-            console.log(data);
-            errordiv.innerHTML = "Success";
-            window.location = "/rooms/" + data.RoomID;
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-    event.stopPropagation();
-    event.preventDefault();
-    return false;
-}
-
-var Account = {
-    data:null,
-    login:function(){
-        var token = GetToken();
-        console.log(token);
-        $.ajax({
-            type: 'post',
-            url: '/assets/php/components/account2.php',
-            dataType: 'JSON',
-            data: {
-                action:"login",
-                token:token
-            },
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
-};
 
 HTMLElement.prototype.removeClass = function(classname) {
     this.className = this.className.replace(new RegExp(" ?" + classname), "");
