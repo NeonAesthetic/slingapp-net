@@ -169,16 +169,15 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account)
     {
-        //User has just connected to the room, and requests to be notified of all changes to the room state
         $roomid = $room->getRoomID();
 
         $newRoomCode = $room->getRoomCodes(); //get the new room code
 
         $response = $this->create_response("Room Code Changed",
-            ["Code" => $newRoomCode]);     //generate message
+            ["Code" => $newRoomCode]);     //generate message to notify participants
 
         foreach ($this->_clients[$roomid] as $k=>$participant) {
-            $this->send($participant, $response);               //send message to all registered participant
+            $this->send($participant, $response);
         }
 
         $this->_clients[$roomid][$newRoomCode] = $user_socket;  //add the new user to the array
