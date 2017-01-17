@@ -162,9 +162,56 @@ class RoomSocketServer extends WebSocketServer
     }
 
 
-    protected function on_client_namechange($user_socket, $message, Room &$room, Account &$account)
+    protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
-        // TODO: Implement on_client_namechange() method.
+
+        $room_id           = $room->getRoomID();
+        $account_id        = $account->getAccountID();
+        $current_nick_name = $account->getScreenName();
+
+        $nick_name         = $message["user"];
+
+        if(strlen($nick_name) <= 20) {
+            //do not report until database has been updated
+            //$this->Log(SLN_CHANGED_NAME, "", $account_id, $room_id);
+//            echo"here at account change";
+
+            $account->_screenName = $nick_name;
+
+            //generate message
+            $response = $this->create_response(
+                "Participant Changed Their Name",
+                [
+                    "id" => $account_id,
+                    "nick" => $nick_name,
+                    "notify" => $current_nick_name . " has changed their name to " . $nick_name
+                ]
+            );
+
+            //send message to all registered participant
+            foreach ($this->_clients[$room_id] as $k=>$participant) {
+                $this->send($participant, $response);
+            }
+
+            //generate message for name change
+            $response = $this->create_response(
+                "Name Changed",
+                [
+                    "success" => true
+                ]
+            );
+
+        }else{
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Name over 20 characters"
+                ]
+            );
+        }
+        $this->send($user_socket, $response);
     }
 
     protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account)
@@ -173,8 +220,12 @@ class RoomSocketServer extends WebSocketServer
 
         $newRoomCode = $room->getRoomCodes(); //get the new room code
 
-        $response = $this->create_response("Room Code Changed",
-            ["Code" => $newRoomCode]);     //generate message to notify participants
+        $response = $this->create_response(
+            "Room Code Changed",
+            [
+                "Code" => $newRoomCode
+            ]
+        );
 
         foreach ($this->_clients[$roomid] as $k=>$participant) {
             $this->send($participant, $response);
@@ -184,7 +235,12 @@ class RoomSocketServer extends WebSocketServer
 
 
         //generate message
-        $response = $this->create_response("Register", ["success" => true]);
+        $response = $this->create_response(
+            "Confirmation",
+            [
+                "success" => true
+            ]
+        );
 
         $this->send($user_socket,
             $response);
