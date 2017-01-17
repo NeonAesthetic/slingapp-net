@@ -218,29 +218,42 @@ class RoomSocketServer extends WebSocketServer
     {
         $roomid = $room->getRoomID();
 
-        $newRoomCode = $room->getRoomCodes(); //get the new room code
+        if($room->getRoomCodes() > 0) { //check to see if there is a room code
 
-        $response = $this->create_response(
-            "Room Code Changed",
-            [
-                "Code" => $newRoomCode
-            ]
-        );
+            $newRoomCode = $room->getRoomCodes(); //get the new room code
 
-        foreach ($this->_clients[$roomid] as $k=>$participant) {
-            $this->send($participant, $response);
+            $response = $this->create_response(
+                "Room Code Changed",
+                [
+                    "Code" => $newRoomCode
+                ]
+            );
+
+            foreach ($this->_clients[$roomid] as $k => $participant) {
+                $this->send($participant, $response);
+            }
+
+            $this->_clients[$roomid][$newRoomCode] = $user_socket;  //add the new user to the array
+
+
+            //generate message
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    "success" => true
+                ]
+            );
         }
-
-        $this->_clients[$roomid][$newRoomCode] = $user_socket;  //add the new user to the array
-
-
-        //generate message
-        $response = $this->create_response(
-            "Confirmation",
-            [
-                "success" => true
-            ]
-        );
+        else{
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Room Code Error"
+                ]
+            );
+        }
 
         $this->send($user_socket,
             $response);
