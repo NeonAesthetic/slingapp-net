@@ -11,12 +11,7 @@ CREATE DATABASE sling
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
-# Was in accounts?
-#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
 USE sling;
-
-
-
 
 #DROP ALL TABLES
 
@@ -56,7 +51,7 @@ CREATE TABLE Accounts (
   LastLogin    DATETIME,
   JoinDate     DATETIME,
   ScreenName   VARCHAR(20)     NULL,
-  Active       BOOLEAN DEFAULT TRUE,
+  AccountActive       BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (AccountID)
 );
 
@@ -209,6 +204,15 @@ VALUES
   ('Fox'),
   ('Turtle'),
   ('Harambe');
+
+INSERT INTO mimetypes (MimeType)
+VALUES
+  ('pdf'),
+  ('audio'),
+  ('video'),
+  ('image'),
+  ('text'),
+  ('archive');
 
 
 #===================END CREATE TABLES====================

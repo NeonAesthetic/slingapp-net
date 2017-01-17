@@ -135,6 +135,30 @@ var Room = {
 
 };
 
+var Account = {
+    data:null,
+    login:function(){
+        var token = GetToken();
+        console.log(token);
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/account2.php',
+            dataType: 'JSON',
+            data: {
+                action:"login",
+                token:token
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+};
+
+
 function showSettings(){
     Modal.create("Settings", "darken");
 }
@@ -221,6 +245,7 @@ function updateInvites(){
 }
 
 function changeScreenName(){
+    var token = GetToken();
     var name = prompt("Enter a new nickname:");
     event.preventDefault();
     event.stopPropagation();

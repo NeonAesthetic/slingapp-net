@@ -5,7 +5,7 @@
  * Date: 11/10/16
  * Time: 9:17 AM
  *
- * Test Name: NOINCLUDE
+ * Test Name: Account Operations
  * Description: Runs all the tests required to make sure Account-Tests works as intended: Login, Create, set, get, update
  */
 
@@ -16,51 +16,51 @@ require_once "classes/Database.php";
 /***********************************************************************************************************************
  *          TEST LOGIN STATIC METHOD
  **********************************************************************************************************************/
-{   //login with invalid credentials
+
+  {   //login with invalid credentials
     mark();
     $account = Account::Login("emaildoesntExist@oit.edu", "testpassword");
-    assert($account == false, "Invalid login returns false");
+    assert($account == "Incorrect Username or Password", "Invalid login returns false");
     mark("Invalid User/pass login");
 
-//login with an invalid token
-$account = Account::Login("test token");
-//var_dump($account);
-assert($account == false, "Invalid login returns false");
-mark("Invalid token login");
+    //login with an invalid token
+    $account = Account::Login("test token");
+    assert($account == "Unable to login using token", "Invalid login returns false");
+    mark("Invalid token login");
 
-//login with an existing account
-$password = password_hash('pass', PASSWORD_BCRYPT);
-$token = '654f1f13d2fa0a49a28d297a10a35f56';
-//create temp account for successful login
-$sql = "INSERT INTO Accounts
-                (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
-                VALUES('testemail@test.com', 'first', 'last', :pass, :token, '2016-11-10 07:47:06', '2016-11-10 07:47:06', '2016-11-10 07:47:06')";
-$statement = Database::connect()->prepare($sql);
-if (!$statement) var_dump(Database::connect()->errorInfo());
-$statement->execute(array(':pass' => $password, ':token' => $token));
+    //login with an existing account
+    $password = password_hash('pass', PASSWORD_BCRYPT);
+    $token = '654f1f13d2fa0a49a28d297a10a35f56';
+    //create temp account for successful login
+    $sql = "INSERT INTO Accounts
+                    (Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)
+                    VALUES('testemail@test.com', 'first', 'last', :pass, :token, '2016-11-10 07:47:06', '2016-11-10 07:47:06', '2016-11-10 07:47:06')";
+    $statement = Database::connect()->prepare($sql);
+    if (!$statement) var_dump(Database::connect()->errorInfo());
+    $statement->execute(array(':pass' => $password, ':token' => $token));
 
-mark();
-$account = Account::Login("testemail@test.com", "pass");
-mark("login with email/pass");
-$first = $account->getName()["First"];
-$last = $account->getName()['Last'];
-$email = $account->getEmail();
-assert($first == "first", "First name is first");
-assert($last == "last", "Last name is last");
-assert($email == "testemail@test.com", "Email is testemail@test.com");
+    mark();
+    $account = Account::Login("testemail@test.com", "pass");
+    mark("login with email/pass");
+    $first = $account->getName()["First"];
+    $last = $account->getName()['Last'];
+    $email = $account->getEmail();
+    assert($first == "first", "First name is first");
+    assert($last == "last", "Last name is last");
+    assert($email == "testemail@test.com", "Email is testemail@test.com");
 
-//login with an existing session
-mark();
-$account = Account::Login("654f1f13d2fa0a49a28d297a10a35f56");
-mark("login with token");
-$first = $account->getName()["First"];
-$last = $account->getName()['Last'];
-$email = $account->getEmail();
-assert($first == "first", "First name is first");
-assert($last == "last", "Last name is last");
-assert($email == "testemail@test.com", "Email is testemail@test.com");
+    //login with an existing session
+    mark();
+    $account = Account::Login("654f1f13d2fa0a49a28d297a10a35f56");
+    mark("login with token");
+    $first = $account->getName()["First"];
+    $last = $account->getName()['Last'];
+    $email = $account->getEmail();
+    assert($first == "first", "First name is first");
+    assert($last == "last", "Last name is last");
+    assert($email == "testemail@test.com", "Email is testemail@test.com");
 
-cleanup();
+    cleanup();
 }
 /***********************************************************************************************************************
  *          CREATE NEW ACCOUNT
@@ -160,9 +160,7 @@ cleanup();
     $token = $account->getToken();
     $accountID = $account->getAccountID();
 
-    $json = $account->getJSON(true);    //how to use json_decode with parameter is false?
-
-    #var_dump($json);
+    $json = json_decode($account->getJSON(), true);
 
     assert($accountID == $json['ID'], "json ID is equal to account's id");
     assert($email == $json['Email'], "json email is equal to account's email");
@@ -220,7 +218,7 @@ cleanup();
     $room->getParticipants();
     cleanup();
 
-    //Created room with current account and mixed accounts joined
+    //Created room permanent and temporary accounts
     mark();
     $account = Account::CreateAccount("testnewemail@test.com", "Bob", "Marley", "password");
     $room = Room::createRoom("roomName");
@@ -272,30 +270,32 @@ function cleanup()
                 OR (Email = 'newer@gmail.com')
                 OR (Email IS NULL)";
         $statement = Database::connect()->prepare($sql);
-        $statement->execute();
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if ($statement->execute()) {
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($result as $row) {
-            if ($row['RoomID'] != null) {
-                $sql = "DELETE
+            foreach ($result as $row) {
+                if ($row['RoomID'] != null) {
+                    $sql = "DELETE
                 FROM RoomCodes
                 WHERE RoomID = :roomID";
-                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
-                $sql = "DELETE
+                    Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+                    $sql = "DELETE
                 FROM RoomAccount
                 WHERE RoomID = :roomID";
-                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
-                $sql = "DELETE
+                    Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+                    $sql = "DELETE
                 FROM Rooms
                 WHERE RoomID = :roomID";
-                Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
-            }
+                    Database::connect()->prepare($sql)->execute(array(':roomID' => $row['RoomID']));
+                }
                 $sql = "DELETE
                 FROM Accounts
                 WHERE AccountID = :accountID";
                 Database::connect()->prepare($sql)->execute(array(':accountID' => $row['AccountID']));
-        }
-} catch
-(Exception $e) {
-}
+            }
+        } else
+            throw new Exception ("Database responded with no results");
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
 }

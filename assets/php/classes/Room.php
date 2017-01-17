@@ -82,7 +82,7 @@ class Room extends DatabaseObject
                                                                         $row["JoinDate"],
                                                                         $row["RoomID"],
                                                                         $row["ScreenName"],
-                                                                        $row["Active"]
+                                                                        $row["AccountActive"]
                                                                     );
 
 //                    $this->_accounts[$row["AccountID"]]->_roomID = $roomID;
@@ -235,7 +235,7 @@ class Room extends DatabaseObject
                   JOIN Rooms AS r
                     ON ra.RoomID = r.RoomID
                 SET ScreenName = NULL,
-                a.Active = 0,
+                a.AccountActive = 0,
                 r.Active = 0
                 WHERE r.RoomID = :roomid";
 
@@ -268,7 +268,7 @@ class Room extends DatabaseObject
     {
         $sql = "UPDATE Accounts
                 SET ScreenName = NULL,
-                Active = 0
+                AccountActive = 0
                 WHERE AccountID = :accid";
 
         if (Database::connect()->prepare($sql)->execute([":accid" => $accountID])) {
@@ -458,6 +458,15 @@ class Room extends DatabaseObject
     }
 
     /**
+     * @return Chat
+     */
+    public function getChat()
+    {
+        return $this->_chat;
+    }
+
+
+    /**
      * Function getJSON
      * @param bool $as_array
      * @return array|string
@@ -487,8 +496,8 @@ class Room extends DatabaseObject
         return json_encode($json);
     }
 
-    public function addMessage($id, $room, $author, $content){
-        $this->_chat->addMessage($id, $room, $author, $content);
+    public function addMessage($id, $room, $author, $content , $filepath = null){
+        $this->_chat->addMessage($id, $room, $author, $content, $filepath);
     }
 
     public function getMessages(){

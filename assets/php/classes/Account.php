@@ -7,10 +7,9 @@
  * Time: 9:21 AM
  */
 
-//add upgrade account from temp function
 require_once "classes/Database.php";
 require_once "interfaces/DatabaseObject.php";
-require_once "classes/logging/Logger.php";
+//require_once "classes/logging/Logger.php";
 
 
 /**
@@ -60,8 +59,6 @@ class Account extends DatabaseObject
     public function __construct($accountID, $token, $tokenGen = null, $email = null, $fName = null, $lName = null,
                                 $lastLogin = null, $joinDate = null, $roomID = null, $screenName = null, $active = true)
     {
-
-//        error_log("INSTANTIATION ACCID: " . $accountID);
         $this->_accountID = $accountID;
         $this->_email = $email;
         $this->_fName = $fName;
@@ -81,6 +78,7 @@ class Account extends DatabaseObject
      * @param $fName
      * @param $lName
      * @param $password
+     * @param $xToken
      * @return Account
      * @throws Exception
      * This function is used to create a new account in the database. It will be called when a user
@@ -88,14 +86,18 @@ class Account extends DatabaseObject
      * a new account with the Sling Application.
      * This Function executes the SQL DML Statement Insert to add a new account to the database.
      */
-    public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null)
+    public static function CreateAccount($email = null, $fName = null, $lName = null, $password = null, $xToken = null)
     {
-        if ($password)
-            $tempPassHash = password_hash($password, PASSWORD_BCRYPT);
-        else
-            $tempPassHash = null;
+        $tempPassHash = ($password) ? password_hash($password, PASSWORD_BCRYPT) : null;
 
-        $token = md5(uniqid(mt_rand(), true));
+        if ($xToken) {      //xToken = preexisting token
+            $token = $xToken;
+            $token[0] = '1';
+        } else {
+            $token = md5(uniqid(mt_rand(), true));
+            $token = ($email) ? "1" . $token : "0" . $token;    // 1 is permanent account, 0 is temp
+        }
+
         $currentDate = gmdate("Y-m-d H:i:s");
         $accountID = Database::getFlakeID();
 
@@ -114,15 +116,14 @@ class Account extends DatabaseObject
             ':logTok' => $token,
             ':tokGen' => $currentDate,
             ':lastLog' => $currentDate,
-            ':joinDate' => $currentDate
-        ])
+            ':joinDate' => $currentDate])
         ) {
             var_dump(Database::connect()->errorInfo());
-            throw new Exception("Could not create account");
-        }
+            $retval = json_encode(['error' => "Database could not be reached"]);
+        } else
+            $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate);
 
-        return new Account($accountID, $token, $currentDate, $email, $fName, $lName,
-            $currentDate, $currentDate);
+        return $retval;
     }
 
     /**
@@ -140,57 +141,68 @@ class Account extends DatabaseObject
     {
         $retval = null;
         $currentDate = gmdate("Y-m-d H:i:s");
-        if ($password) {
-            $sql = "SELECT *
-                FROM Accounts AS a 
-                  LEFT JOIN RoomAccount AS ra
-                    ON a.AccountID = ra.AccountID
-                  LEFT JOIN Rooms AS r
-                    ON ra.RoomID = r.RoomID
-                WHERE Email = :email";
 
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute(array(':email' => $token_email));
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
+        try {
+            if ($password) {
+                $sql = "SELECT *
+                    FROM Accounts AS a 
+                      LEFT JOIN RoomAccount AS ra
+                        ON a.AccountID = ra.AccountID
+                      LEFT JOIN Rooms AS r
+                        ON ra.RoomID = r.RoomID
+                    WHERE Email = :email";
 
-            if ($result && password_verify($password, $result['PasswordHash'])) {
-                if ($result['RoomID'])   //if participating in room
-                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
-                        $result['RoomID'], $result['ScreenName'], $result['Active']);
-                else                    //if not participating in room
-                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
-                $sql = "UPDATE Accounts
-                SET LastLogin = :lastLog
-                WHERE Email = :email";
-                if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':email' => $token_email)))
-                    $retval = null;
-            }
+                $statement = Database::connect()->prepare($sql);
+                $statement->execute([':email' => $token_email]);
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        } else {      //no password provided, lookup based on token
-            $sql = "SELECT *
+                if ($result) {
+//                    if ($result['AccountActive']) {
+                        if (password_verify($password, $result['PasswordHash'])) {
+                            if ($result['RoomID'])   //if participating in room
+                                $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
+                                    $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
+                                    $result['RoomID'], $result['ScreenName'], $result['AccountActive']);
+                            else                    //if not participating in room
+                                $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
+                                    $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
+
+                            $sql = "UPDATE Accounts
+                            SET LastLogin = :lastLog    
+                            WHERE Email = :email";
+
+                            if (!Database::connect()->prepare($sql)->execute([':lastLog' => $currentDate, ':email' => $token_email]))
+                                throw new Exception("Database unable to update account's last login information");
+                        } else
+                            throw new Exception("Password is Incorrect");
+//                    } else
+//                        throw new Exception("Account is deactivated");
+                } else
+                    throw new Exception("Incorrect Username or Password");
+            } else {      //no password provided, lookup based on token
+                $sql = "SELECT *
                     FROM Accounts 
                     WHERE LoginToken = :logtok";
-            $statement = Database::connect()->prepare($sql);
-            $statement->execute(array(':logtok' => $token_email));
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
+                $statement = Database::connect()->prepare($sql);
+                $statement->execute([':logtok' => $token_email]);
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
 
+                if ($result) {
+                    $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
+                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], 24, $result["ScreenName"], 1);
 
-            if ($result) {
-                $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                    $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], 24, $result["ScreenName"], 1);
-
-                $sql = "UPDATE Accounts
+                    $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
                 WHERE LoginToken = :token";
-                //if account last login doesn't update don't return account
-                if (!Database::connect()->prepare($sql)->execute(array(':lastLog' => $currentDate, ':token' => $token_email)))
-                    $retval = null;
+                    //if account last login doesn't update don't return account
+                    if (!Database::connect()->prepare($sql)->execute([':lastLog' => $currentDate, ':token' => $token_email]))
+                        throw new Exception("Database unable to update account's last login information");
 
-            } else {
-                $retval = false;
+                } else
+                    throw new Exception("Unable to login using token");
             }
+        } catch (Exception $e) {
+            $retval = $e->getMessage();
         }
         return $retval;
     }
@@ -211,16 +223,14 @@ class Account extends DatabaseObject
                 WHERE AccountID = $this->_accountID";
         $statement = Database::connect()->prepare($sql);
         return ($statement->execute()) ? true : false;
-
     }
+
     /**
      * Function Update
      * This function will trigger whenever a setter is used or a user attempts to join a rooms,
      * it will attempt to insert the account
      * data to correlate with the new rooms status.
      */
-    //NEEDED:   Update Account-Tests status based on rooms to join
-    //NEEDED:   Test that allows rooms to be created-> then account-> then update to move account and part. to rooms
     public function update()
     {
         $sql = "UPDATE Accounts
@@ -232,11 +242,11 @@ class Account extends DatabaseObject
                 LastLogin = :lastLog,
                 JoinDate = :joinDate,
                 ScreenName = :screenName,
-                Active = :active  
+                AccountActive = :active  
                 WHERE AccountID = :accountID";
 
         $statement = Database::connect()->prepare($sql);
-        if (!$statement->execute(array(
+        if (!$statement->execute([
             ':email' => $this->_email,
             ':fName' => $this->_fName,
             ':lName' => $this->_lName,
@@ -246,7 +256,7 @@ class Account extends DatabaseObject
             ':joinDate' => $this->_joinDate,
             ':accountID' => $this->_accountID,
             ':screenName' => $this->_screenName,
-            ':active' => $this->_active))
+            ':active' => $this->_active])
         ) ;
     }
 
@@ -254,23 +264,31 @@ class Account extends DatabaseObject
      * Function Update Password
      * @param $pass
      * @throws Exception
+     * @return bool
      * This function allows a user to update the password stored in the database
      * based on an existing account ID. This will allow user validity checks to
      * be run elsewhere, this function will simply handle setting the new value.
      */
     public function updatePass($pass)
     {
+        $retval = false;
         if (strlen($pass) >= $GLOBALS['MINLENGTH'] && strlen($pass) <= $GLOBALS['MAXLENGTH']) {
             $hashedPass = password_hash($pass, PASSWORD_BCRYPT);
             $sql = "UPDATE Accounts
                 SET PasswordHash = :passHash
                 WHERE AccountID = :accountID";
-            if (Database::connect()->prepare($sql)->execute(array(':passHash' => $hashedPass, ':accountID' => $this->_accountID))) {
-                Logger::Log(__FILE__, SLN_UPDATE, $this->_accountID, NULL, "Password");
-            }
+            if (Database::connect()->prepare($sql)->execute([':passHash' => $hashedPass,
+                                                             ':accountID' => $this->_accountID]))
+                $retval = true;
         } else
             throw new Exception("Password must be between 6 - 30 characters");
-        return;
+
+        return $retval;
+    }
+
+    public function Deactivate()
+    {
+        $this->_active = false;
     }
 
     /**
@@ -284,7 +302,7 @@ class Account extends DatabaseObject
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getAccountID()
     {
@@ -300,7 +318,7 @@ class Account extends DatabaseObject
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getToken()
     {
@@ -308,7 +326,7 @@ class Account extends DatabaseObject
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
     public function getRoomID()
     {
@@ -316,7 +334,7 @@ class Account extends DatabaseObject
     }
 
     /**
-     * @return string[]
+     * @return string[string]
      */
     public function getName()
     {
@@ -339,7 +357,7 @@ class Account extends DatabaseObject
         $json['ID'] = $this->_accountID;
         $json['ScreenName'] = $this->_screenName;
         $json['RoomID'] = $this->_roomID;
-        $json['Active'] = $this->_active;
+        $json['AccountActive'] = $this->_active;
         if ($as_array)
             return $json;
         return json_encode($json);
@@ -378,10 +396,7 @@ class Account extends DatabaseObject
         switch (strtolower($name)) {
             case "_email":
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                    $temp = $this->_email;
                     $this->_email = $value;
-//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                        "Account-Tests: $this->_accountID \n Updated Email From: $temp to: $value");
                 } else
                     throw new Exception("Email is not valid, please try again.");
 
@@ -389,10 +404,7 @@ class Account extends DatabaseObject
                 break;
             case "_fname":
                 if ($this->isNameValid($value)) {
-                    $temp = $this->_fName;
                     $this->_fName = $value;
-//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                        "Account-Tests: $this->_accountID \n Updated First Name From: $temp to: $value");
                 } else
                     throw new Exception("First name is not valid, please try again.");
 
@@ -400,10 +412,7 @@ class Account extends DatabaseObject
                 break;
             case "_lname":
                 if ($this->isNameValid($value)) {
-                    $temp = $this->_lName;
                     $this->_lName = $value;
-//                    DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                        "Account-Tests: $this->_accountID \n Updated Last Name From: $temp to: $value");
                 } else
                     throw new Exception("Last name is not valid, please try again.");
 
@@ -411,30 +420,17 @@ class Account extends DatabaseObject
             case "_token":
                 $this->_token = md5(uniqid(mt_rand(), true));
                 $this->_tokenGen = gmdate('Y-m-d H:i:s');
-//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                    "Account-Tests: $this->_accountID \n Updated token");
                 break;
             case "_roomid":
-                $temp = $this->_roomID;
                 $this->_roomID = $value;
-//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                    "Account-Tests: $this->_accountID \n Updated roomID from: $temp to: $value");
                 break;
             case "_screenname":             //add validation check
-                $temp = $this->_screenName;
                 $this->_screenName = $value;
-//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                    "Account-Tests: $this->_accountID \n Updated screenname from: $temp to: $value");
                 break;
             case "_active":
-                $temp = $this->_active;
                 $this->_active = $value;
-//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                    "Account-Tests: $this->_accountID \n Updated active from: $temp to: $value");
                 break;
             default:
-//                DatabaseObject::Log(__FILE__, "Updated Account-Tests",
-//                    "Account-Tests: $this->_accountID \n set method using: $name wasn't valid");
         }
 
         $this->update();

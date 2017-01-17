@@ -5,14 +5,6 @@
  * Date: 10/16/16
  * Time: 5:57 PM
  */
-//Include directory
-//***************************
-//      Basic Setup
-//...........................
-//
-//  Import constants file?
-//
-//
 
 require_once("classes/Database.php");
 require_once("classes/logging/Logger.php");
