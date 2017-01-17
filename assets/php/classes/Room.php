@@ -138,15 +138,6 @@ class Room extends DatabaseObject
             return false;
         }
     }
-    /**
-     * Function createRoomWithoutAccount
-     * @param $roomName
-     * @param $screenName
-     * @return Room
-     * @throws Exception
-     * This Function will allow the generation of a rooms without an account
-     * token, and will allow the joining of Account-Tests Users as well as Temp Users.
-     */
 
     /**
      * @return mixed

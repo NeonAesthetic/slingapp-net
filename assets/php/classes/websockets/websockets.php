@@ -36,7 +36,9 @@ abstract class WebSocketServer
         $requested_resource = $user->requestedResource;
         preg_match("#/rooms/([0-9]+)#", $requested_resource, $matches);
         $client_room_id = $matches[1];
+//        echo $client_room_id . "\n";
         $client_account_id = null;
+//        echo $message . "\n";
         try {
             /*************************************************************************************
              *  SETUP ALL VARIABLES AND CACHED OBJECTS
@@ -62,7 +64,7 @@ abstract class WebSocketServer
                     $this->_clients[$client_room_id] = [];
 
                 } else {
-
+                    echo "Room creation failed\n";
                 }
             }
             $client_room = &$this->_rooms[$client_room_id];
@@ -73,9 +75,10 @@ abstract class WebSocketServer
                 $this->Log(SLN_NOT_AUTHORIZED, "", $client_account_id, $client_room_id);
                 $response = $this->generate_error_response(ERR_ACCESS_DENIED);
                 $this->send($user, $response);
+                echo "Invalid user" . "\n";
                 return;
             }
-
+//            echo $message_object['action'] . "\n";
             switch($message_object["action"]) {
                 case "Send Message":
                 {
@@ -95,7 +98,7 @@ abstract class WebSocketServer
 
                 case "Change Name":
                 {
-                    $this->on_client_namechange($user, $message_object, $client_room, $client_account);
+                    $this->on_client_alter_name($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Connect Voice":
@@ -125,7 +128,7 @@ abstract class WebSocketServer
 
     abstract protected function on_client_join($user_socket, $message, Room &$room, Account &$account);
 
-    abstract protected function on_client_namechange($user_socket, $message, Room &$room, Account &$account);
+    abstract protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account);
 
     abstract protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account);
 
