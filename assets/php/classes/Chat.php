@@ -74,7 +74,7 @@ class Chat
             $typeID = $file->getTypeID();
             $fileName = basename($filePath);
 
-            $sql = "INSERT INTO files (Data, Filename, TypeID)
+            $sql = "INSERT INTO Files (Data, Filename, TypeID)
                 VALUES(:data, :filename, :typeID)";
 
             $statement = Database::connect()->prepare($sql);
