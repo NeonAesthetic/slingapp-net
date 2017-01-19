@@ -10,6 +10,7 @@ require_once "components/Components.php";
 require_once "classes/Account.php";
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
     <title>
@@ -38,7 +39,7 @@ require_once "classes/Account.php";
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <button id="login-button" class="login-button" onclick="(GetToken()) ? logout() : showLogin()"
+                    <button id="login-button" class="login-button" onclick="(isLoggedIn()) ? logout() : showLogin()"
                             style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
                     </button>
                 </li>
@@ -72,18 +73,15 @@ require_once "classes/Account.php";
                    value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
         </form>
     </div>
-
 </div>
 
 </body>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type='text/javascript' src="/assets/js/sling.js"></script>
-<!-- use enter button to submit login info-->
 <script>
-    /** PAGE SETUP HERE **/
 
-    isLoggedIn(GetToken());
+    isLoggedIn();
 
     window.addEventListener("load", function () {
         Modal.init();
