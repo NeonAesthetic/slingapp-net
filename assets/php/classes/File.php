@@ -20,7 +20,7 @@ class File
         $ext = pathinfo($filePath, PATHINFO_EXTENSION);
         $this->LookupMIME($ext);
 
-        $sql = "SELECT * FROM mimetypes WHERE MimeType = :mime";
+        $sql = "SELECT * FROM MimeTypes WHERE MimeType = :mime";
 
         $statement = Database::connect()->prepare($sql);
         $statement->execute([":mime" => $this->mime]);

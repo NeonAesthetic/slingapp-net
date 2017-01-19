@@ -55,7 +55,11 @@ require_once "classes/Account.php";
     else
         $url = 'https://dev.slingapp.net/assets/php/components/account.php';
 
-    $data = array('action' => 'register', 'email' => 'ozzy.osbourne@gmail.com', 'fname' => 'ozzy', 'lname' => 'osbourne', 'pass1' => 'pass', 'pass2' => 'pass');
+    $data = array('action' => 'register',
+                  'email' => 'ozzy.osbourne@gmail.com',
+                  'fname' => 'ozzy', 'lname' => 'osbourne',
+                  'pass1' => 'pass', 'pass2' => 'pass'
+        );
 
     $options = array(
         'http' => array(

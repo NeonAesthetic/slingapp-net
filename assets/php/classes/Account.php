@@ -286,12 +286,16 @@ class Account extends DatabaseObject
         return $retval;
     }
 
+    /**
+     * Function Deactivate
+     * This function will deactivate the account if requested by the user.
+     */
     public function Deactivate()
     {
-        $this->_active = false;
     }
 
     /**
+     * Function isNameValid
      * @param $name
      * @return int
      */
@@ -302,6 +306,7 @@ class Account extends DatabaseObject
     }
 
     /**
+     * Function getAccountID
      * @return int
      */
     public function getAccountID()
@@ -310,6 +315,7 @@ class Account extends DatabaseObject
     }
 
     /**
+     * Function getActive
      * @return bool
      */
     public function getActive()
@@ -318,6 +324,7 @@ class Account extends DatabaseObject
     }
 
     /**
+     * Function getToken
      * @return string
      */
     public function getToken()
@@ -326,6 +333,7 @@ class Account extends DatabaseObject
     }
 
     /**
+     * Function getRoomID
      * @return integer
      */
     public function getRoomID()
@@ -334,6 +342,7 @@ class Account extends DatabaseObject
     }
 
     /**
+     * Function getName
      * @return string[string]
      */
     public function getName()
@@ -364,7 +373,8 @@ class Account extends DatabaseObject
     }
 
     /**
-     * @return mixed
+     * Function getScreenName
+     * @return string
      */
     public function getScreenName()
     {
@@ -437,6 +447,11 @@ class Account extends DatabaseObject
         return $value;
     }
 
+    /**
+     * Function __toString
+     * @return string
+     * This function returns the account id if instance is treated as a string
+     */
     public function __toString()
     {
         return (string)$this->_accountID;
