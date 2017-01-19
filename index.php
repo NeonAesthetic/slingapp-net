@@ -73,14 +73,12 @@ require_once "classes/Account.php";
                    value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
         </form>
     </div>
-
 </div>
 
 </body>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type='text/javascript' src="/assets/js/sling.js"></script>
-<!-- use enter button to submit login info-->
 <script>
 
     isLoggedIn();

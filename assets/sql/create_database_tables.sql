@@ -205,7 +205,7 @@ VALUES
   ('Turtle'),
   ('Harambe');
 
-INSERT INTO mimetypes (MimeType)
+INSERT INTO MimeTypes (MimeType)
 VALUES
   ('pdf'),
   ('audio'),
