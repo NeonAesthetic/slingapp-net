@@ -13,7 +13,7 @@
         </div>
         <form id="registerForm" class="full-height"
               method="post"
-              onsubmit="return submitRegister(this);" onclick="return noprop(event)">
+              onsubmit="return submitRegister();" onclick="return noprop(event)">
 
             <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Create an Account</h2>
             <input name="fname" class="form-control" placeholder="first name" type="text">
@@ -21,9 +21,6 @@
             <input name="email" class="form-control" placeholder="email" type="email">
             <input name="pass1" class="form-control" placeholder="password" type="password">
             <input name="pass2" class="form-control" placeholder="confirm password" type="password">
-<!--            <div class="checkbox col-sm-6">-->
-<!--                <label><input type="checkbox" value="">Remember Me</label>-->
-<!--            </div>-->
             <div id="registererror" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
         </form>
 
@@ -37,9 +34,6 @@
             <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Login</h2>
             <input name="email" class="form-control" placeholder="email" type="email">
             <input name="pass1" class="form-control" placeholder="password" type="password">
-<!--            <div class="checkbox col-sm-6">-->
-<!--                <label><input type="checkbox" value="">Remember Me</label>-->
-<!--            </div>-->
             <div id="loginerror" style="position: relative; top: 0; height: 30px; color: #333; font-size: large">
                 <br></div>
         </form>

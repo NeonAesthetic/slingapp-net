@@ -135,6 +135,30 @@ var Room = {
 
 };
 
+var Account = {
+    data:null,
+    login:function(){
+        var token = GetToken();
+        console.log(token);
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/account2.php',
+            dataType: 'JSON',
+            data: {
+                action:"login",
+                token:token
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+};
+
+
 function showSettings(){
     Modal.create("Settings", "darken");
 }
@@ -221,27 +245,21 @@ function updateInvites(){
 }
 
 function changeScreenName(){
-    var accountID = Account.data.ID;
     var token = GetToken();
     var name = prompt("Enter a new nickname:");
-    $.ajax({
-        type: 'post',
-        url: '/assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "changename",
-            room: roomid,
-            token: token,
-            name: name
-        },
-        success: function (data) {
-            Room.data.RoomCodes.push(data);
-            updateInvites();
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
+    event.preventDefault();
+    event.stopPropagation();
+    var token = GetToken();
+    var json = {
+        action:"Change Name",
+        user:name,
+        token:token
+    };
+    Room.socket.send(JSON.stringify(json));
+    //updateUsersHere();
+    //Page reload needed
+    updateInvites();
+    return false;
 }
 
 function textNode(msg){
