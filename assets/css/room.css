@@ -218,7 +218,7 @@ body{
     display: none !important;
 }
 
-#send-box input{
+#message-input{
     padding: 10px;
     width: calc(100% - 60px);
     margin: 0;
@@ -243,6 +243,22 @@ body{
     border-left: 1px solid lightgrey;
 }
 
+#file-upload{
+    position: absolute;
+    margin-left:77%;
+    width:11%;
+    padding-top: 3%;
+}
+
+#file-upload img
+{
+    width:40%;
+    cursor: pointer;
+}
+
+#file-upload input {
+    display: none;
+}
 #chat-log{
     font-size: 12px;
     color: white;

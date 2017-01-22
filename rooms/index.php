@@ -118,8 +118,14 @@ else{
 <div class="panel" id="chat" style="height: 100%; position: absolute; right: 0;width: 400px; max-width:100%;margin: 5px auto auto; background-color: #333333;">
     <div id="chat-log" style="background-color: #333333;"></div>
     <div id="send-box" style="background-color: #333333; ">
-        <input onkeypress="if (event.keyCode == 13) sendMessage()" >
+        <input id="message-input" onkeypress="if (event.keyCode == 13) sendMessage()" >
         <button onclick="sendMessage()">SEND</button>
+        <div id="file-upload">
+            <label for="file-input">
+                <img src="upload.png">
+            </label>
+            <input id="file-input" type="file" onchange="uploadFile(this)"/>
+        </div>
     </div>
     <div  style="width: 100%; ">
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
