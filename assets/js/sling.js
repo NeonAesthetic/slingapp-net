@@ -247,7 +247,7 @@ function isLoggedIn() {
     if(!(token = GetToken()))
         tempRegister();
     else
-        CheckTokenValidity(token, tempRegister());
+        CheckTokenValidity(token, 'tempRegister');
 
     var login = document.getElementById("login-button");
     var screenshot = document.getElementById("screenshot");
@@ -445,9 +445,6 @@ function CheckTokenValidity(token, callback){
         data: {
             action: "tokenisvalid",
             token: token
-        },
-        success: function (token) {
-            if(callback) callback(token.valid);
         },
         error: function (error) {
             console.log(error);
