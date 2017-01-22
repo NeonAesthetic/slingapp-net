@@ -250,8 +250,7 @@ body{
     padding-top: 3%;
 }
 
-#file-upload img
-{
+#file-upload img {
     width:40%;
     cursor: pointer;
 }
