@@ -12,6 +12,50 @@ window.addEventListener("load", function () {
     repopulateMessages();
 });
 
+
+
+
+var ContextMenu = null;
+
+window.addEventListener("load2", function () {
+    testList = document.getElementById("#invite-codes");
+    testConsole.addEventListener("contextmenu", function (event) {
+        ContextMenu.create(event, getCodeNodeList());
+        return false;
+    });
+});
+
+function getCodeNodeList(testElement){
+    // label = document.createElement("p");
+    //label.innerHTML = testElement.querySelector(".tname").innerHTML;
+    var setUses = ContextMenu.createMenuLink("Set Uses", "", changeRemainingUses());
+
+    var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
+        testElement.click();
+    });
+
+    return [setUses, expiration];
+}
+
+
+function addCodeButtonEvents(){
+    var testdiv = document.getElementById("#invite-codes");
+    var codes = testdiv.querySelectorAll("#invite-codes");
+
+    codes.forEach(function(n){
+        n.addEventListener("click", startTest);
+        n.addEventListener("contextmenu", function (event) {
+            ContextMenu.create(event, getCodeNodeList(n));
+            return false;
+        });
+    });
+
+}
+
+
+
+
+
 var Chat = {
     chatlog:null,
     init:function(){
@@ -242,6 +286,21 @@ function updateInvites(){
             iCodeDiv.appendChild(tr);
         }
     }
+}
+
+function changeRemainingUses(){
+    var uses = prompt("Enter remaining uses:");
+    event.preventDefault();
+    event.stopPropagation();
+    var token = GetToken;
+    var json = {
+        action: "Change Code Uses",
+        uses: uses,
+        token: token
+    };
+    Room.socket.send(JSON.stringify(json));
+    updateInvites();
+    return false;
 }
 
 function changeScreenName(){

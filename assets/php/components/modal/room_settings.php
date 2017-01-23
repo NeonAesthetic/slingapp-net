@@ -33,7 +33,8 @@
             <hr>
             <table>
                 <tr>
-                    <td>Code</td>
+                    <td>Code
+                        </td>
                     <td>Member</td>
                     <td>Restrictions</td>
                 </tr>
@@ -46,5 +47,12 @@
             <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
             
         </div>
+
     </div>
 </div>
+
+<script>
+    window.addEventListener("load2", function () {
+        addCodeButtonEvents();
+    });
+</script>
