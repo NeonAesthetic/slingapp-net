@@ -46,31 +46,31 @@ else{
     <link rel="stylesheet" href="/assets/css/custom.css">
 
 </head>
-<body style="background-color: #38474F; overflow: hidden">
+<body style="background-color: #38474F; overflow: hidden" onload="newUserSet('small', null)">
 <div class="module-container" id="grad1" style="background-color: #38474F; padding-right: 400px; position: absolute">
-    <div class="roomMainBack">
+    <div class="roomMainBack" id="mainBackground">
         <div class="roomSideBack" id="screensList" style="left: 0">
-            <div class="roomSide " id="screen-title" style="height: 35px; text-align: center; background-color: rgba(0,0,0,0)">
+            <div class="roomSide " id="screen-title" style="height: 35px; text-align: center; background-color: #333333">
                 <span class="vertical-text" style="color: white; background-color: rgba(0,0,0,0)">USERS</span>
             </div>
-            <div class="roomSide " id="screen-collection" style="background-color: darkcyan">
-                <div class="roomSideTitle">
-                    <span class="vertical-text">Anonymous Cat</span>
-                </div>
-            </div>
-            <div class="roomSide " id="screen-collection" style="background-color: darkseagreen">
-                <div class="roomSideTitle">
-                    <span class="vertical-text">Anonymous Dog</span>
-                </div>
-            </div>
-            <div class="roomSide " id="screen-collection" style="background-color: darkturquoise">
-                <div class="roomSideTitle">
-                    <span class="vertical-text">Anonymous Penguin</span>
-                </div>
-            </div>
+<!--            <div class="roomSide " id="screen-collection" style="background-color: darkcyan">-->
+<!--                <div class="roomSideTitle">-->
+<!--                    <span class="vertical-text" id="Las"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="roomSide " id="screen-collection" style="background-color: darkseagreen">-->
+<!--                <div class="roomSideTitle">-->
+<!--                    <span class="vertical-text" id="1"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="roomSide " id="screen-collection" style="background-color: darkturquoise">-->
+<!--                <div class="roomSideTitle">-->
+<!--                    <span class="vertical-text" id="2"></span>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
-        <div class="roomHeaderBack"style="height: 60px; border-radius: 2px;">
-            <div class="roomSide" style="height: 50px; ">
+        <div class="roomHeaderBack" style="height: 60px; border-radius: 2px;">
+            <div class="roomSide" style="height: 50px; background-color: transparent">
                 <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="showSettings()">SHARE SCREEN</button>
                 <div class="roomSideTitle" style="text-align: center; width: 30%; min-width:20%; height: 20px; margin: -25px auto 10px auto; background-color: rgba(0,0,0,0)">
                     <span class="vertical-text" id="r-title">ROOM TITLE</span>
@@ -79,25 +79,27 @@ else{
             </div>
         </div>
 
-        <div class="screen-container">
-            <div class="screen" style="">
-                <video class="inner" ondblclick="fullScreen(this)">
-<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
-                </video>
-<!--                <div class="screen-bar" >-->
-<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->
-<!--                </div>-->
-            </div>
-            <div class="screen" style="">
 
-                <video class="inner" ondblclick="fullScreen(this)">
-<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
-                </video>
 
-<!--                <div class="screen-bar" >-->
-<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->
-<!--                </div>-->
-            </div>
+        <div class="screen-container" id="ScreenContainer">
+<!--            <div class="screen" style="">-->
+<!--                <video class="inner" ondblclick="fullScreen(this)">-->
+<!--<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
+<!--                </video>-->
+<!--<!--                <div class="screen-bar" >-->-->
+<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
+<!--<!--                </div>-->-->
+<!--            </div>-->
+<!--            <div class="screen" style="">-->
+<!---->
+<!--                <video class="inner" ondblclick="fullScreen(this)">-->
+<!--<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
+<!--                </video>-->
+<!---->
+<!--<!--                <div class="screen-bar" >-->-->
+<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
+<!--<!--                </div>-->-->
+<!--            </div>-->
         </div>
 
     </div>
@@ -146,7 +148,7 @@ else{
 
     });
     Account.data = <?=$account->getJSON()?>;
-    Room.data = <?=$room_json?>;
+    Room.data = <?=$room->getJSON()?>;
     Messages = <?=$room->getMessages()?>;
 
     function fullScreen(element) {
@@ -154,8 +156,115 @@ else{
             element.webkitExitFullscreen();
         }else{
             element.webkitRequestFullscreen();
-
         }
     }
+    function updateUserInfo(){
+        Room.data = <?=$room->getJSON()?>;
+            for (var key in Room.data.Accounts) {
+                if (Room.data.Accounts.hasOwnProperty(key)) {
+                    var account = Room.data.Accounts[key];
+
+                    console.log("in User Info Update");
+                    console.log(account.ScreenName);
+                    document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
+                }
+            }
+    }
+
+    function newUserSet(size, target) {
+        if(size == 'small') {   //Small + no EventTarget sent
+            for (var key in Room.data.Accounts) {
+                if (Room.data.Accounts.hasOwnProperty(key)) {
+                    var account = Room.data.Accounts[key];
+
+                    console.log("in New User Set");
+                    var newUser = document.createElement('div');
+                    newUser.id = 'NU' + key.toString();
+                    newUser.className = 'roomSide';
+                    document.getElementById('screensList').appendChild(newUser);
+
+                    document.getElementById('NU' + key.toString()).setAttribute("onclick", "expandDiv(event)");
+                    document.getElementById('NU' + key.toString()).setAttribute("ondblclick", "sendDivToCenter(event)");
+
+                    var newUserTitle = document.createElement('div');
+                    newUserTitle.id = 'UT' + key.toString();
+                    newUserTitle.className = 'roomSideTitle';
+                    document.getElementById('NU' + key.toString()).appendChild(newUserTitle);
+
+                    var newUserName = document.createElement('span');
+                    newUserName.id = 'UN' + key.toString();
+                    newUserName.className = 'vertical-text';
+                    document.getElementById('UT' + key.toString()).appendChild(newUserName);
+
+                    document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
+                }
+            }
+        }
+        else{   //Large + EventTarget sent
+            for (var keyMS in Room.data.Accounts) {
+                if (Room.data.Accounts.hasOwnProperty(keyMS)) {
+                    if(target.id == 'NU' + keyMS.toString()) {
+                        //This is the target Screen we want to make a large version of
+
+                        var accountMS = Room.data.Accounts[keyMS];
+
+                        console.log("in New User Set");
+                        var newUserMS = document.createElement('div');
+                        newUserMS.id = 'NU' + keyMS.toString() + 'mainScreen';
+                        newUserMS.className = 'screen';
+                        document.getElementById('ScreenContainer').appendChild(newUserMS);
+
+                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').setAttribute("onclick", "returnDivToSide(event)");
+
+                        var newUserTitleMS = document.createElement('div');
+                        newUserTitleMS.id = 'UT' + keyMS.toString() + 'mainScreen';
+                        newUserTitleMS.className = 'roomSideTitleMS';
+                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').appendChild(newUserTitleMS);
+
+                        var newUserNameMS = document.createElement('span');
+                        newUserNameMS.id = 'UN' + keyMS.toString() + 'mainScreen';
+                        newUserNameMS.className = 'vertical-text';
+                        document.getElementById('UT' + keyMS.toString() + 'mainScreen').appendChild(newUserNameMS);
+
+                        document.getElementById('UN' + keyMS.toString() + 'mainScreen').innerHTML = accountMS.ScreenName;
+                    }
+                }
+            }
+        }
+    }
+    //These all only Remain until page reload, they are wiped then.
+    function expandDiv(event){
+        var target = event.target;
+        if(target != null)
+        {
+            target.className = 'eRoomSide';
+            target.setAttribute("onclick", "minimizeDiv(event)");
+        }
+    }
+    function minimizeDiv(event){
+        var target = event.target;
+        if(target != null)
+        {
+            target.className = 'roomSide';
+            target.setAttribute("onclick", "expandDiv(event)");
+        }
+    }
+    function sendDivToCenter(event){
+        var target = event.target;
+        if(target != null&& document.getElementById(target.id.toString() + 'mainScreen') == null)
+        {
+            newUserSet('large', target);
+        }
+
+    }
+    function returnDivToSide(event){
+        var target = event.target;
+        if(target != null)
+        {
+            console.log("Remove Div");
+            target.setAttribute("display", "none");
+        }
+    }
+
 </script>
 
