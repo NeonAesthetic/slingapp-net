@@ -12,14 +12,8 @@ require_once "classes/Room.php";
 require_once "classes/Chat.php";
 require_once "classes/Message.php";
 
-$account = Account::CreateAccount("testemail@test.com", "Bob", "Marley", "password");
-$token = $account->getToken();
-$room = Room::createRoom("Test File Upload");
-$room->addParticipant($account, "host");
 
-$room->addMessage(0, $room->getRoomID(), $account->getAccountID(), "test", "tests/Files/test.txt");
-
-assert($room->getChat()->_files[0]->getMime() == "text", "MIME type is text");
+$file = File::Insert("../tests/uploads/14948841493111845106/test.txt", "test.txt");
 
 function cleanup(){
     try{

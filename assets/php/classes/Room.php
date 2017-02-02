@@ -430,7 +430,7 @@ class Room extends DatabaseObject
     }
 
     /**
-     * @return array
+     * @return Account[]
      */
     public function getAccounts()
     {
@@ -496,12 +496,33 @@ class Room extends DatabaseObject
         return json_encode($json);
     }
 
-    public function addMessage($id, $room, $author, $content , $filepath = null){
-        $this->_chat->addMessage($id, $room, $author, $content, $filepath);
+    public function addMessage($id, $room, $author, $content, $fileID = null){
+        $this->_chat->addMessage($id, $room, $author, $content, $fileID);
     }
 
     public function getMessages(){
-        $this->_chat->getMessages(500);
-        return json_encode($this->_chat->_messages);
+        return json_encode($this->_chat->getMessages(500));
+    }
+
+
+    /**
+     * Function validateDownload
+     * @param $fileid
+     * @param $token
+     * @param $roomid
+     * @return bool | File
+     * This Function ensures the user requesting to download file
+     * has permission
+     */
+    public function &validateDownload($fileid, $token, $roomid){
+
+        if($this->_roomID == $roomid)
+            foreach ($this->_accounts as $account)
+                if($account->getToken() == $token)
+                    foreach($this->_chat->getFiles() as $file)
+                        if($file->getFileID() == $fileid)
+                            return $file;
+
+        return false;
     }
 }

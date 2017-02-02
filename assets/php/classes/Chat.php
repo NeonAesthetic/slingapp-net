@@ -17,78 +17,68 @@ class Chat
     public $_files = [];
 
     protected $_roomid;
+
     public function __construct($roomid)
     {
         $this->_roomid = $roomid;
     }
 
-    private function _get_messages($number, $before = -1){
+    private function _get_messages($number, $before = -1)
+    {
 
     }
 
-    public function getMessages($number, $before = 99999999999999999999999999){
+    public function getMessages($number, $before = 99999999999999999999999999)
+    {
+        $retval = false;
         $sql = "SELECT * 
-                FROM Messages AS m
-                  LEFT JOIN files AS f 
-                    ON m.FileID = f.FileID
+                FROM Messages
                 WHERE RoomID = :rid AND MessageID < :bef
                 ORDER BY MessageID DESC
                 LIMIT 500";
         $statement = Database::connect()->prepare($sql);
-        if(!$statement->execute([
-            ":rid"=>$this->_roomid,
-            ":bef"=>$before
-        ])){
+        if ($statement->execute([
+            ":rid" => $this->_roomid,
+            ":bef" => $before
+        ])
+        )
+        {
+            $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        };
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($results as $message){
-            $this->_messages[$message["MessageID"]] = new Message($message["MessageID"], $message["RoomID"], $message["AccountID"], $message["Content"], $message["Filename"]);
+            foreach ($results as $message) {
+                $this->_messages[$message["MessageID"]] = new Message($message["MessageID"], $message["RoomID"], $message["AccountID"], $message["Content"], $message["FileID"]);
+            }
+            $retval = $this->_messages;
         }
+        return $retval;
     }
 
-    public function addMessage($id, $room, $author, $content, $filepath = null){
-
+    public function addMessage($id, $room, $author, $content, $fileID = null)
+    {
         $sql = "INSERT INTO Messages 
-                (MessageID, RoomID, AccountID, Content)
-                VALUES (:id, :rmid, :sender, :content)";
+                (MessageID, RoomID, AccountID, Content, FileID)
+                VALUES (:id, :rmid, :sender, :content, :fileID)";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([
             ":id" => $id,
             ":rmid" => $room,
             ":sender" => $author,
-            ":content" => $content
+            ":content" => $content,
+            ":fileID" => $fileID
         ]);
 
-        if($filepath) {
-            $this->addFile($filepath);
-        }
-
-        $this->_messages[] = new Message($id, $room, $author, $content);
+        $this->_messages[] = new Message($id, $room, $author, $content, $fileID);
     }
 
-    public function addFile($filePath) {
+    public function AddFile($id, $path, $name){
+        $this->_files[] = new File($id, $path, $name);
+    }
 
-        if ($blob = fopen($filePath, 'rb')) {
-            $file = new File($filePath);
-            $typeID = $file->getTypeID();
-            $fileName = basename($filePath);
-
-            $sql = "INSERT INTO Files (Data, Filename, TypeID)
-                VALUES(:data, :filename, :typeID)";
-
-            $statement = Database::connect()->prepare($sql);
-
-//        PDO::PARAM_LOB allows for mapping data as stream
-            $statement->bindParam(":data", $blob, PDO::PARAM_LOB);
-            $statement->bindParam(":filename", $fileName);
-            $statement->bindParam("typeID", $typeID);
-
-            if ($statement->execute()) {
-                $this->_files[] = $file;
-            }
-        } else {
-            throw new Exception("File couldn't open");
-        }
+    /**
+     * @return File[]
+     */
+    public function getFiles()
+    {
+        return $this->_files;
     }
 }

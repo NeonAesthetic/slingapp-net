@@ -89,20 +89,12 @@ CREATE TABLE RoomCodes (
   FOREIGN KEY (CreatedBy) REFERENCES Accounts (AccountID)
 );
 
-
-CREATE TABLE MimeTypes (
-  TypeID   SERIAL,
-  MimeType VARCHAR(64),
-  PRIMARY KEY (TypeID)
-);
-
 CREATE TABLE Files (
   FileID   SERIAL,
-  Data     MEDIUMBLOB,
-  Filename VARCHAR(64),
-  TypeID   BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (FileID),
-  FOREIGN KEY (TypeID) REFERENCES MimeTypes (TypeID)
+  FilePath     VARCHAR(512),
+  Name VARCHAR(64),
+  Ext       VARCHAR(16),
+  PRIMARY KEY (FileID)
 );
 
 CREATE TABLE Messages (
@@ -147,22 +139,22 @@ CREATE INDEX IDX_Logs_RoomID ON Logs(RoomID);
 
 
 INSERT INTO LogTypes (TypeID, TypeName)
-    VALUES
-      (0, 'SLN_CACHE_HIT'),
-      (1, 'SLN_CACHE_MISS'),
-      (2, 'SLN_REGISTER'),
-      (3, 'SLN_MESSAGE_SENT'),
-      (4, 'SLN_ERROR_ACCOUNT_NOT_FOUND'),
-      (5, 'SLN_CREATE_ROOM'),
-      (6, 'SLN_CREATE_CODE'),
-      (7, 'SLN_CREATE_ACCOUNT'),
-      (8, 'SLN_NOT_AUTHENTICATED'),
-      (9, 'SLN_NOT_AUTHORIZED'),
-      (10, 'SLN_ACCESSED_SOCKET'),
-      (11, 'SLN_JOINED_ROOM'),
-      (12, 'SLN_ERROR'),
-      (13, 'SLN_ACCESSED_FILE'),
-      (14, 'SLN_UPDATE');
+VALUES
+  (0, 'SLN_CACHE_HIT'),
+  (1, 'SLN_CACHE_MISS'),
+  (2, 'SLN_REGISTER'),
+  (3, 'SLN_MESSAGE_SENT'),
+  (4, 'SLN_ERROR_ACCOUNT_NOT_FOUND'),
+  (5, 'SLN_CREATE_ROOM'),
+  (6, 'SLN_CREATE_CODE'),
+  (7, 'SLN_CREATE_ACCOUNT'),
+  (8, 'SLN_NOT_AUTHENTICATED'),
+  (9, 'SLN_NOT_AUTHORIZED'),
+  (10, 'SLN_ACCESSED_SOCKET'),
+  (11, 'SLN_JOINED_ROOM'),
+  (12, 'SLN_ERROR'),
+  (13, 'SLN_ACCESSED_FILE'),
+  (14, 'SLN_UPDATE');
 
 CREATE TABLE Animals (
   AnimalID SERIAL,
@@ -204,16 +196,6 @@ VALUES
   ('Fox'),
   ('Turtle'),
   ('Harambe');
-
-INSERT INTO MimeTypes (MimeType)
-VALUES
-  ('pdf'),
-  ('audio'),
-  ('video'),
-  ('image'),
-  ('text'),
-  ('archive');
-
 
 #===================END CREATE TABLES====================
 

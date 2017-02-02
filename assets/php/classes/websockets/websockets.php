@@ -107,6 +107,10 @@ abstract class WebSocketServer
 
                 }break;
 
+                case "Download File":
+                {
+                    $this->on_download_file($user, $message_object, $client_room, $client_account);
+                }break;
                 case "Connect Video":
                 case "Disconnect Video":
                 {
@@ -129,6 +133,8 @@ abstract class WebSocketServer
     abstract protected function on_client_join($user_socket, $message, Room &$room, Account &$account);
 
     abstract protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account);
+
+    abstract protected function on_download_file($user_socket, $message, Room &$room, Account &$account);
 
     abstract protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account);
 
