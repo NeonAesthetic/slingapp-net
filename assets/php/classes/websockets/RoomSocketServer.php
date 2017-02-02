@@ -141,7 +141,6 @@ class RoomSocketServer extends WebSocketServer
 
     private function create_response($type, array $optionals){
         echo "response type: ", $type, "<br>";
-        var_dump($optionals);
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -239,7 +238,9 @@ class RoomSocketServer extends WebSocketServer
 
 //        var_dump($message);
 
-        if ($file = $room->validateDownload($message['fileid'], $message['token'], $room_id)){
+        var_dump("accounts: ", $room->getAccounts());
+
+        if ($file = $room->validateDownload($message['fileid'], $message['token'])){
 
             $response = $this->create_response(
                 "Download",

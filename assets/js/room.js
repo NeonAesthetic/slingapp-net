@@ -440,16 +440,15 @@ function uploadProgress(e) {
     // }
 }
 
-function uploadComplete(evt) {
-    /* This event is raised when the server send back a response */
+function uploadComplete(e) {
     console.log("upload complete");
 }
 
-function uploadFailed(evt) {
+function uploadFailed(e) {
     console.log("error uploading file");
 }
 
-function uploadAbort(evt) {
+function uploadAbort(e) {
     console.log("upload canceled by user");
 }
 function updateScroll() {

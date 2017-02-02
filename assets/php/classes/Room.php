@@ -515,19 +515,17 @@ class Room extends DatabaseObject
      * Function validateDownload
      * @param $fileid
      * @param $token
-     * @param $roomid
      * @return bool | File
      * This Function ensures the user requesting to download file
      * has permission
      */
-    public function &validateDownload($fileid, $token, $roomid){
+    public function validateDownload($fileid, $token){
 
-        if($this->_roomID == $roomid)
-            foreach ($this->_accounts as $account)
-                if($account->getToken() == $token)
-                    foreach($this->_chat->getFiles() as $file)
-                        if($file->getFileID() == $fileid)
-                            return $file;
+        foreach ($this->_accounts as $account)
+            if($account->getToken() == $token)
+                foreach($this->_chat->getFiles() as $file)
+                    if($file->getFileID() == $fileid)
+                        return $file;
 
         return false;
     }
