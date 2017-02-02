@@ -174,9 +174,16 @@ class RoomSocketServer extends WebSocketServer
         if(strlen($nick_name) <= 20) {
             //do not report until database has been updated
             //$this->Log(SLN_CHANGED_NAME, "", $account_id, $room_id);
-//            echo"here at account change";
 
             $account->_screenName = $nick_name;
+            //There are probably better ways to take care of this...
+            foreach ($room->getAccounts() as $k=>$participant) {
+                if($message["token"] == $participant->getToken()){
+                    $participant->_screenName = $nick_name;
+                    echo($participant->getScreenName());
+                    break;
+                }
+            }
 
             //generate message
             $response = $this->create_response(

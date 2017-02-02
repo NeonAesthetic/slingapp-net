@@ -70,7 +70,7 @@ require_once "classes/Account.php";
         <form class="" style="margin: 15px; margin-left: 30px; margin-right: 30px; display: inline-block"
               onsubmit="joinroom(event, this);">
             <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;"
-                   value="Join a Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
+                   value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
         </form>
     </div>
 </div>
