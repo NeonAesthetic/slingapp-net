@@ -216,7 +216,6 @@ var Account = {
     }
 };
 
-
 function showSettings(){
     Modal.create("Settings", "darken");
 }
@@ -346,7 +345,6 @@ function changeExpirationDate(){
 }
 
 function changeScreenName(){
-    var token = GetToken();
     var name = prompt("Enter a new nickname:");
     event.preventDefault();
     event.stopPropagation();
@@ -357,9 +355,9 @@ function changeScreenName(){
         token:token
     };
     Room.socket.send(JSON.stringify(json));
-    //updateUsersHere();
     //Page reload needed
     updateInvites();
+    updateUserInfo();
     return false;
 }
 
@@ -433,3 +431,4 @@ function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
 }
+
