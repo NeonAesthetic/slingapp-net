@@ -126,10 +126,15 @@ else{
             <label for="file-input">
                 <img src="upload.png">
             </label>
-            <input id="file-input" type="file" onchange="uploadFile(this)"/>
+            <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this)"/>
         </div>
+
     </div>
     <div  style="width: 100%; ">
+<!--        <div id="progressNumber" style="margin:0; color:white">-->
+<!--            <progress id="prog" value="0" max="100.0"></progress>-->
+<!--            0%-->
+<!--        </div>-->
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="connectVoice()">CONNECT VOICE</button>
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="openInvites()">INVITE</button>
@@ -140,8 +145,11 @@ else{
 
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/assets/js/FileSaver.js"></script>
 <script src="/assets/js/sling.js"></script>
 <script src="/assets/js/room.js"></script>
+<script src="/assets/js/Autolinker.js"></script>
+
 <link rel="stylesheet" href="/assets/css/room.css">
 <script>
     window.addEventListener("load", function () {

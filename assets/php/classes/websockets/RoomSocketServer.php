@@ -74,6 +74,13 @@ class RoomSocketServer extends WebSocketServer
         $room_id    = $room->getRoomID();
         $text       = htmlspecialchars($message['text']);
 
+        if (isset($message['fileid'])) {
+            $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
+            $file_id = $message['fileid'];
+        } else {
+            $file_id = null;
+        }
+
         if(strlen($text) <= 2000){
 
             $this->Log(SLN_MESSAGE_SENT, "", $account_id, $room_id);
@@ -82,13 +89,15 @@ class RoomSocketServer extends WebSocketServer
                 Database::getFlakeID(),
                 $room_id,
                 $account_id,
-                $text);
+                $text,
+                $file_id);
 
             $response = $this->create_response(
                 "Message",
                 [
                     "sender" => $account_id,
-                    "text" => $text
+                    "text" => $text,
+                    "fileid" => $file_id
                 ]
             );
 
@@ -132,7 +141,6 @@ class RoomSocketServer extends WebSocketServer
 
     private function create_response($type, array $optionals){
         echo "response type: ", $type, "<br>";
-        var_dump($optionals);
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -220,6 +228,40 @@ class RoomSocketServer extends WebSocketServer
                 ]
             );
         }
+        $this->send($user_socket, $response);
+    }
+
+    protected function on_download_file($user_socket, $message, Room &$room, Account &$account)
+    {
+        $account_id = $account->getAccountID();
+        $room_id    = $room->getRoomID();
+
+//        var_dump($message);
+
+        var_dump("accounts: ", $room->getAccounts());
+
+        if ($file = $room->validateDownload($message['fileid'], $message['token'])){
+
+            $response = $this->create_response(
+                "Download",
+                [
+                    "sender" => $account_id,
+                    "fileid" => $file->fileID,
+                    "filename" => $file->fileName,
+                    "filepath" => $file->filePath
+                ]
+            );
+        } else {
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Permission denied"
+                ]
+            );
+        }
+
         $this->send($user_socket, $response);
     }
 

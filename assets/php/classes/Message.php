@@ -12,11 +12,14 @@ class Message
     public $author;
     public $content;
     public $room;
-    public function __construct($id, $room, $author, $content)
+    public $fileid;
+
+    public function __construct($id, $room, $author, $content, $fileID = null)
     {
         $this->author = $author;
         $this->id = $id;
         $this->room = $room;
         $this->content = $content;
+        $this->fileid = $fileID;
     }
 }
