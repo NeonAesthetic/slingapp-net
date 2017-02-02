@@ -2,6 +2,7 @@
  * Created by ian on 11/19/16.
  */
 
+
 window.addEventListener("load", function () {
     Chat.init();
     Modal.init();
@@ -10,50 +11,57 @@ window.addEventListener("load", function () {
     window.document.title = Room.data.RoomName;
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
     repopulateMessages();
-});
 
-
-
-
-var ContextMenu = null;
-
-window.addEventListener("load2", function () {
-    testList = document.getElementById("#invite-codes");
-    testConsole.addEventListener("contextmenu", function (event) {
-        ContextMenu.create(event, getCodeNodeList());
-        return false;
-    });
 });
 
 function getCodeNodeList(testElement){
-    // label = document.createElement("p");
-    //label.innerHTML = testElement.querySelector(".tname").innerHTML;
-    var setUses = ContextMenu.createMenuLink("Set Uses", "", changeRemainingUses());
 
-    var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
-        testElement.click();
+    //console.log("Menu Link");
+    var setUses = ContextMenu.createMenuLink("Set Uses", "", function() {
+        changeRemainingUses();
+        ContextMenu.close();
     });
 
-    return [setUses, expiration];
+
+    var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
+        changeExpirationDate();
+        ContextMenu.close();
+    });
+
+    var deleteCode = ContextMenu.createMenuLink("Delete", "", function () {
+        deleteInviteCode();
+        ContextMenu.close();
+    });
+
+    return [setUses, expiration, deleteCode];
 }
 
 
 function addCodeButtonEvents(){
-    var testdiv = document.getElementById("#invite-codes");
-    var codes = testdiv.querySelectorAll("#invite-codes");
+    var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
+    console.log(codes);
 
     codes.forEach(function(n){
-        n.addEventListener("click", startTest);
-        n.addEventListener("contextmenu", function (event) {
+        //console.log("Button Test");
+        n.addEventListener("contextmenu", function(event) {
+            console.log("Context Menu");
             ContextMenu.create(event, getCodeNodeList(n));
             return false;
         });
     });
-
 }
 
+function closeContextMenu(){
+    var close = Room.settings.optionsPanel.querySelectorAll("div");
 
 
+    close.forEach(function(n){
+        n.addEventListener("click", function(event){
+            console.log("Close Test");
+            ContextMenu.close();
+        })
+    })
+}
 
 
 var Chat = {
@@ -120,6 +128,12 @@ var Room = {
                         Toast.error(textNode("Action: " + message.action + " failed"));
                     }
                 }break;
+
+                case "Room Code Changed":
+                {
+                    uses = message.uses;
+                    updateInvites(uses);
+                }
 
                 default:{
                     console.info(message);
@@ -232,6 +246,7 @@ function InitSettingsModal(){
 
     updateUsersHere();
     updateInvites();
+    addCodeButtonEvents();
 }
 
 function updateUsersHere(){
@@ -272,7 +287,12 @@ function createInviteCode(e){
         }
     });
 }
-function updateInvites(){
+
+function deleteInviteCode(){
+    //Room.settings.optionsPanel.querySelector("#Invites")
+}
+
+function updateInvites(uses){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
     iCodeDiv.innerHTML = "";
@@ -282,24 +302,46 @@ function updateInvites(){
             var tr = document.createElement("tr");
             tr.innerHTML += "<td><input class='form-control iv-code' onclick='this.select()' readonly value='" + rc.Code + "'></td>";
             tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
-            tr.innerHTML += "<td>" + rc.Expires + "</td>";
+            tr.innerHTML += "<td>" + "Remaining Uses: " + uses + "</td>";
             iCodeDiv.appendChild(tr);
+
         }
+
     }
+    addCodeButtonEvents();
+
 }
 
 function changeRemainingUses(){
     var uses = prompt("Enter remaining uses:");
     event.preventDefault();
     event.stopPropagation();
-    var token = GetToken;
+    var token = GetToken();
     var json = {
-        action: "Change Code Uses",
-        uses: uses,
-        token: token
+        action:"Change Uses",
+        remaining:uses,
+        token:token,
+    };
+    Room.socket.send(JSON.stringify(json));
+
+    updateInvites();
+    return false;
+}
+
+function changeExpirationDate(){
+    var expires = prompt("Enter expiration date:", "mm/dd/yyyy");
+    event.preventDefault();
+    event.stopPropagation();
+    var token = GetToken();
+    var json = {
+        action:"Change Expiration Date",
+        expiration:expires,
+        token:token
     };
     Room.socket.send(JSON.stringify(json));
     updateInvites();
+    //closeContextMenu();
+
     return false;
 }
 

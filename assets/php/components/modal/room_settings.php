@@ -52,7 +52,9 @@
 </div>
 
 <script>
-    window.addEventListener("load2", function () {
-        addCodeButtonEvents();
+    window.addEventListener("load", function () {
+        refreshTests();
     });
 </script>
+
+

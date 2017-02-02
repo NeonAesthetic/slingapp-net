@@ -90,14 +90,15 @@ abstract class WebSocketServer
                     $this->on_client_join($user, $message_object, $client_room, $client_account);
                 }break;
 
-                case "Create Room Code":
-                case "Delete Room Code":
+                case "Change Uses":
                 {
                     $this->on_alter_roomcode($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Change Name":
                 {
+                    echo "<script>console.log('Alter Name')</script>";
+
                     $this->on_client_alter_name($user, $message_object, $client_room, $client_account);
                 }break;
 
