@@ -324,6 +324,12 @@ class Room extends DatabaseObject
         return $this->_usesLeft;
     }
 
+    public function setUsesLeft($uses)
+    {
+        $this->_usesLeft = $uses;
+        //$this->_room_codes[$this->getRoomCodes()]->_uses = $uses;
+    }
+
     public function setParticipantInactive($accountID)
     {
         $retval = false;
@@ -413,7 +419,7 @@ class Room extends DatabaseObject
      * specific settings such as the uses remaining for the key as well as the
      * datetime that the key will expire.
      */
-    public function addRoomCode($accountID, $uses = null, $expires = null)
+    public function addRoomCode($accountID, $uses, $expires = null)
     {
         $retval = false;
         if (array_key_exists($accountID, $this->_accounts)) {

@@ -131,6 +131,8 @@ class RoomSocketServer extends WebSocketServer
     }
 
     private function create_response($type, array $optionals){
+        echo "response type: ", $type, "<br>";
+        var_dump($optionals);
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -164,7 +166,7 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
-
+        echo('<script>console.log("Alter Name")</script>');
         $room_id           = $room->getRoomID();
         $account_id        = $account->getAccountID();
         $current_nick_name = $account->getScreenName();
@@ -223,7 +225,49 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account)
     {
-        // TODO: Implement on_alter_roomcode() method.
+        //echo("<script>console.log('Alter Room Code')</script>");
+        $newUses = $message["remaining"];
+
+        //echo "newUses: ", $newUses;
+        $roomid = $room->getRoomID();
+        $current_nick_name = $account->getScreenName();
+
+        if($newUses < 100) {
+            echo "uses: ", $newUses;
+            $room->setUsesLeft($newUses);
+
+            $response = $this->create_response(
+                "Room Code Changed",
+                [
+                    "uses" => $newUses,
+                    "notify" => $current_nick_name . " has modified a room code"
+                ]
+            );
+
+            var_dump($response);
+            foreach ($this->_clients[$roomid] as $k => $participant) {
+                $this->send($participant, $response);
+            }
+            //$this->_clients[$roomid][$newUses] = $user_socket;  //add the new user to the array
+            //generate message
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    "success" => true
+                ]
+            );
+        }
+        else{
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Room Code Error"
+                ]
+            );
+        }
+        $this->send($user_socket, $response);
     }
 
     protected function on_client_alter_voice($user_socket, $message, Room &$room, Account &$account)

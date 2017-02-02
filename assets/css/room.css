@@ -324,6 +324,42 @@ body{
 
 }
 
+.context-menu{
+    position: absolute;
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.5);
+    background-color: #fefefe;
+    min-width: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    z-index: 9999999999999999999;
+}
+
+.context-menu a{
+    width: 100%;
+    display: inline-block;
+    text-decoration: none;
+    padding: 3px 20px 3px 20px;
+
+}
+
+.context-menu a:hover{
+    background-color: #4286f4;
+    color: white;
+    cursor: pointer;
+}
+
+.context-menu p{
+    padding: 5px 20px 5px 20px;
+
+    border-bottom: 1px solid lightgrey;
+    width: 100%;
+}
+
+.context-menu hr{
+    margin: 5px;
+}
+
 @keyframes e {
     from {}
     to {box-shadow: 1px 1px 5px rgba(0,0,0,.3);transform: scale(1.01)}
