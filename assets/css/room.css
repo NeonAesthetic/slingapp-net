@@ -10,6 +10,13 @@ body{
          background: -moz-linear-gradient(right, #38474F, black); /* For Firefox 3.6 to 15 */
          background: linear-gradient(to right, #38474F, black); /* Standard syntax (must be last) */
      }
+     /*Animations*/
+@keyframes thumbNailExpand {
+    from{background-color:  darkcyan}
+    to{background-color: black}
+}
+    /*Room Assets*/
+
 .roomMain{
     height: 45%;
     width: 75%;
@@ -45,12 +52,30 @@ body{
     margin: 5px;
     float: left;
 }
-
+    /*Room Side*/
 .roomSide{
+    height: 20px;
+    padding: 10px;
+    width: 98%;
+    background-color: darkslategray;
+    position: relative;
+    margin: 10px 0 0 -49%;
+    left: 50%;
+    border-color: #222222;
+    border-radius: 2px;
+    border-width: 2px;
+    -webkit-transition: height 0.7s; /* For Safari 3.1 to 6.0 */
+    transition: height 0.7s;
+}
+.roomSide:hover{
+    height: 100px;
+}
+
+.eRoomSide{
     height: 100px;
     padding: 10px;
     width: 98%;
-    background-color: transparent;
+    background-color: darkslategray;
     position: relative;
     margin: 10px 0 0 -49%;
     left: 50%;
@@ -58,6 +83,7 @@ body{
     border-radius: 2px;
     border-width: 2px;
 }
+
 .roomSideBack{
     height: calc(100%);
     width: 195px;
@@ -67,7 +93,7 @@ body{
     float: left;
 }
 .roomSideTitle{
-    height: 20%;
+    height: 20px;
     width: 112%;
     background-color: #333333;
     color: white;
@@ -76,6 +102,16 @@ body{
     top: 90%;
     float: left;
 }
+.roomSideTitleMS{
+    height: 20px;
+    width: 100%;
+    background-color: #333333;
+    color: white;
+    position: relative;
+    top: 95%;
+    float: left;
+}
+
 
 .roomControls{
     float: left;
@@ -93,7 +129,6 @@ body{
     position: relative;
     border-radius: 2px;
 }
-
 
 .module{
     float: left;
@@ -199,7 +234,7 @@ body{
     left: 0;
     height: calc(50% - 60px);
     margin: 10px;
-
+    background-color: black;
 }
 
 .screen .inner{
@@ -287,6 +322,42 @@ body{
     text-align: center;
     box-shadow: none;
 
+}
+
+.context-menu{
+    position: absolute;
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.5);
+    background-color: #fefefe;
+    min-width: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    z-index: 9999999999999999999;
+}
+
+.context-menu a{
+    width: 100%;
+    display: inline-block;
+    text-decoration: none;
+    padding: 3px 20px 3px 20px;
+
+}
+
+.context-menu a:hover{
+    background-color: #4286f4;
+    color: white;
+    cursor: pointer;
+}
+
+.context-menu p{
+    padding: 5px 20px 5px 20px;
+
+    border-bottom: 1px solid lightgrey;
+    width: 100%;
+}
+
+.context-menu hr{
+    margin: 5px;
 }
 
 @keyframes e {
