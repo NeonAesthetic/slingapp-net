@@ -136,7 +136,7 @@ else{
 <!--            0%-->
 <!--        </div>-->
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="connectVoice()">CONNECT VOICE</button>
+        <button id='connect-voice' class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="AVC.connectVoice()">CONNECT VOICE</button>
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="openInvites()">INVITE</button>
         <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="showSettings()">SETTINGS</button>
     </div>
@@ -149,6 +149,8 @@ else{
 <script src="/assets/js/sling.js"></script>
 <script src="/assets/js/room.js"></script>
 <script src="/assets/js/Autolinker.js"></script>
+<script src="/assets/js/peer.js"></script>
+<script src="/assets/js/MediaStreams.js"></script>
 
 <link rel="stylesheet" href="/assets/css/room.css">
 <script>
@@ -156,6 +158,7 @@ else{
 
     });
     Account.data = <?=$account->getJSON()?>;
+    AVC.id = Account.data.ID;
     Room.data = <?=$room->getJSON()?>;
     Messages = <?=$room->getMessages()?>;
 

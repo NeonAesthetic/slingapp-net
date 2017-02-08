@@ -360,6 +360,11 @@ body{
     margin: 5px;
 }
 
+.button-green{
+    color: #55ff55;
+    border-color: #55ff55;
+}
+
 @keyframes e {
     from {}
     to {box-shadow: 1px 1px 5px rgba(0,0,0,.3);transform: scale(1.01)}
