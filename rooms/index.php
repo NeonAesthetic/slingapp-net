@@ -79,26 +79,24 @@ else{
             </div>
         </div>
 
-
-
         <div class="screen-container" id="ScreenContainer">
 <!--            <div class="screen" style="">-->
 <!--                <video class="inner" ondblclick="fullScreen(this)">-->
-<!--<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
+<!--<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
 <!--                </video>-->
-<!--<!--                <div class="screen-bar" >-->-->
-<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
-<!--<!--                </div>-->-->
+<!--<!--                <div class="screen-bar" >-->
+<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->
+<!--<!--                </div>-->
 <!--            </div>-->
 <!--            <div class="screen" style="">-->
-<!---->
+<!--
 <!--                <video class="inner" ondblclick="fullScreen(this)">-->
-<!--<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
+<!--<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->
 <!--                </video>-->
-<!---->
-<!--<!--                <div class="screen-bar" >-->-->
-<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
-<!--<!--                </div>-->-->
+<!--
+<!--<!--                <div class="screen-bar" >-->
+<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->
+<!--<!--                </div>-->
 <!--            </div>-->
         </div>
 
@@ -114,34 +112,47 @@ else{
 <!--        </div>-->
 <!--    </div>-->
 
-    
 </div>
 
-<div class="panel" id="chat" style="height: 100%; position: absolute; right: 0;width: 400px; max-width:100%;margin: 5px auto auto; background-color: #333333;">
-    <div id="chat-log" style="background-color: #333333;"></div>
-    <div id="send-box" style="background-color: #333333; ">
-        <input id="message-input" onkeypress="if (event.keyCode == 13) sendMessage()" >
-        <button onclick="sendMessage()">SEND</button>
-        <div id="file-upload">
-            <label for="file-input">
-                <img src="upload.png">
-            </label>
-            <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this)"/>
+<div class="chat_window_container">
+    <div id="tabs">
+        <ul class="nav nav-tabs chat_nav">
+            <li  class="nav-item chat_window_tab">
+                <a id="chat_tab" class="nav-link active chat_nav_button" onclick="switchLog('chat')">Chat</a>
+            </li>
+            <li class="nav-item chat_window_tab">
+                <a id="files_tab" class="nav-link chat_nav_button_inactive" onclick="switchLog('files')">Files</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="panel chat_window" id="chat">
+        <div id="chat-log"></div>
+        <div id="file-log"></div>
+
+        <div id="send-box" style="background-color: #333333; ">
+            <input id="message-input" onkeypress="if (event.keyCode == 13) sendMessage()" >
+            <button onclick="sendMessage()">SEND</button>
+            <div id="file-upload">
+                <label for="file-input">
+                    <img src="upload.png">
+                </label>
+                <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+            </div>
+
         </div>
-
-    </div>
-    <div  style="width: 100%; ">
-<!--        <div id="progressNumber" style="margin:0; color:white">-->
-<!--            <progress id="prog" value="0" max="100.0"></progress>-->
-<!--            0%-->
-<!--        </div>-->
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
-        <button id='connect-voice' class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="AVC.connectVoice()">CONNECT VOICE</button>
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="openInvites()">INVITE</button>
-        <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="showSettings()">SETTINGS</button>
+        <div  style="width: 100%; ">
+    <!--        <div id="progressNumber" style="margin:0; color:white">-->
+    <!--            <progress id="prog" value="0" max="100.0"></progress>-->
+    <!--            0%-->
+    <!--        </div>-->
+            <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="showSettings()">MUTE</button>
+            <button id='connect-voice' class="buttonRoom" style="margin: 5px; width: calc(50% - 10px);" onclick="AVC.connectVoice()">CONNECT VOICE</button>
+            <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="openInvites()">INVITE</button>
+            <button class="buttonRoom" style="margin: 5px; width: calc(50% - 10px)" onclick="showSettings()">SETTINGS</button>
+        </div>
     </div>
 </div>
-
 
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -156,6 +167,9 @@ else{
 <script>
     window.addEventListener("load", function () {
 
+        if (window.File && window.FileList && window.FileReader) {
+            initDragDrop();
+        }
     });
     Account.data = <?=$account->getJSON()?>;
     AVC.id = Account.data.ID;
@@ -169,6 +183,7 @@ else{
             element.webkitRequestFullscreen();
         }
     }
+
     function updateUserInfo(){
         Room.data = <?=$room->getJSON()?>;
             for (var key in Room.data.Accounts) {
