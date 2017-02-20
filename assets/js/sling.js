@@ -457,13 +457,13 @@ function CheckTokenValidity(token, callback){
  ******************************************************************************************************************/
 
 function toggleform(e) {
-    if (e.value === "Join a Room") {
+    if (e.value === "Join Room") {
         e.value = "";
         e.style.color = "black";
         e.style.backgroundColor = "#fefefe";
     }
     else if (e.value === "") {
-        e.value = "Join a Room";
+        e.value = "Join Room";
         e.style.color = "white";
         e.style.backgroundColor = "transparent";
     } else {

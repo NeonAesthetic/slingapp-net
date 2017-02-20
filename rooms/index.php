@@ -71,7 +71,7 @@ else{
         </div>
         <div class="roomHeaderBack" style="height: 60px; border-radius: 2px;">
             <div class="roomSide" style="height: 50px; background-color: transparent">
-                <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="showSettings()">SHARE SCREEN</button>
+                <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="AVC.connectScreenCapture()">SHARE SCREEN</button>
                 <div class="roomSideTitle" style="text-align: center; width: 30%; min-width:20%; height: 20px; margin: -25px auto 10px auto; background-color: rgba(0,0,0,0)">
                     <span class="vertical-text" id="r-title">ROOM TITLE</span>
                 </div>

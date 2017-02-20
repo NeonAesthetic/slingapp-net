@@ -6,16 +6,32 @@ if ( ! "Peer" in window ){
 };
 
 var MEDIA = {
-    AUDIO : {audio: true, video:false},
-    VIDEO : {audio: false, video:true},
-    BOTH  : {audio: true, video:true}
-}
+    AUDIO  : {audio: true, video:false},
+    VIDEO  : {audio: false, video:true},
+    BOTH   : {audio: true, video:true},
+    SCREEN : {
+        audio: false,
+        video: {
+            mandatory: {
+                chromeMediaSource: 'desktop',
+                maxWidth: 1920,
+                maxHeight: 1080
+            }
+        },
+        options:[]
+    }
+};
 
 var AVC = {
     connection:null,
     id:null,
-    options:{key: 'lwjd5qra8257b9'},
+    options:{
+        host: 'slingapp.net',
+        port: 9000,
+        secure: true
+    },
     audioSources:[],
+    videoSources:[],
     connected:false,
     connectButton:null,
     audioInput:null,
@@ -85,6 +101,11 @@ var AVC = {
             AVC.connectVoice();
         }
     },
+    connectScreenCapture:function () {
+        AVC.getUserMedia(MEDIA.SCREEN, function(stream){
+            AVC.createPeerVideoNode(stream);
+        });
+    },
     getPeerAudioStream:function (peerid, callback) {
         AVC.createAudioStream(function (stream) {
             var call = AVC.connection.call(peerid, stream);
@@ -114,6 +135,12 @@ var AVC = {
         document.body.appendChild(audioNode);
         AVC.audioSources.push(audioNode);
         // audioNode.peer = peerid;
+    },
+    createPeerVideoNode:function (stream) {
+        var videoNode = createVideoSourceNode();
+        videoNode.src = URL.createObjectURL(stream);
+        document.body.appendChild(videoNode);
+        AVC.videoSources.push(videoNode);
     }
 }
 
@@ -129,3 +156,8 @@ function createAudioSourceNode(){
     return node;
 }
 
+function createVideoSourceNode(){
+    var node = document.createElement("video");
+    node.autoplay = true;
+    return node;
+}
