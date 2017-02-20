@@ -1,6 +1,6 @@
 # CREATE USER AND DATABASE
 
-DROP USER 'sling'@'localhost';
+# DROP USER 'sling'@'localhost';
 DROP DATABASE IF EXISTS sling;
 
 CREATE USER 'sling'@'localhost';
