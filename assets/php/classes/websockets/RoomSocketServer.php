@@ -74,6 +74,13 @@ class RoomSocketServer extends WebSocketServer
         $room_id    = $room->getRoomID();
         $text       = htmlspecialchars($message['text']);
 
+        if (isset($message['fileid'])) {
+            $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
+            $file_id = $message['fileid'];
+        } else {
+            $file_id = null;
+        }
+
         if(strlen($text) <= 2000){
 
             $this->Log(SLN_MESSAGE_SENT, "", $account_id, $room_id);
@@ -82,13 +89,15 @@ class RoomSocketServer extends WebSocketServer
                 Database::getFlakeID(),
                 $room_id,
                 $account_id,
-                $text);
+                $text,
+                $file_id);
 
             $response = $this->create_response(
                 "Message",
                 [
                     "sender" => $account_id,
-                    "text" => $text
+                    "text" => $text,
+                    "fileid" => $file_id
                 ]
             );
 
@@ -131,6 +140,7 @@ class RoomSocketServer extends WebSocketServer
     }
 
     private function create_response($type, array $optionals){
+        echo "response type: ", $type, "<br>";
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -164,7 +174,7 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
-
+        echo('<script>console.log("Alter Name")</script>');
         $room_id           = $room->getRoomID();
         $account_id        = $account->getAccountID();
         $current_nick_name = $account->getScreenName();
@@ -174,9 +184,16 @@ class RoomSocketServer extends WebSocketServer
         if(strlen($nick_name) <= 20) {
             //do not report until database has been updated
             //$this->Log(SLN_CHANGED_NAME, "", $account_id, $room_id);
-//            echo"here at account change";
 
             $account->_screenName = $nick_name;
+            //There are probably better ways to take care of this...
+            foreach ($room->getAccounts() as $k=>$participant) {
+                if($message["token"] == $participant->getToken()){
+                    $participant->_screenName = $nick_name;
+                    echo($participant->getScreenName());
+                    break;
+                }
+            }
 
             //generate message
             $response = $this->create_response(
@@ -214,9 +231,85 @@ class RoomSocketServer extends WebSocketServer
         $this->send($user_socket, $response);
     }
 
+    protected function on_download_file($user_socket, $message, Room &$room, Account &$account)
+    {
+        $account_id = $account->getAccountID();
+        $room_id    = $room->getRoomID();
+
+//        var_dump($message);
+
+        var_dump("accounts: ", $room->getAccounts());
+
+        if ($file = $room->validateDownload($message['fileid'], $message['token'])){
+
+            $response = $this->create_response(
+                "Download",
+                [
+                    "sender" => $account_id,
+                    "fileid" => $file->fileID,
+                    "filename" => $file->fileName,
+                    "filepath" => $file->filePath
+                ]
+            );
+        } else {
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Permission denied"
+                ]
+            );
+        }
+
+        $this->send($user_socket, $response);
+    }
+
     protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account)
     {
-        // TODO: Implement on_alter_roomcode() method.
+        //echo("<script>console.log('Alter Room Code')</script>");
+        $newUses = $message["remaining"];
+
+        //echo "newUses: ", $newUses;
+        $roomid = $room->getRoomID();
+        $current_nick_name = $account->getScreenName();
+
+        if($newUses < 100) {
+            echo "uses: ", $newUses;
+            $room->setUsesLeft($newUses);
+
+            $response = $this->create_response(
+                "Room Code Changed",
+                [
+                    "uses" => $newUses,
+                    "notify" => $current_nick_name . " has modified a room code"
+                ]
+            );
+
+            var_dump($response);
+            foreach ($this->_clients[$roomid] as $k => $participant) {
+                $this->send($participant, $response);
+            }
+            //$this->_clients[$roomid][$newUses] = $user_socket;  //add the new user to the array
+            //generate message
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    "success" => true
+                ]
+            );
+        }
+        else{
+            $response = $this->create_response(
+                "Confirmation",
+                [
+                    'action'=>$message['action'],
+                    'success'=>false,
+                    "message"=>"Room Code Error"
+                ]
+            );
+        }
+        $this->send($user_socket, $response);
     }
 
     protected function on_client_alter_voice($user_socket, $message, Room &$room, Account &$account)

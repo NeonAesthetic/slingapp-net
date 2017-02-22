@@ -27,8 +27,6 @@ abstract class WebSocketServer
         socket_listen($this->master, 20) or die("Failed: socket_listen()");
         $this->sockets['m'] = $this->master;
         $this->stdout("Server started\nListening on: $addr:$port\nMaster socket: " . $this->master);
-
-
     }
 
     protected function process($user, $message)
@@ -90,14 +88,15 @@ abstract class WebSocketServer
                     $this->on_client_join($user, $message_object, $client_room, $client_account);
                 }break;
 
-                case "Create Room Code":
-                case "Delete Room Code":
+                case "Change Uses":
                 {
                     $this->on_alter_roomcode($user, $message_object, $client_room, $client_account);
                 }break;
 
                 case "Change Name":
                 {
+                    echo "<script>console.log('Alter Name')</script>";
+
                     $this->on_client_alter_name($user, $message_object, $client_room, $client_account);
                 }break;
 
@@ -107,6 +106,10 @@ abstract class WebSocketServer
 
                 }break;
 
+                case "Download File":
+                {
+                    $this->on_download_file($user, $message_object, $client_room, $client_account);
+                }break;
                 case "Connect Video":
                 case "Disconnect Video":
                 {
@@ -116,9 +119,6 @@ abstract class WebSocketServer
                 default:
                     echo "\n" . $message . "\n";
             }
-
-
-
         }catch (Throwable $e){
 
         }
@@ -129,6 +129,8 @@ abstract class WebSocketServer
     abstract protected function on_client_join($user_socket, $message, Room &$room, Account &$account);
 
     abstract protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account);
+
+    abstract protected function on_download_file($user_socket, $message, Room &$room, Account &$account);
 
     abstract protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account);
 

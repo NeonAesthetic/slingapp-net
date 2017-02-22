@@ -120,9 +120,39 @@ class RoomCode extends DatabaseObject
             return false;
     }
 
+    function __set($name, $value)
+    {
+        switch (strtolower($name)) {
+            case "_uses":
+                    $this->_uses = $value;
+
+                break;
+            case "_expire_date":
+                    $this->_expire_date = $value;
+                break;
+            default:
+        }
+
+        $this->update();
+        return $value;
+    }
+
+
+
     public function update()
     {
-        // Not needed
+        $sql = "    INSERT INTO RoomCodes (RoomCode, RoomID, CreatedBy, ExpirationDate, RemainingUses)
+                    VALUES (:code, :rid, :createdby, :exp_date, :rem_uses)";
+        $statement = Database::connect()->prepare($sql);
+
+        if (!$statement->execute([
+            ":code" => $this->_code,
+            ":rid" => $this->_roomID,
+            ":createdby" => $this->_accountID,
+            ":exp_date" => $this->_expires_in,
+            ":rem_uses" => $this->_uses
+        ])
+        );
     }
 
     /**

@@ -324,6 +324,12 @@ class Room extends DatabaseObject
         return $this->_usesLeft;
     }
 
+    public function setUsesLeft($uses)
+    {
+        $this->_usesLeft = $uses;
+        //$this->_room_codes[$this->getRoomCodes()]->_uses = $uses;
+    }
+
     public function setParticipantInactive($accountID)
     {
         $retval = false;
@@ -413,7 +419,7 @@ class Room extends DatabaseObject
      * specific settings such as the uses remaining for the key as well as the
      * datetime that the key will expire.
      */
-    public function addRoomCode($accountID, $uses = null, $expires = null)
+    public function addRoomCode($accountID, $uses, $expires = null)
     {
         $retval = false;
         if (array_key_exists($accountID, $this->_accounts)) {
@@ -430,7 +436,7 @@ class Room extends DatabaseObject
     }
 
     /**
-     * @return array
+     * @return Account[]
      */
     public function getAccounts()
     {
@@ -447,6 +453,19 @@ class Room extends DatabaseObject
             $participants[] = $p->getScreenName();
         }
         return $participants;
+    }
+
+    /**
+     * @param $accountID
+     * @return true|false
+     */
+    public function checkForAccountInRoom($accountID)
+    {
+        foreach ($this->_accounts as $p) {
+            if($accountID == $p->getAccountID())
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -496,12 +515,31 @@ class Room extends DatabaseObject
         return json_encode($json);
     }
 
-    public function addMessage($id, $room, $author, $content , $filepath = null){
-        $this->_chat->addMessage($id, $room, $author, $content, $filepath);
+    public function addMessage($id, $room, $author, $content, $fileID = null){
+        $this->_chat->addMessage($id, $room, $author, $content, $fileID);
     }
 
     public function getMessages(){
-        $this->_chat->getMessages(500);
-        return json_encode($this->_chat->_messages);
+        return json_encode($this->_chat->getMessages(500));
+    }
+
+
+    /**
+     * Function validateDownload
+     * @param $fileid
+     * @param $token
+     * @return bool | File
+     * This Function ensures the user requesting to download file
+     * has permission
+     */
+    public function validateDownload($fileid, $token){
+
+        foreach ($this->_accounts as $account)
+            if($account->getToken() == $token)
+                foreach($this->_chat->getFiles() as $file)
+                    if($file->getFileID() == $fileid)
+                        return $file;
+
+        return false;
     }
 }

@@ -21,9 +21,13 @@
             <h1>Users</h1>
             <hr>
             <h2>Your Name</h2>
-            <div id="you" style="padding: 15px;">
-                <span class="user"></span><button class="btn-circle" onclick="changeScreenName()">Change Nickname</button>
+            <div id="you" style="padding-top: 15px;">
+                <span class='user'></span><br>
             </div>
+            <div>
+                <button class="btn-circle"  style="margin: 0;" onclick="changeScreenName()">Change Nickname</button>
+            </div>
+
             <div id="users-here" style="padding: 15px;">
 
             </div>
@@ -33,7 +37,8 @@
             <hr>
             <table>
                 <tr>
-                    <td>Code</td>
+                    <td>Code
+                        </td>
                     <td>Member</td>
                     <td>Restrictions</td>
                 </tr>
@@ -46,5 +51,14 @@
             <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
             
         </div>
+
     </div>
 </div>
+
+<script>
+    window.addEventListener("load", function () {
+        refreshTests();
+    });
+</script>
+
+
