@@ -10,4 +10,4 @@
 echo get_include_path() . "<br>";
 echo php_ini_loaded_file();
 
-echphpinfo();
+echo phpinfo();

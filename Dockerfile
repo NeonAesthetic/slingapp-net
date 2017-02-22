@@ -3,6 +3,7 @@ MAINTAINER Ian Murphy <ian@isogen.net>
 
 #
 
+RUN docker-php-ext-install pdo pdo_mysql
 
 RUN 	mkdir /var/www/sling; \
 		mkdir /var/www/ssl/; \
@@ -18,9 +19,8 @@ COPY 	php.ini /usr/local/etc/php/
 
 RUN 	a2enmod rewrite; a2enmod ssl
 
-RUN 	echo "include_path=/var/www/sling/assets/php/" >> /dev/null
 
-RUN docker-php-ext-install pdo pdo_mysql
+VOLUME 	/var/www/sling/
 
 EXPOSE 80
 EXPOSE 443
