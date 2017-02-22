@@ -53,21 +53,6 @@ else{
             <div class="roomSide " id="screen-title" style="height: 35px; text-align: center; background-color: #333333">
                 <span class="vertical-text" style="color: white; background-color: rgba(0,0,0,0)">USERS</span>
             </div>
-<!--            <div class="roomSide " id="screen-collection" style="background-color: darkcyan">-->
-<!--                <div class="roomSideTitle">-->
-<!--                    <span class="vertical-text" id="Las"></span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="roomSide " id="screen-collection" style="background-color: darkseagreen">-->
-<!--                <div class="roomSideTitle">-->
-<!--                    <span class="vertical-text" id="1"></span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="roomSide " id="screen-collection" style="background-color: darkturquoise">-->
-<!--                <div class="roomSideTitle">-->
-<!--                    <span class="vertical-text" id="2"></span>-->
-<!--                </div>-->
-<!--            </div>-->
         </div>
         <div class="roomHeaderBack" style="height: 60px; border-radius: 2px;">
             <div class="roomSide" style="height: 50px; background-color: transparent">
@@ -78,42 +63,10 @@ else{
                 <button class="buttonRoom" style="margin: -30px auto auto 67%; width: 30%; min-width: 50px;" onclick="leaveRoom()">LEAVE ROOM</button>
             </div>
         </div>
-
-
-
         <div class="screen-container" id="ScreenContainer">
-<!--            <div class="screen" style="">-->
-<!--                <video class="inner" ondblclick="fullScreen(this)">-->
-<!--<!--                <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
-<!--                </video>-->
-<!--<!--                <div class="screen-bar" >-->-->
-<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
-<!--<!--                </div>-->-->
-<!--            </div>-->
-<!--            <div class="screen" style="">-->
-<!---->
-<!--                <video class="inner" ondblclick="fullScreen(this)">-->
-<!--<!--                    <source src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" type="video/mp4">-->-->
-<!--                </video>-->
-<!---->
-<!--<!--                <div class="screen-bar" >-->-->
-<!--<!--                    <span class="vertical-text" style="color: white; font-size: small">(You)</span>-->-->
-<!--<!--                </div>-->-->
-<!--            </div>-->
         </div>
 
     </div>
-
-<!---->
-<!--    <div class="roomSideBack" id="controls" style="text-align: center; height: 70px;  width: 60%; position: fixed; bottom:0;margin: auto 200px 10px 210px;">-->
-<!--        <div class="roomSide" style="height: 50px">-->
-<!--            <button class="buttonRoom" onclick="showSettings()">INVITE</button>-->
-<!--            <button class="buttonRoom" onclick="showSettings()">SETTINGS</button>-->
-<!--            <button class="buttonRoom" onclick="showSettings()">SHARE FILE</button>-->
-<!--            <button class="buttonRoom" onclick="showSettings()">LEAVE ROOM</button>-->
-<!--        </div>-->
-<!--    </div>-->
-
     
 </div>
 
@@ -152,31 +105,18 @@ else{
 
 <link rel="stylesheet" href="/assets/css/room.css">
 <script>
-    window.addEventListener("load", function () {
-
-    });
     Account.data = <?=$account->getJSON()?>;
     Room.data = <?=$room->getJSON()?>;
     Messages = <?=$room->getMessages()?>;
 
-    function fullScreen(element) {
-        if (element == document.fullscreenElement){
-            element.webkitExitFullscreen();
-        }else{
-            element.webkitRequestFullscreen();
-        }
-    }
-    function updateUserInfo(){
-        Room.data = <?=$room->getJSON()?>;
-            for (var key in Room.data.Accounts) {
-                if (Room.data.Accounts.hasOwnProperty(key)) {
-                    var account = Room.data.Accounts[key];
+    function updateUserInfo(accountID, nickname){
 
-                    console.log("in User Info Update");
-                    console.log(account.ScreenName);
-                    document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
-                }
-            }
+        console.log("account: ", accountID);
+        console.log("nickname", nickname);
+        console.log(Room.data.Accounts[accountID]);
+        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
+        document.getElementById('UN' + accountID.toString()+ 'mainScreen').innerHTML = nickname;
+        document.getElementById("modalUsername").innerHTML = nickname;
     }
 
     function newUserSet(size, target) {
@@ -184,27 +124,29 @@ else{
             for (var key in Room.data.Accounts) {
                 if (Room.data.Accounts.hasOwnProperty(key)) {
                     var account = Room.data.Accounts[key];
+                    //Check to make sure that this user div does not already exist
+                    if(document.getElementById('NU' + key.toString()) == null) {
+                        console.log("in New User Set");
+                        var newUser = document.createElement('div');
+                        newUser.id = 'NU' + key.toString();
+                        newUser.className = 'roomSide';
+                        document.getElementById('screensList').appendChild(newUser);
 
-                    console.log("in New User Set");
-                    var newUser = document.createElement('div');
-                    newUser.id = 'NU' + key.toString();
-                    newUser.className = 'roomSide';
-                    document.getElementById('screensList').appendChild(newUser);
+                        document.getElementById('NU' + key.toString()).setAttribute("onclick", "expandDiv(event)");
+                        document.getElementById('NU' + key.toString()).setAttribute("ondblclick", "sendDivToCenter(event)");
 
-                    document.getElementById('NU' + key.toString()).setAttribute("onclick", "expandDiv(event)");
-                    document.getElementById('NU' + key.toString()).setAttribute("ondblclick", "sendDivToCenter(event)");
+                        var newUserTitle = document.createElement('div');
+                        newUserTitle.id = 'UT' + key.toString();
+                        newUserTitle.className = 'roomSideTitle';
+                        document.getElementById('NU' + key.toString()).appendChild(newUserTitle);
 
-                    var newUserTitle = document.createElement('div');
-                    newUserTitle.id = 'UT' + key.toString();
-                    newUserTitle.className = 'roomSideTitle';
-                    document.getElementById('NU' + key.toString()).appendChild(newUserTitle);
+                        var newUserName = document.createElement('span');
+                        newUserName.id = 'UN' + key.toString();
+                        newUserName.className = 'vertical-text';
+                        document.getElementById('UT' + key.toString()).appendChild(newUserName);
 
-                    var newUserName = document.createElement('span');
-                    newUserName.id = 'UN' + key.toString();
-                    newUserName.className = 'vertical-text';
-                    document.getElementById('UT' + key.toString()).appendChild(newUserName);
-
-                    document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
+                        document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
+                    }
                 }
             }
         }
@@ -222,8 +164,6 @@ else{
                         newUserMS.className = 'screen';
                         document.getElementById('ScreenContainer').appendChild(newUserMS);
 
-                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').setAttribute("onclick", "returnDivToSide(event)");
-
                         var newUserTitleMS = document.createElement('div');
                         newUserTitleMS.id = 'UT' + keyMS.toString() + 'mainScreen';
                         newUserTitleMS.className = 'roomSideTitleMS';
@@ -235,6 +175,8 @@ else{
                         document.getElementById('UT' + keyMS.toString() + 'mainScreen').appendChild(newUserNameMS);
 
                         document.getElementById('UN' + keyMS.toString() + 'mainScreen').innerHTML = accountMS.ScreenName;
+
+                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').setAttribute("onclick", "returnDivToSide(event)");
                     }
                 }
             }
@@ -243,18 +185,21 @@ else{
     //These all only Remain until page reload, they are wiped then.
     function expandDiv(event){
         var target = event.target;
-        if(target != null)
-        {
-            target.className = 'eRoomSide';
-            target.setAttribute("onclick", "minimizeDiv(event)");
+        if(event.target.id[0] == 'N') {
+            if (target != null) {
+                console.log(event.target.id);
+                target.className = 'eRoomSide';
+                target.setAttribute("onclick", "minimizeDiv(event)");
+            }
         }
     }
     function minimizeDiv(event){
         var target = event.target;
-        if(target != null)
-        {
-            target.className = 'roomSide';
-            target.setAttribute("onclick", "expandDiv(event)");
+        if(event.target.id[0] == 'N') {
+            if (target != null) {
+                target.className = 'roomSide';
+                target.setAttribute("onclick", "expandDiv(event)");
+            }
         }
     }
     function sendDivToCenter(event){
@@ -263,14 +208,13 @@ else{
         {
             newUserSet('large', target);
         }
-
     }
     function returnDivToSide(event){
         var target = event.target;
         if(target != null)
         {
-            console.log("Remove Div");
-            target.setAttribute("display", "none");
+            var item = document.getElementById(target.id);
+            item.parentNode.removeChild(item);
         }
     }
 

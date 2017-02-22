@@ -118,6 +118,7 @@ var Room = {
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
                     updateUsersHere();
+                    newUserSet('small', null);
                 } break;
 
                 case "Confirmation": {
@@ -134,6 +135,9 @@ var Room = {
                     uses = message.uses;
                     updateInvites(uses);
                 } break;
+                case "Participant Changed Their Name": {
+                    updateUserInfo(message.id, message.nick);
+                }break;
                 default:{
                     console.info(message);
                 }
@@ -267,7 +271,8 @@ function updateUsersHere() {
     var you = userPanel.querySelector("#you");
     here.innerHTML = "";
     var loggedInUserID = Account.data.ID;
-    you.innerHTML = "<span class='user'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
+    you.innerHTML = "";
+    you.innerHTML = "<span class='user' id='modalUsername'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
     for (var key in Room.data.Accounts) {
         if (Room.data.Accounts.hasOwnProperty(key)) {
             var account = Room.data.Accounts[key];
@@ -355,19 +360,20 @@ function changeExpirationDate(){
 
 function changeScreenName(){
     var name = prompt("Enter a new nickname:");
-    event.preventDefault();
-    event.stopPropagation();
-    var token = GetToken();
-    var json = {
-        action: "Change Name",
-        user: name,
-        token: token
-    };
-    Room.socket.send(JSON.stringify(json));
-    //Page reload needed
-    updateInvites();
-    updateUserInfo();
-    return false;
+    if(name.length > 0 && name[0] != " ") {
+        event.preventDefault();
+        event.stopPropagation();
+        var token = GetToken();
+        var json = {
+            action: "Change Name",
+            user: name,
+            token: token
+        };
+        Room.socket.send(JSON.stringify(json));
+        //Page reload needed
+        updateUsersHere();
+    }
+    // return false;
 }
 
 function textNode(msg) {
