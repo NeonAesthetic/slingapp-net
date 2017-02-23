@@ -65,7 +65,8 @@ class Room extends DatabaseObject
 
             foreach ($result as $row) {
                 if ($row["RoomCode"] != null)
-                    $this->_room_codes[$row["RoomCode"]] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"]);
+                    $this->_room_codes[$row["RoomCode"]] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"],
+                        $row["RemainingUses"], $row["ExpirationDate"]);
                 if ($row["AccountID"] != null) {
 //                    $this->_accounts[$row["AccountID"]] = Account::Login($row["LoginToken"]);
                     /**
@@ -324,11 +325,17 @@ class Room extends DatabaseObject
         return $this->_usesLeft;
     }
 
-    public function setUsesLeft($uses)
+    public function setUsesLeft($uses, $code)
     {
-        $this->_usesLeft = $uses;
-        //$this->_room_codes[$this->getRoomCodes()]->_uses = $uses;
+        $this->_room_codes[$code]->setUses($uses);
+        $this->_room_codes[$code]->update();
     }
+
+    public function deleteCode($code)
+    {
+        $this->_room_codes[$code]->delete();
+    }
+
 
     public function setParticipantInactive($accountID)
     {
