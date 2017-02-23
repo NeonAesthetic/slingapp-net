@@ -27,8 +27,6 @@ abstract class WebSocketServer
         socket_listen($this->master, 20) or die("Failed: socket_listen()");
         $this->sockets['m'] = $this->master;
         $this->stdout("Server started\nListening on: $addr:$port\nMaster socket: " . $this->master);
-
-
     }
 
     protected function process($user, $message)
@@ -121,9 +119,6 @@ abstract class WebSocketServer
                 default:
                     echo "\n" . $message . "\n";
             }
-
-
-
         }catch (Throwable $e){
 
         }

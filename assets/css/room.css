@@ -130,6 +130,10 @@ body{
     border-radius: 2px;
 }
 
+.roomTransparent{
+    background-color: transparent;
+}
+
 .module{
     float: left;
     height: calc(100% - 4px);
@@ -230,10 +234,15 @@ body{
 }
 
 .screen{
+    display:table;
+
     position: relative;
-    left: 0;
-    height: calc(50% - 60px);
-    margin: 10px;
+    left: 10px;
+    right: 10px;
+    width: 500px;
+    height: 250px;
+    /*height: calc(50% - 60px);*/
+    margin: 10px 10px 10px 10px;
     background-color: black;
 }
 
