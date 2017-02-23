@@ -90,10 +90,10 @@ CREATE TABLE RoomCodes (
 );
 
 CREATE TABLE Files (
-  FileID   SERIAL,
-  FilePath     VARCHAR(512),
-  Name VARCHAR(64),
-  Ext       VARCHAR(16),
+  FileID        SERIAL,
+  FilePath      VARCHAR(512),
+  Name          VARCHAR(64),
+  Ext           VARCHAR(16),
   PRIMARY KEY (FileID)
 );
 
