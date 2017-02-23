@@ -7,7 +7,6 @@
  * Test Name: Include Path
  */
 //require_once 'classes/Database.php';
-echo get_include_path() . "<br>";
-echo php_ini_loaded_file();
+
 
 echo phpinfo();

@@ -24,8 +24,6 @@ class Database
 
         $password           =       DATABASE_PASS;
 
-        error_log($username);
-        error_log("PASS" . $password);
 
         if (! $username OR ! $password){
             throw new Exception("Database user or password are not set");

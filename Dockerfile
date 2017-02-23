@@ -2,8 +2,12 @@ FROM php:7.0-apache
 MAINTAINER Ian Murphy <ian@isogen.net>
 
 #
+RUN 	apt-get update
 
-RUN docker-php-ext-install pdo pdo_mysql
+RUN		apt-get install -y screen
+
+RUN 	docker-php-ext-install pdo pdo_mysql 
+RUN 	docker-php-ext-install sockets
 
 RUN 	mkdir /var/www/sling; \
 		mkdir /var/www/ssl/; \
@@ -11,18 +15,21 @@ RUN 	mkdir /var/www/sling; \
 
 COPY 	. /var/www/sling
 
-COPY 	sling.conf /etc/apache2/sites-enabled/
+COPY 	docker/sling.conf /etc/apache2/sites-enabled/
 
-COPY 	server.* /var/www/ssl/
+COPY 	docker/server.* /var/www/ssl/
 
-COPY 	php.ini /usr/local/etc/php/
+COPY 	docker/php.ini /usr/local/etc/php/
 
-RUN 	a2enmod rewrite; a2enmod ssl
+RUN 	a2enmod rewrite; a2enmod ssl; a2enmod proxy_wstunnel;
 
 
 VOLUME 	/var/www/sling/
 
+WORKDIR /var/www/sling
+
 EXPOSE 80
 EXPOSE 443
+EXPOSE 8001
 
-ENTRYPOINT bash -c "service apache2 start; bash"
+ENTRYPOINT bash -c "php manage.php restart;php manage.php websocket start; bash"
