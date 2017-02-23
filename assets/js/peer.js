@@ -1427,7 +1427,7 @@ var util = {
   chunkedBrowsers: {'Chrome': 1},
   chunkedMTU: 16300, // The original 60000 bytes setting does not work when sending data from Firefox to Chrome, which is "cut off" after 16384 bytes and delivered individually.
 
-  // logging logic
+
   logLevel: 0,
   setLogLevel: function(level) {
     var debugLevel = parseInt(level, 10);
