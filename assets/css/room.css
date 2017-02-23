@@ -306,13 +306,91 @@ body{
     font-size: 12px;
     color: white;
     overflow-y: scroll;
-    height: calc(80%);
+    height: calc(78%);
+    width: inherit;
+    background-color: #333333;
+}
+
+#file-log{
+    font-size: 12px;
+    color: white;
+    overflow-y: scroll;
+    height: calc(78%);
+    width: inherit;
+    background-color: #333333;
+    display:none;
 }
 
 #chat{
     max-width: 100%;
-    padding: 5px;
+    padding: 0 5px 5px 5px;
 }
+
+.chat_nav {
+    margin: 0px;
+    border:none;
+}
+
+.chat_window_tab {
+    border: 1px;
+    border-color: #999999;
+}
+.chat_nav_button {
+    width:14.05em;
+    height:1.5em;
+    color: white;
+    text-align: center;
+    padding: 0 !important;
+    background-color: #333333;
+    cursor: pointer;
+}
+
+.chat_nav_button_inactive {
+    width:14.05em;
+    height:1.5em;
+    color: #999999;
+    text-align: center;
+    padding: 0 !important;
+    background-color: #12171a;
+    cursor: pointer;
+}
+ul.nav a:hover {
+    background-color: #333333;
+    color: white;
+    border-bottom: none;
+}
+
+ul.nav a:active {
+    background-color: #2d2d2d;
+    color: white;
+    border-bottom: none;
+}
+
+.chat_window{
+    height: 100%;
+    position: absolute;
+    right: 0;
+    width: 400px;
+    max-width:100%;
+    padding-top: 0;
+    margin: 0 auto auto;
+    background-color: #333333;
+    border-top: none !important;
+    border-radius:0 !important;
+}
+
+.chat_window_container {
+    height: 100%;
+    position: absolute;
+    right: 0;
+    width: 400px;
+    max-width:100%;
+    padding-top: 0;
+    margin: 10px auto auto;
+    background-color: transparent;
+    border-top: none !important;
+}
+
 
 #outerBox{
     max-width: 100%;
@@ -367,6 +445,11 @@ body{
 
 .context-menu hr{
     margin: 5px;
+}
+
+.button-green{
+    color: #55ff55;
+    border-color: #55ff55;
 }
 
 @keyframes e {

@@ -12,6 +12,7 @@ window.addEventListener("load", function () {
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
     repopulateMessages();
 
+
 });
 
 function getCodeNodeList(testElement){
@@ -39,7 +40,7 @@ function getCodeNodeList(testElement){
 
 function addCodeButtonEvents(){
     var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
-    console.log(codes);
+    //console.log(codes);
 
     codes.forEach(function(n){
         //console.log("Button Test");
@@ -324,7 +325,6 @@ function updateInvites(uses){
 
 }
 
-
 function changeRemainingUses(){
     var uses = prompt("Enter remaining uses:");
     event.preventDefault();
@@ -402,7 +402,8 @@ function sendMessage() {
 }
 
 function uploadFile(files) {
-    var file = files.files[0];
+    console.log("file specs: ", files);
+    var file = files[0];
     var token = GetToken();
     if (file.size > 0) {
         var form = new FormData();
@@ -432,6 +433,28 @@ function uploadFile(files) {
     }
 }
 
+function initDragDrop() {
+    var chat = document.getElementById("chat");
+    var xhr = new XMLHttpRequest();
+
+    if (xhr.upload) {
+        chat.addEventListener("dragover", fileDragHover, false);
+        chat.addEventListener("dragleave", fileDragHover, false);
+        chat.addEventListener("drop", fileSelectorHandler, false);
+    }
+}
+
+function fileSelectorHandler(e) {
+    fileDragHover(e);
+    uploadFile(e.dataTransfer.files);
+}
+
+function fileDragHover(e) {
+    e.stopPropagation();    //prevent file drag from effecting parent nodes
+    e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
+    //e.target.className = (e.type == "dragover" ? "hover" : "");
+}
+
 function uploadProgress(e) {
     console.log("uploadProgress");
     // var progressNumber = document.getElementById('progressNumber');
@@ -457,9 +480,36 @@ function uploadFailed(e) {
 function uploadAbort(e) {
     console.log("upload canceled by user");
 }
+
 function updateScroll() {
     var element = document.getElementById("chat-log");
+    var element2 = document.getElementById("file-log");
+
     element.scrollTop = element.scrollHeight;
+    element2.scrollTop = element.scrollHeight;
+}
+
+function switchLog(logtype) {
+    chat = document.getElementById('chat');
+    chat_tab = document.getElementById('chat_tab');
+    file_tab = document.getElementById('files_tab');
+
+    console.log(chat_tab.className);
+    console.log(chat.childNodes[1].style.display);
+    if(logtype == 'files') {
+        chat.childNodes[1].style.display = 'none';
+        chat.childNodes[3].style.display = 'block';
+
+        chat_tab.className = "nav-link chat_nav_button_inactive";
+        file_tab.className = "nav-link chat_nav_button";
+    }
+    else {
+        chat.childNodes[1].style.display = 'block';
+        chat.childNodes[3].style.display = 'none';
+
+        file_tab.className = "nav-link chat_nav_button_inactive";
+        chat_tab.className = "nav-link chat_nav_button";
+    }
 }
 
 function putMessage(sender, _text, before, fileid) {
@@ -469,22 +519,32 @@ function putMessage(sender, _text, before, fileid) {
     else
         text = Autolinker.link(_text);
 
-
     var messageLog = document.getElementById("chat-log");
+    var fileLog = document.getElementById("file-log");
+
     var username = Room.data.Accounts[sender].ScreenName;
-    var message = document.createElement("div");
+    var chat_messages = document.createElement("div");
+    var file_messages = document.createElement("div");
+
     if (sender == Account.data.ID) {
-        message.className = "message mine";
+        chat_messages.className = "message mine";
+        file_messages.className = "message mine";
         username += " (you)";
     }
     else {
-        message.className = "message";
+        chat_messages.className = "message";
+        file_messages.className = "message";
     }
-    message.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
+    chat_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
+    file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
-        messageLog.insertBefore(message, messageLog.firstChild);
+        messageLog.insertBefore(chat_messages, messageLog.firstChild);
+        if(fileid)
+            fileLog.insertBefore(file_messages, fileLog.firstChild);
     } else {
-        messageLog.appendChild(message);
+        messageLog.appendChild(chat_messages);
+        if(fileid)
+            fileLog.appendChild(file_messages);
     }
     updateScroll();
 }
@@ -518,6 +578,7 @@ function repopulateMessages() {
         }
     }
 }
+
 
 function openInvites() {
     Modal.create("Settings", "darken");
