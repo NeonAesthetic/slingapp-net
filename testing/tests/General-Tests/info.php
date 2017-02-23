@@ -6,7 +6,7 @@
  * Time: 10:55 AM
  * Test Name: Include Path
  */
-require_once 'classes/Database.php';
-echo get_include_path();
+//require_once 'classes/Database.php';
 
-//phpinfo();
+
+echo phpinfo();
