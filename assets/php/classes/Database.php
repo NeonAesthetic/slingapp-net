@@ -8,7 +8,9 @@
  */
 class Database
 {
-
+    /**
+     * @var PDO
+     */
     private static $_instance;
 
     /**
@@ -34,9 +36,28 @@ class Database
         }else{
             static::$_instance = new PDO($connection_string, $username, $password);
             static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//            static::$_instance->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
         }
+
         return static::$_instance;
+    }
+
+    public static function reconnect(){
+        static::$_instance = null;
+        return static::connect();
+    }
+
+    public static function assureConnection(){
+        if(! static::$_instance){
+            static::connect();
+        }
+        try{
+            static::$_instance->query("SHOW STATUS;")->execute();
+        }catch(PDOException $e){
+            error_log("DATABASE: Reconnecting");
+            static::reconnect();
+            return false;
+        }
+        return true;
     }
 
     public static function getRandomAnimal(){

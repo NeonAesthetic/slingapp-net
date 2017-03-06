@@ -47,18 +47,11 @@ const LogText = [
 
 class Logger
 {
-    private static $_log_file = null;
-    private static $_log_file_path = __DIR__ . "/Logs/sling.log";
+
     public static function Log($filename, $log_type,  $user, $room, $event_desc, $ip = null){
         try{
-            $filename = basename($filename);
-            if(static::$_log_file === null){
-                static::$_log_file = fopen(static::$_log_file_path, "a+");
-            }
 
             $log_string = "[" . date(DATE_ATOM) . "] " . LogText[$log_type] . ": " . $event_desc . "\n";
-
-            fwrite(static::$_log_file, $log_string);
 
             $sql = "INSERT INTO Logs (IP, File, TypeID, Description, AccountID, RoomID) VALUES(:ip, :file, :type, :desc, :user, :room)";
             Database::connect()->prepare($sql)->execute([
