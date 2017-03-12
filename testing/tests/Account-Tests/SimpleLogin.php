@@ -4,12 +4,17 @@
  * User: Ian Murphy
  * Date: 11/27/2016
  * Time: 8:04 PM
+<<<<<<< HEAD
  * Test Name: Create Account and Login
  * Test Description: Creates an Account and Logs in with that account
+=======
+ * Test Name: NOINCLUDE
+>>>>>>> working
  */
 
 
 require_once "classes/Account.php";
+<<<<<<< HEAD
 
 $accounts_to_cleanup = [];
 
@@ -29,11 +34,22 @@ mark("Create Blank Account");
 
 
 $token = $account->getToken();
+=======
+mark();
+
+$a = Account::CreateAccount();
+setcookie("Token", $a->getToken(), time()+31104000);
+$a = Account::Login($_COOKIE["Token"]);
+mark("Create Account");
+
+$token = $a->getToken();
+>>>>>>> working
 
 mark();
 $account = Account::Login($token);
 mark("Login with Token");
 
+<<<<<<< HEAD
 
 
 
@@ -65,3 +81,7 @@ function cleanup() {
         if($account->delete()) $number_removed++;
     }
 }
+=======
+echo "Account ID: " . $a->getAccountID() . "<br>";
+echo "Account Screenname: ". $a->getScreenName();
+>>>>>>> working

@@ -364,15 +364,21 @@ function getRoomData() {
                         active = " ACTIVE";
                     if(active == 0)
                         active = " INACTIVE";
+                    /////////////////////////////////////////////
+                    //Temporarily Disabled for website overhaul//
+                    /////////////////////////////////////////////
 
-                    var prevRoomName = document.createElement('div');
-                    var dataStream = document.createElement('span');
-                    dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
-                    prevRoomName.id = "Room" + elem;
-                    prevRoomName.className = 'sling-prev-room';
-                    document.getElementById('RecentRooms').appendChild(prevRoomName);
-                    // document.getElementById("Room" + elem)
-                    prevRoomName.appendChild(dataStream);
+                    // var prevRoomName = document.createElement('div');
+                    // var dataStream = document.createElement('span');
+                    // var dataStreamStatus = document.createElement('span');
+                    // dataStream.innerHTML = "RoomTitle: " + roomName + "<br>";
+                    // dataStreamStatus.innerHTML = "Status:" + active;
+                    // prevRoomName.id = "Room" + elem;
+                    // prevRoomName.className = 'sling-prev-room';
+                    //
+                    // document.getElementById('RecentRooms').appendChild(prevRoomName);
+                    // prevRoomName.appendChild(dataStream);
+                    // prevRoomName.appendChild(dataStreamStatus);
                 }
             }
 
@@ -499,16 +505,30 @@ function CheckTokenValidity(token, callback){
                                             // MISC FUNCTIONS //
  ******************************************************************************************************************/
 
+// function toggleform(e) {
+//     if (e.value === "Join Room") {
+//         e.value = "";
+//         e.style.color = "black";
+//         e.style.backgroundColor = "white";
+//     }
+//     else if (e.value === "") {
+//         e.value = "Join Room";
+//         e.style.color = "black";
+//         e.style.backgroundColor = "white";
+//     } else {
+//     }
+// }
+
 function toggleform(e) {
     if (e.value === "Join Room") {
         e.value = "";
         e.style.color = "black";
-        e.style.backgroundColor = "#fefefe";
+        e.style.backgroundColor = "#f5f5f5";
     }
     else if (e.value === "") {
         e.value = "Join Room";
-        e.style.color = "white";
-        e.style.backgroundColor = "#333333";
+        e.style.color = "black";
+        e.style.backgroundColor = "#f5f5f5";
     } else {
     }
 }
@@ -516,8 +536,8 @@ function toggleform(e) {
 function noprop(e) {
     e.stopPropagation();
     return false;
-}
 
+}
 HTMLElement.prototype.removeClass = function(classname) {
     this.className = this.className.replace(new RegExp(" ?" + classname), "");
 };
