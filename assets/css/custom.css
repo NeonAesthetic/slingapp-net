@@ -177,8 +177,8 @@ form{
 
 .login-button {
     position: relative;
-    border: 2px solid black;
-    border-radius: 50px;
+    border: 2px solid #38474F;
+    border-radius: 2px;
     background-color: white;
     width: 500vw;
     height: 500vw;
