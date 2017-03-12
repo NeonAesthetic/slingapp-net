@@ -6,7 +6,7 @@
  * Time: 8:19 AM
  */
 
-require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
+require_once "components/StandardHeader.php";
 require_once "classes/Account.php";
 
 $p = GetParams("action", "email", "fname", "lname", "pass1", "pass2", "token");

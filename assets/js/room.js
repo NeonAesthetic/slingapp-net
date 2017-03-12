@@ -84,7 +84,7 @@ var Room = {
         if (!Room.data) return;
         var url = "wss:dev.slingapp.net/rooms/";
         if (window.location.host === "localhost") {
-            url = "ws:localhost:8001/rooms/";
+            url = "wss:localhost/rooms/";
         }
         url += Room.data.RoomID;
 

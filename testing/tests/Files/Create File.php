@@ -4,8 +4,8 @@
  * User: Isaac
  * Date: 1/11/2017
  * Time: 8:21 PM
- * Test Name: Test Downloading/Uploading Files
- * Description: ensures files can be sent and recieved from the database
+ * Test Name: Test DownloadingUploading Files
+ * Test Description: ensures files can be sent and recieved from the database
  */
 
 require_once "classes/Room.php";

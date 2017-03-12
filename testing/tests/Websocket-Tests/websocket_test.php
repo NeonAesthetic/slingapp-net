@@ -12,12 +12,12 @@
 
 <script>
 function test(test){
-    test.log("Socket");
-    var url = "ws://localhost:8001/rooms/socket.php";
+
+    var url = "wss://localhost/rooms/";
     var Socket = new WebSocket(url);
     Socket.onopen = function(){
         test.log("Connected to server");
-        Socket.send("Hello");
+        Socket.send(JSON.stringify({action:"echo"}));
         test.end(true)
         return
     };
