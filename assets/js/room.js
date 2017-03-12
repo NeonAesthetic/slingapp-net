@@ -584,3 +584,69 @@ function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
 }
+
+'use strict';
+
+
+var audioInputSelect = document.querySelector('select#audioSource');
+console.log(audioInputSelect);
+var audioOutputSelect = document.querySelector('select#audioOutput');
+var selectors = [audioInputSelect, audioOutputSelect];
+
+function gotDevices(deviceInfos) {
+    // Handles being called several times to update labels. Preserve values.
+    var values = selectors.map(function(select) {
+        return select.value;
+    });
+    selectors.forEach(function(select) {
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
+    });
+    for (var i = 0; i !== deviceInfos.length; ++i) {
+        var deviceInfo = deviceInfos[i];
+        var option = document.createElement('option');
+        option.value = deviceInfo.deviceId;
+        if (deviceInfo.kind === 'audioinput') {
+            option.text = deviceInfo.label ||
+                'microphone ' + (audioInputSelect.length + 1);
+            audioInputSelect.appendChild(option);
+        } else if (deviceInfo.kind === 'audiooutput') {
+            option.text = deviceInfo.label || 'speaker ' +
+                (audioOutputSelect.length + 1);
+            audioOutputSelect.appendChild(option);
+        } else {
+            console.log('Some other kind of source/device: ', deviceInfo);
+        }
+    }
+
+    selectors.forEach(function(select, selectorIndex) {
+        if (Array.prototype.slice.call(select.childNodes).some(function(n) {
+                return n.value === values[selectorIndex];
+            })) {
+            select.value = values[selectorIndex];
+        }
+    });
+}
+
+navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+
+
+function start() {
+    console.log("Start");
+    var audioSource = audioInputSelect.value;
+    var constraints = {
+        audio: {deviceId: audioSource ? {exact: audioSource} : undefined}
+    };
+    navigator.getUserMedia(constraints).then(gotDevices).catch(handleError);
+}
+
+
+//audioInputSelect.onchange = start;
+//audioOutputSelect.onchange = changeAudioDestination;
+
+start();
+
+function handleError(error) {
+    console.log('navigator.getUserMedia error: ', error);
+}

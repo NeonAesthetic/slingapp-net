@@ -8,7 +8,7 @@ const DATABASE_HOST 		= "enyo.isogen.net";
 const DATABASE_PORT 		= "3306";
 const DATABASE_NAME 		= "sling_testing";
 const DATABASE_USER 		= "sling_testing";
-const DATABASE_PASS 		= "fake pass";
+const DATABASE_PASS 		= "My5-Vgr-Me4-yDo";
 
 
 

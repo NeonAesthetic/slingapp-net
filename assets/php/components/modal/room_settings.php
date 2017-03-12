@@ -15,6 +15,7 @@
         </div>
         <a id="UsersLink" class="selected" href="#Users">Users</a>
         <a id="InvitesLink" href="#Invites">Invite Codes</a>
+        <a id="SoundLink" href="#Sound">Sound</a>
     </div>
     <div class="settings-right">
         <div id="Users" class="settings-panel active">
@@ -37,8 +38,7 @@
             <hr>
             <table>
                 <tr>
-                    <td>Code
-                        </td>
+                    <td>Code</td>
                     <td>Member</td>
                     <td>Restrictions</td>
                 </tr>
@@ -51,6 +51,62 @@
             <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
             
         </div>
+        <div id="Sound" class="settings-panel">
+            <h1>Sound</h1>
+
+            <div class="select">
+                <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+            </div>
+
+            <div class="select">
+                <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+            </div>
+
+            <script>src="slingapp-net/assets/js/room.js"</script>
+
+            <div id="player">
+                <i class="fa fa-volume-down"></i>
+                <div id="volume"></div>
+                <i class="fa fa-volume-up"></i>
+            </div>
+
+            <script>
+
+                $("#volume").slider({
+                    min: 0,
+                    max: 100,
+                    value: 0,
+                    range: "min",
+                    slide: function(event, ui) {
+                        setVolume(ui.value / 100);
+                    }
+                });
+
+                var myMedia = document.createElement('audio');
+                $('#player').append(myMedia);
+                myMedia.id = "myMedia";
+
+                playAudio('http://emilcarlsson.se/assets/Avicii%20-%20The%20Nights.mp3', 0);
+
+                function playAudio(fileName, myVolume) {
+                    myMedia.src = fileName;
+                    myMedia.setAttribute('loop', 'loop');
+                    setVolume(myVolume);
+                    myMedia.play();
+                }
+
+                function setVolume(myVolume) {
+                    var myMedia = document.getElementById('myMedia');
+                    myMedia.volume = myVolume;
+                }
+
+            </script>
+
+
+
+        </div>
+
+
 
     </div>
 </div>
