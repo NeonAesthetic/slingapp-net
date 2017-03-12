@@ -2,6 +2,11 @@
  * Created by ian on 11/12/16.
  */
 console.info("Loaded sling.js");
+
+//globals
+var MINPASSLENGTH = 6;
+var MAXPASSLENGTH = 30;
+
 var Resource = {
     info:{},
     dictionary:{},
@@ -98,8 +103,6 @@ var Modal = {
             Modal.stack.push(current);
         }
     }
-
-
 };
 
 
@@ -198,37 +201,55 @@ function get(url, parameters, callback){
 }
 
 /******************************************************************************************************************
-                                                // ACCOUNT FUNCTIONS //
-******************************************************************************************************************/
+ // ACCOUNT FUNCTIONS //
+ ******************************************************************************************************************/
 function submitLogin() {
     var form = document.getElementById("loginForm");
-    var email = form.elements["email"].value;
-    var password = form.elements["pass1"].value;
-    document.getElementById("loginerror").innerHTML = "<div class='sling' style=''></div>";
-    return $.ajax({
-        type: 'post',
-        url: 'assets/php/components/account.php',
-        dataType: 'JSON',
-        data: {
-            action: "login",
-            email: email,
-            pass1: password
-        },
-        success: function (data) {
-            if (validateCredentials(data)) {
-                var button = document.getElementById("login-button");
-                button.innerHTML = "Logout";
-                button.className = "login-button";
-                document.getElementById("loginForm").reset();
-                SetCookie("Token", data.LoginToken, 7);
-                Modal.hide();
+    var error = document.getElementById("loginerror");
+    var email = form.elements["email"];
+    var password = form.elements["pass1"];
+    var emailRegex = new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
+    var passRegex = new RegExp(".{6,30}");
+
+    error.innerHTML = "";
+
+    var formError = (validateEntry(email, emailRegex)) ? false : displayError(email, error, "Invalid email address");
+    formError = (validateEntry(password, passRegex) && !formError) ? formError : displayError(password, error, "Password Length: 6-30");
+
+    if(!formError) {
+        document.getElementById("loginerror").innerHTML = "<div class='sling' style=''></div>";
+
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            dataType: 'JSON',
+            data: {
+                action: "login",
+                email: email.value,
+                pass1: password.value
+            },
+            success: function (data) {
+                if (!data.hasOwnProperty('error') && validateCredentials(data)) {
+                    var button = document.getElementById("login-button");
+                    button.innerHTML = "Logout";
+                    button.className = "login-button";
+                    document.getElementById("loginForm").reset();
+                    SetCookie("Token", data.LoginToken, 7);
+                    Modal.hide();
+                    getRoomData();
+                }
+                else
+                    error.innerHTML = data.error;
+
+                //Provide Recent Rooms Info
+
+                return data;
+            },
+            error: function (error) {
+                console.log(error);
             }
-            return data;
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
+        });
+    }
 }
 
 function showLogin() {
@@ -253,7 +274,7 @@ function isLoggedIn() {
     var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
     login.innerHTML = (loggedIn) ? "Logout" : "Login<span id='reg'><br>or sign up</span>";
-
+    //Provide Recent Rooms Info
     return loggedIn;
 }
 
@@ -262,47 +283,115 @@ function hideLogin(data) {
     Modal.hide();
 }
 
+function validateEntry(entry, regex) {
+    if((regex && regex.test(entry.value)) && !(entry.value == "")) {
+        entry.classList.remove("form-control-error");
+        return true;
+    } else
+        entry.classList.add("form-control-error");
+
+    return false;
+}
+
+//If both passwords match, change the second password's background color to green
+function checkPasswords(form) {
+    //console.log(form);
+    pass1 = form.elements['pass1'];
+    pass2 = form.elements['pass2'];
+    var passRegex = new RegExp(".{6,30}");
+
+    if(passRegex.test(pass1.value) && pass1.value == pass2.value) {
+        pass2.classList.remove("form-control-red");
+        pass2.classList.add("form-control-green");
+    }
+    else if(pass2.classList.contains("form-control-green"))
+        pass2.classList.remove("form-control-green");
+}
+
+function validatePasswords(pass1, pass2) {
+    var error = document.getElementById("registererror");
+
+    if (!pass2.value || pass1.value != pass2.value) {
+        if(pass2.value.length == 0) {
+            pass2.classList.add("form-control-error");
+
+        } else
+            pass2.classList.add("form-control-red");
+        return false;
+    }
+    return true;
+}
+
+function displayError(field, errorElement, errormsg) {
+    if(errorElement.innerHTML == "") {
+        errorElement.innerHTML = errormsg;
+        field.focus();
+    }
+
+    return true;
+}
+
+function clearError(){ document.getElementById("registererror").innerHTML = ""; }
+
 function submitRegister() {
     var form = document.getElementById("registerForm");
-    var first = form.elements["fname"].value;
-    var last = form.elements["lname"].value;
-    var email = form.elements["email"].value;
-    var pass1 = form.elements["pass1"].value;
-    var pass2 = form.elements["pass2"].value;
-    var token = GetToken();
-
-    // console.log(token);
-
     var error = document.getElementById("registererror");
+    var first = form.elements["fname"];
+    var last = form.elements["lname"];
+    var email = form.elements["email"];
+    var pass1 = form.elements["pass1"];
+    var pass2 = form.elements["pass2"];
+    var token = GetToken();
+    var nameRegex = new RegExp("[a-zA-Z]{2,30}");
+    var passRegex = new RegExp(".{6,30}");
+    var emailRegex = new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
+
+    //reset error message
+    error.innerHTML = "";
+
+    var formError = validateEntry(first, nameRegex) ? false : displayError(first, error, "Invalid first name, Length: 2-30");
+    formError = (validateEntry(last, nameRegex) && !formError) ? formError : displayError(last, error, "Invalid last name, Length: 2-30");
+    formError = (validateEntry(email, emailRegex) && !formError) ? formError : displayError(email, error, "Invalid email address");
+    formError = (validateEntry(pass1, passRegex) && !formError) ? formError : displayError(pass1, error, "Password Length: 6-30");
+    formError = (validatePasswords(pass1, pass2) && !formError) ? formError : displayError(pass2, error, "passwords do not match");
+
+    if (!formError) {
         error.innerHTML = "<div class='sling' style=''></div>";
-    return $.ajax({
-        type: 'post',
-        url: 'assets/php/components/account.php',
-        dataType: 'JSON',
-        data: {
-            action: "register",
-            fname: first,
-            lname: last,
-            email: email,
-            pass1: pass1,
-            pass2: pass2,
-            token: token
-        },
-        success: function (data) {
-            var button = document.getElementById("login-button");
-            button.innerHTML = "Logout";
-            button.className = "login-button";
-            console.log(data);
-            SetCookie("Token", data.LoginToken, 7);
-            error.innerHTML = "";
-            document.getElementById("registerForm").reset();
-            Modal.hide();
-            return data;
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            dataType: 'JSON',
+            data: {
+                action: "register",
+                fname: first.value,
+                lname: last.value,
+                email: email.value,
+                pass1: pass1.value,
+                pass2: pass2.value,
+                token: token
+            },
+            success: function (data) {
+                var error = document.getElementById("registererror");
+
+                if (!data.hasOwnProperty('error')) {
+                    var button = document.getElementById("login-button");
+                    button.innerHTML = "Logout";
+                    button.className = "login-button";
+                    SetCookie("Token", data.LoginToken, 7);
+                    error.innerHTML = "";
+                    document.getElementById("registerForm").reset();
+                    Modal.hide();
+                } else
+                    error.innerHTML = data.error;
+
+                return data;
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    } else
+        form.reportValidity();
 }
 
 function tempRegister() {
@@ -342,8 +431,50 @@ function validateCredentials(data) {
     }
 }
 
+function getRoomData() {
+    return $.ajax({
+        type: 'post',
+        url: 'assets/php/components/account.php',
+        dataType: 'JSON',
+        data: {
+            action: "roomdata",
+            token: GetToken()
+        },
+        success: function (data) {
+            console.log(data);
+            for(elem = 0; elem < 10; elem++){
+                if(data.length > 0) {
+                    var roomName = data[elem].RoomName;
+                    var active = data[elem].Active;
+                    if (roomName.length == 0)
+                        roomName = " Unnamed ";
+                    if(active == 1)
+                        active = " ACTIVE";
+                    if(active == 0)
+                        active = " INACTIVE";
+
+                    var prevRoomName = document.createElement('div');
+                    var dataStream = document.createElement('span');
+                    dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
+                    prevRoomName.id = "Room" + elem;
+                    prevRoomName.className = 'sling-prev-room';
+                    document.getElementById('RecentRooms').appendChild(prevRoomName);
+                    // document.getElementById("Room" + elem)
+                    prevRoomName.appendChild(dataStream);
+                }
+            }
+
+            //Provide Recent Rooms Info
+            return data;
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
 /******************************************************************************************************************
-                                              // ROOM FUNCTIONS //
+ // ROOM FUNCTIONS //
  ******************************************************************************************************************/
 function joinroom(event, f) {
     event.preventDefault();
@@ -404,7 +535,7 @@ function CreateRoom(event, element) {
 
 
 /******************************************************************************************************************
-                                            // COOKIE FUNCTIONS //
+ // COOKIE FUNCTIONS //
  ******************************************************************************************************************/
 
 function GetToken() {
@@ -453,7 +584,7 @@ function CheckTokenValidity(token, callback){
 }
 
 /******************************************************************************************************************
-                                            // MISC FUNCTIONS //
+ // MISC FUNCTIONS //
  ******************************************************************************************************************/
 
 function toggleform(e) {
@@ -465,7 +596,7 @@ function toggleform(e) {
     else if (e.value === "") {
         e.value = "Join Room";
         e.style.color = "white";
-        e.style.backgroundColor = "transparent";
+        e.style.backgroundColor = "#333333";
     } else {
     }
 }

@@ -178,3 +178,7 @@ body{
     margin: 5px;
 }
 
+#console{
+    overflow-x: auto;
+    overflow-wrap: break-word;
+}

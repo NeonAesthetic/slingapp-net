@@ -62,6 +62,13 @@ switch($command){
 					stop_websocket($screen_name);
 				}
 			}
+
+			case "view":
+			{
+				if(screen_session_exists($screen_name)){
+					connect_to_screen($screen_name);
+				}
+			}break;
 		}
 	}break;
 
@@ -94,6 +101,12 @@ function restart_websocket($screen_name){
 		stop_websocket($screen_name);
 	}
 	start_websocket($screen_name);
+}
+
+function connect_to_screen($name){
+	$out = [];
+	var_dump(shell_exec("screen -x $name"));
+	var_dump($out);
 }
 
 ?>

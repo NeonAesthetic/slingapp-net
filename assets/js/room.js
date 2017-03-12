@@ -84,7 +84,7 @@ var Room = {
         if (!Room.data) return;
         var url = "wss:dev.slingapp.net/rooms/";
         if (window.location.host === "localhost") {
-            url = "ws:localhost:8001/rooms/";
+            url = "wss:localhost/rooms/";
         }
         url += Room.data.RoomID;
 
@@ -119,6 +119,7 @@ var Room = {
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
                     updateUsersHere();
+                    newUserSet('small', null);
                 } break;
 
                 case "Confirmation": {
@@ -135,6 +136,9 @@ var Room = {
                     uses = message.uses;
                     updateInvites(uses);
                 } break;
+                case "Participant Changed Their Name": {
+                    updateUserInfo(message.id, message.nick);
+                }break;
                 default:{
                     console.info(message);
                 }
@@ -268,7 +272,8 @@ function updateUsersHere() {
     var you = userPanel.querySelector("#you");
     here.innerHTML = "";
     var loggedInUserID = Account.data.ID;
-    you.innerHTML = "<span class='user'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
+    you.innerHTML = "";
+    you.innerHTML = "<span class='user' id='modalUsername'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
     for (var key in Room.data.Accounts) {
         if (Room.data.Accounts.hasOwnProperty(key)) {
             var account = Room.data.Accounts[key];
@@ -355,19 +360,20 @@ function changeExpirationDate(){
 
 function changeScreenName(){
     var name = prompt("Enter a new nickname:");
-    event.preventDefault();
-    event.stopPropagation();
-    var token = GetToken();
-    var json = {
-        action: "Change Name",
-        user: name,
-        token: token
-    };
-    Room.socket.send(JSON.stringify(json));
-    //Page reload needed
-    updateInvites();
-    updateUserInfo();
-    return false;
+    if(name.length > 0 && name[0] != " ") {
+        event.preventDefault();
+        event.stopPropagation();
+        var token = GetToken();
+        var json = {
+            action: "Change Name",
+            user: name,
+            token: token
+        };
+        Room.socket.send(JSON.stringify(json));
+        //Page reload needed
+        updateUsersHere();
+    }
+    // return false;
 }
 
 function textNode(msg) {
@@ -416,7 +422,6 @@ function uploadFile(files) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    console.log("response: ", xhr.responseText);
                     var response = JSON.parse(xhr.responseText);
                     Room.uploadFile(response);
                 } else {
@@ -428,17 +433,26 @@ function uploadFile(files) {
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("chat");
+    var chat = document.getElementById("upload-overlay");
+
+    var doc = document;
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        chat.addEventListener("dragover", fileDragHover, false);
+        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
+        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
+        chat.addEventListener("dragover", displayOverlay, false);
         chat.addEventListener("dragleave", fileDragHover, false);
         chat.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
+function displayOverlay(e) {
+    document.getElementById("upload-overlay").style.display = "block";
+    fileDragHover(e);
+}
 function fileSelectorHandler(e) {
+    document.getElementById("upload-overlay").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -546,7 +560,7 @@ function putMessage(sender, _text, before, fileid) {
 function DownloadFile(fileurl, filename) {
     var xhr = new XMLHttpRequest();
 
-    xhr.open('GET', "http://".concat(fileurl));
+    xhr.open('GET', "https://".concat(fileurl));
     xhr.responseType = "arraybuffer";
     xhr.onload = function() {
         var blob = new Blob([xhr.response], {type: "application/octet-stream"});
