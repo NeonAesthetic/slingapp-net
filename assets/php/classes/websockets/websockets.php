@@ -17,6 +17,7 @@ abstract class WebSocketServer
     protected $headerSecWebSocketExtensionsRequired = false;
     protected $_rooms = [];
     protected $_clients = [];
+    protected $_account_cache = [];
 
     function __construct($addr, $port, $bufferLength = 2048)
     {
@@ -27,7 +28,33 @@ abstract class WebSocketServer
         socket_listen($this->master, 20) or die("Failed: socket_listen()");
         $this->sockets['m'] = $this->master;
         $this->stdout("Server started\nListening on: $addr:$port\nMaster socket: " . $this->master);
+    }
 
+    private function get_client_room($room_id){
+        if(array_key_exists($room_id, $this->_rooms)){
+            echo "Room in cache" .NL;
+        }else{
+            foreach ($this->_rooms as $room_flake){
+                echo "Roomid: " . $room_flake . NL;
+            }
+            $this->_rooms[$room_id] = new Room($room_id);
+        }
+        return $this->_rooms[$room_id];
+    }
+
+    private function get_client_account($client_token, $room_id, $socket_client){
+        $account = null;
+        if(array_key_exists($client_token, $this->_account_cache)){
+            echo "Client in cache" .NL;
+        }else{
+            foreach ($this->_clients as $room_flake){
+                echo "Roomid: " . $room_flake . NL;
+            }
+            $this->_account_cache[$client_token] = Account::Login($client_token);
+
+        }
+
+        return $this->_account_cache[$client_token];
     }
 
     protected function process($user, $message)
@@ -35,38 +62,25 @@ abstract class WebSocketServer
         $requested_resource = $user->requestedResource;
         preg_match("#/rooms/([0-9]+)#", $requested_resource, $matches);
         $client_room_id = $matches[1];
-//        echo $client_room_id . "\n";
         $client_account_id = null;
 //        echo $message . "\n";
+        if(!Database::assureConnection()){
+            $this->Log(SLN_ERROR, "Database Connection Lost: Reconnecting", NULL, NULL);
+        }
         try {
             /*************************************************************************************
              *  SETUP ALL VARIABLES AND CACHED OBJECTS
              *************************************************************************************/
-
-            $message_object = json_decode($message, true);
-            $client_room = null;
-            $client_account = Account::Login($message_object['token']);
+            $loop_start        = microtime(true);
+            $message_object    = json_decode($message, true);
+            $client_token      = $message_object["token"];
+            $client_room       = $this->get_client_room($client_room_id);
+            $client_account    = $this->get_client_account($client_token, $client_room_id, $user);
             $client_account_id = $client_account->getAccountID();
 
             $this->Log(SLN_ACCESSED_ENDPOINT, $message_object['action'], $client_account_id, $client_room_id);
 
-            if (!array_key_exists($client_room_id, $this->_rooms)) {
-                try {
-                    $client_room = new Room($client_room_id);
-                } catch (Exception $e) {
-                    echo $e . "";
-                    $client_room = false;
-                }
-                if ($client_room) {
-                    $this->Log(SLN_CACHE_MISS, "Add room to cache", $client_account_id, $client_room_id);
-                    $this->_rooms[$client_room_id] = $client_room;
-                    $this->_clients[$client_room_id] = [];
-
-                } else {
-                    echo "Room creation failed\n";
-                }
-            }
-            $client_room = &$this->_rooms[$client_room_id];
+//            $client_room = &$this->_rooms[$client_room_id];
 
             $response = null;
             /** Make sure that the account has permissions to access the room */
@@ -100,7 +114,7 @@ abstract class WebSocketServer
 
                 case "Change Name":
                 {
-                    echo "<script>console.log('Alter Name')</script>";
+
 
                     $this->on_client_alter_name($user, $message_object, $client_room, $client_account);
                 }break;
@@ -124,11 +138,10 @@ abstract class WebSocketServer
                 default:
                     echo "\n" . $message . "\n";
             }
-
-
-
+            error_log("Event processed in " . round((microtime(true) - $loop_start)*1000, 3) . " ms");
         }catch (Throwable $e){
-
+            error_log($e->getMessage());
+            echo $e->getMessage() . NL;
         }
     }
 
@@ -736,6 +749,7 @@ abstract class WebSocketServer
     public function Log($type, $msg, $userid, $roomid){
         echo "[" . date("Y-m-d H:i:s") . "] " . LogText[$type] . ": " . $msg . "\n";
         Logger::Log(__FILE__, $type,  $userid, $roomid, $msg, NULL);
+        error_log("[WEBSOCKET] - " . LogText[$type] . ": " . $msg);
     }
 
 }

@@ -6,12 +6,16 @@
  * Time: 8:19 AM
  */
 
-require_once realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/components/StandardHeader.php";
+require_once "components/StandardHeader.php";
 require_once "classes/Account.php";
 
 $p = GetParams("action", "email", "fname", "lname", "pass1", "pass2", "token");
 
 switch ($p['action']) {
+    case "roomdata":
+        $account = Account::Login($p['token']);
+        echo($account->getRoomsUserIsIn());
+        break;
     case "register":
         $account = Account::CreateAccount($p['email'], $p['fname'], $p['lname'], $p['pass1'], $p['token']);
         //if method getJSON exists, then an account has been created, otherwise it returned a JSON error message

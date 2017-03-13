@@ -8,22 +8,56 @@
  */
 class Database
 {
-    const TESTING = 1;
-    const PRODUCTION = 0;
+    /**
+     * @var PDO
+     */
     private static $_instance;
 
     /**
      * @return PDO
      */
     public static function connect(){
+        $connection_string  =       "mysql:host=" . 
+                                    DATABASE_HOST . 
+                                    ";dbname=" . 
+                                    DATABASE_NAME;
+
+        $username           =       DATABASE_USER;
+
+        $password           =       DATABASE_PASS;
+
+
+        if (! $username OR ! $password){
+            throw new Exception("Database user or password are not set");
+        }
+
         if(static::$_instance instanceof PDO){
             //pass
         }else{
-            static::$_instance = new PDO('mysql:host=127.0.0.1;dbname=sling', "sling", '');
+            static::$_instance = new PDO($connection_string, $username, $password);
             static::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//            static::$_instance->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
         }
+
         return static::$_instance;
+    }
+
+    public static function reconnect(){
+        static::$_instance = null;
+        return static::connect();
+    }
+
+    public static function assureConnection(){
+        if(! static::$_instance){
+            static::connect();
+        }
+        try{
+            static::$_instance->query("SHOW STATUS;")->execute();
+        }catch(PDOException $e){
+            error_log("DATABASE: Reconnecting");
+            static::reconnect();
+            return false;
+        }
+        return true;
     }
 
     public static function getRandomAnimal(){

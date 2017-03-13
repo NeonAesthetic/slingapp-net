@@ -12,6 +12,7 @@ window.addEventListener("load", function () {
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
     repopulateMessages();
 
+
 });
 
 function getCodeNodeList(code){
@@ -84,7 +85,7 @@ var Room = {
         if (!Room.data) return;
         var url = "wss:dev.slingapp.net/rooms/";
         if (window.location.host === "localhost") {
-            url = "ws:localhost:8001/rooms/";
+            url = "wss:localhost/rooms/";
         }
         url += Room.data.RoomID;
 
@@ -120,6 +121,7 @@ var Room = {
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
                     updateUsersHere();
+                    newUserSet('small', null);
                 } break;
 
                 case "Confirmation": {
@@ -136,11 +138,17 @@ var Room = {
                     Room.data.RoomCodes[message.inviteCode].UsesRemaining = message.uses;
                     updateInvites();
                 } break;
+
                 case "Room Code Deleted":
                 {
                     Room.data.RoomCodes[message.inviteCode] = null;
                     updateInvites();
                 }
+
+                case "Participant Changed Their Name": {
+                    updateUserInfo(message.id, message.nick);
+                }break;
+
                 default:{
                     console.info(message);
                 }
@@ -274,7 +282,8 @@ function updateUsersHere() {
     var you = userPanel.querySelector("#you");
     here.innerHTML = "";
     var loggedInUserID = Account.data.ID;
-    you.innerHTML = "<span class='user'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
+    you.innerHTML = "";
+    you.innerHTML = "<span class='user' id='modalUsername'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
     for (var key in Room.data.Accounts) {
         if (Room.data.Accounts.hasOwnProperty(key)) {
             var account = Room.data.Accounts[key];
@@ -327,6 +336,7 @@ function updateInvites(){
     }
 
 }
+
 
 function changeRemainingUses(code){
     var uses = prompt("Enter remaining uses:");
@@ -385,19 +395,20 @@ function deleteInviteCode(code){
 
 function changeScreenName(){
     var name = prompt("Enter a new nickname:");
-    event.preventDefault();
-    event.stopPropagation();
-    var token = GetToken();
-    var json = {
-        action: "Change Name",
-        user: name,
-        token: token
-    };
-    Room.socket.send(JSON.stringify(json));
-    //Page reload needed
-    updateInvites();
-    updateUserInfo();
-    return false;
+    if(name.length > 0 && name[0] != " ") {
+        event.preventDefault();
+        event.stopPropagation();
+        var token = GetToken();
+        var json = {
+            action: "Change Name",
+            user: name,
+            token: token
+        };
+        Room.socket.send(JSON.stringify(json));
+        //Page reload needed
+        updateUsersHere();
+    }
+    // return false;
 }
 
 function textNode(msg) {
@@ -426,7 +437,8 @@ function sendMessage() {
 }
 
 function uploadFile(files) {
-    var file = files.files[0];
+    console.log("file specs: ", files);
+    var file = files[0];
     var token = GetToken();
     if (file.size > 0) {
         var form = new FormData();
@@ -456,6 +468,28 @@ function uploadFile(files) {
     }
 }
 
+function initDragDrop() {
+    var chat = document.getElementById("chat");
+    var xhr = new XMLHttpRequest();
+
+    if (xhr.upload) {
+        chat.addEventListener("dragover", fileDragHover, false);
+        chat.addEventListener("dragleave", fileDragHover, false);
+        chat.addEventListener("drop", fileSelectorHandler, false);
+    }
+}
+
+function fileSelectorHandler(e) {
+    fileDragHover(e);
+    uploadFile(e.dataTransfer.files);
+}
+
+function fileDragHover(e) {
+    e.stopPropagation();    //prevent file drag from effecting parent nodes
+    e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
+    //e.target.className = (e.type == "dragover" ? "hover" : "");
+}
+
 function uploadProgress(e) {
     console.log("uploadProgress");
     // var progressNumber = document.getElementById('progressNumber');
@@ -481,9 +515,36 @@ function uploadFailed(e) {
 function uploadAbort(e) {
     console.log("upload canceled by user");
 }
+
 function updateScroll() {
     var element = document.getElementById("chat-log");
+    var element2 = document.getElementById("file-log");
+
     element.scrollTop = element.scrollHeight;
+    element2.scrollTop = element.scrollHeight;
+}
+
+function switchLog(logtype) {
+    chat = document.getElementById('chat');
+    chat_tab = document.getElementById('chat_tab');
+    file_tab = document.getElementById('files_tab');
+
+    console.log(chat_tab.className);
+    console.log(chat.childNodes[1].style.display);
+    if(logtype == 'files') {
+        chat.childNodes[1].style.display = 'none';
+        chat.childNodes[3].style.display = 'block';
+
+        chat_tab.className = "nav-link chat_nav_button_inactive";
+        file_tab.className = "nav-link chat_nav_button";
+    }
+    else {
+        chat.childNodes[1].style.display = 'block';
+        chat.childNodes[3].style.display = 'none';
+
+        file_tab.className = "nav-link chat_nav_button_inactive";
+        chat_tab.className = "nav-link chat_nav_button";
+    }
 }
 
 function putMessage(sender, _text, before, fileid) {
@@ -493,22 +554,32 @@ function putMessage(sender, _text, before, fileid) {
     else
         text = Autolinker.link(_text);
 
-
     var messageLog = document.getElementById("chat-log");
+    var fileLog = document.getElementById("file-log");
+
     var username = Room.data.Accounts[sender].ScreenName;
-    var message = document.createElement("div");
+    var chat_messages = document.createElement("div");
+    var file_messages = document.createElement("div");
+
     if (sender == Account.data.ID) {
-        message.className = "message mine";
+        chat_messages.className = "message mine";
+        file_messages.className = "message mine";
         username += " (you)";
     }
     else {
-        message.className = "message";
+        chat_messages.className = "message";
+        file_messages.className = "message";
     }
-    message.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
+    chat_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
+    file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
-        messageLog.insertBefore(message, messageLog.firstChild);
+        messageLog.insertBefore(chat_messages, messageLog.firstChild);
+        if(fileid)
+            fileLog.insertBefore(file_messages, fileLog.firstChild);
     } else {
-        messageLog.appendChild(message);
+        messageLog.appendChild(chat_messages);
+        if(fileid)
+            fileLog.appendChild(file_messages);
     }
     updateScroll();
 }
@@ -542,6 +613,7 @@ function repopulateMessages() {
         }
     }
 }
+
 
 function openInvites() {
     Modal.create("Settings", "darken");

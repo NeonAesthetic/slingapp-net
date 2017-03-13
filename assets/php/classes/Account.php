@@ -159,6 +159,7 @@ class Account extends DatabaseObject
                 if ($result) {
 //                    if ($result['AccountActive']) {
                         if (password_verify($password, $result['PasswordHash'])) {
+
                             if ($result['RoomID'])   //if participating in room
                                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                                     $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
@@ -206,7 +207,33 @@ class Account extends DatabaseObject
         }
         return $retval;
     }
+    /**
+     * Function getRoomsUserIsIn
+     * @param $accountID
+     * @return string
+     */
+    public function getRoomsUserIsIn()
+    {
+        $sql = "SELECT * FROM RoomAccount AS a 
+                JOIN Rooms AS r ON a.RoomID = r.RoomID
+                WHERE AccountID = :accountID";
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([':accountID' => $this->_accountID]);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+        $json = [];
+        $json['Type'] = "RoomData";
+        $json['Rooms']=[];
+
+        foreach ($result as $row) {
+            if ($row["RoomName"] !== null)
+                $json['Rooms'] = $row['RoomName'];
+            if($row["Active"] !== null)
+                $json['Active'] = $row['Active'];
+        }
+        return json_encode($result);
+    }
+    //14948841491605656826
     /**
      * Function Delete
      * @return boolean
@@ -380,6 +407,8 @@ class Account extends DatabaseObject
     {
         return $this->_screenName;
     }
+    
+    
 
     /**
      * Function getEmail

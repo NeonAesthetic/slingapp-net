@@ -141,7 +141,8 @@ class RoomSocketServer extends WebSocketServer
 
     private function create_response($type, array $optionals)
     {
-        echo "response type: ", $type, "<br>";
+        //echo "response type: ", $type, "<br>";
+
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -173,9 +174,11 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
-        echo('<script>console.log("Alter Name")</script>');
-        $room_id = $room->getRoomID();
-        $account_id = $account->getAccountID();
+
+//        echo('<script>console.log("Alter Name")</script>');
+        $room_id           = $room->getRoomID();
+        $account_id        = $account->getAccountID();
+
         $current_nick_name = $account->getScreenName();
 
         $nick_name = $message["user"];

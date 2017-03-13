@@ -98,8 +98,6 @@ var Modal = {
             Modal.stack.push(current);
         }
     }
-
-
 };
 
 
@@ -223,7 +221,10 @@ function submitLogin() {
                 document.getElementById("loginForm").reset();
                 SetCookie("Token", data.LoginToken, 7);
                 Modal.hide();
+                getRoomData();
             }
+            //Provide Recent Rooms Info
+
             return data;
         },
         error: function (error) {
@@ -254,7 +255,7 @@ function isLoggedIn() {
     var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
     login.innerHTML = (loggedIn) ? "Logout" : "Login<span id='reg'><br>or sign up</span>";
-
+    //Provide Recent Rooms Info
     return loggedIn;
 }
 
@@ -341,6 +342,48 @@ function validateCredentials(data) {
         loginError.innerHTML = "Username or password is Incorrect";
         return false;
     }
+}
+
+function getRoomData() {
+    return $.ajax({
+        type: 'post',
+        url: 'assets/php/components/account.php',
+        dataType: 'JSON',
+        data: {
+            action: "roomdata",
+            token: GetToken()
+        },
+        success: function (data) {
+            console.log(data);
+            for(elem = 0; elem < 10; elem++){
+                if(data.length > 0) {
+                    var roomName = data[elem].RoomName;
+                    var active = data[elem].Active;
+                    if (roomName.length == 0)
+                        roomName = " Unnamed ";
+                    if(active == 1)
+                        active = " ACTIVE";
+                    if(active == 0)
+                        active = " INACTIVE";
+
+                    var prevRoomName = document.createElement('div');
+                    var dataStream = document.createElement('span');
+                    dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
+                    prevRoomName.id = "Room" + elem;
+                    prevRoomName.className = 'sling-prev-room';
+                    document.getElementById('RecentRooms').appendChild(prevRoomName);
+                    // document.getElementById("Room" + elem)
+                    prevRoomName.appendChild(dataStream);
+                }
+            }
+
+            //Provide Recent Rooms Info
+            return data;
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
 }
 
 /******************************************************************************************************************
@@ -469,15 +512,15 @@ function CheckTokenValidity(token, callback){
  ******************************************************************************************************************/
 
 function toggleform(e) {
-    if (e.value === "Join a Room") {
+    if (e.value === "Join Room") {
         e.value = "";
         e.style.color = "black";
         e.style.backgroundColor = "#fefefe";
     }
     else if (e.value === "") {
-        e.value = "Join a Room";
+        e.value = "Join Room";
         e.style.color = "white";
-        e.style.backgroundColor = "transparent";
+        e.style.backgroundColor = "#333333";
     } else {
     }
 }

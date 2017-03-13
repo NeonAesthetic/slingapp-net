@@ -463,6 +463,19 @@ class Room extends DatabaseObject
     }
 
     /**
+     * @param $accountID
+     * @return true|false
+     */
+    public function checkForAccountInRoom($accountID)
+    {
+        foreach ($this->_accounts as $p) {
+            if($accountID == $p->getAccountID())
+                return true;
+        }
+        return false;
+    }
+
+    /**
      * @return RoomCode[]
      */
     public function getRoomCodes()

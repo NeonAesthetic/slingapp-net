@@ -2,4 +2,6 @@
 uploads/*
 *./log
 *.log
+settings.php
+
 
