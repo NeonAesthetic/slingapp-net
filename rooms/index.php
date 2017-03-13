@@ -37,13 +37,16 @@ else{
 
 ?>
 <html>
+<!DOCTYPE html>
 <head>
     <title>
         Room
     </title>
 
+    <link rel="stylesheet" href="www.github.com/necolas/normalize.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
 
 </head>
     <body style="background-color: #38474F; overflow: hidden" onload="newUserSet('small', null)">
@@ -87,9 +90,15 @@ else{
                 </ul>
             </div>
 
+<<<<<<< HEAD
             <div class="panel chat_window" id="chat">
                 <div id="chat-log"></div>
                 <div id="file-log"></div>
+=======
+
+<link rel="stylesheet" href="/assets/css/room.css">
+<script>
+>>>>>>> 410ebb277ffc39fab7a2f12c1e0f904bcd4b648c
 
                 <div id="send-box" style="background-color: #333333; ">
                     <input id="message-input" onkeypress="if (event.keyCode == 13) sendMessage()" >

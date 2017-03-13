@@ -8,6 +8,7 @@
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
+require_once "classes/Room.php";
 
 ?>
 <!DOCTYPE html>
@@ -91,6 +92,7 @@ require_once "classes/Account.php";
 </nav>
 
 <div class="container-fluid"
+
                style="text-align: center; position: fixed; bottom: 0; width: 100%; background: #38474F;">
         <div style="margin: 0 auto; height: 20%;">
 <!--            <button class="btn-main"-->
@@ -113,7 +115,6 @@ require_once "classes/Account.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>
 <script>
-
     isLoggedIn();
     getRoomData();
     window.addEventListener("load", function () {
