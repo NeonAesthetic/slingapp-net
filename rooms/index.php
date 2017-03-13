@@ -90,15 +90,10 @@ else{
                 </ul>
             </div>
 
-<<<<<<< HEAD
+
             <div class="panel chat_window" id="chat">
                 <div id="chat-log"></div>
                 <div id="file-log"></div>
-=======
-
-<link rel="stylesheet" href="/assets/css/room.css">
-<script>
->>>>>>> 410ebb277ffc39fab7a2f12c1e0f904bcd4b648c
 
                 <div id="send-box" style="background-color: #333333; ">
                     <input id="message-input" onkeypress="if (event.keyCode == 13) sendMessage()" >
