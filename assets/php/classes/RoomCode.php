@@ -142,14 +142,15 @@ class RoomCode extends DatabaseObject
     public function update()
     {
         $sql = "    INSERT INTO RoomCodes (RoomCode, RoomID, CreatedBy, ExpirationDate, RemainingUses)
-                    VALUES (:code, :rid, :createdby, :exp_date, :rem_uses)";
+                    VALUES (:code, :rid, :createdby, :exp_date, :rem_uses)
+                    ON DUPLICATE UPDATE (ExpirationDate = :exp_date, RemainingUses = :rem_uses)";
         $statement = Database::connect()->prepare($sql);
 
         if (!$statement->execute([
             ":code" => $this->_code,
             ":rid" => $this->_roomID,
             ":createdby" => $this->_accountID,
-            ":exp_date" => $this->_expires_in,
+            ":exp_date" => $this->_expire_date,
             ":rem_uses" => $this->_uses
         ])
         );
@@ -161,6 +162,11 @@ class RoomCode extends DatabaseObject
     public function getCode()
     {
         return $this->_code;
+    }
+
+    public function setUses($uses)
+    {
+        $this->_uses = $uses;
     }
 
     /**

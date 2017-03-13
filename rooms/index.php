@@ -37,13 +37,16 @@ else{
 
 ?>
 <html>
+<!DOCTYPE html>
 <head>
     <title>
         Room
     </title>
 
+    <link rel="stylesheet" href="www.github.com/necolas/normalize.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
 
 </head>
     <body style="background-color: #38474F; overflow: hidden" onload="newUserSet('small', null)">
