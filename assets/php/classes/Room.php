@@ -542,7 +542,7 @@ class Room extends DatabaseObject
     public function validateDownload($fileid, $token){
 
         foreach ($this->_accounts as $account)
-            //if($account->getToken() == $token)
+            if($account->getToken() == $token)
                 foreach($this->_chat->getFiles() as $file)
                     if($file->getFileID() == $fileid)
                         return $file;
