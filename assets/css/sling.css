@@ -16,7 +16,7 @@
 
 .slingBackgroundUpper {
     background-color: white;
-    height: 55%;
+    height: 60%;
 }
 
 /*Always In the Center Unless Overridden*/
@@ -32,29 +32,61 @@
     margin-top:-150px;
 }
 
+.sling-title{
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.sling-title-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    margin:0 auto;
+    max-width: 600px;
+}
+
+.container-main-page{
+    height: 47vh;
+    position: relative;
+    margin-top: 0;
+}
+
+.is-flex{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.motto-div{
+    font-size: 30px;
+    width: 33%;
+    text-align: center;
+}
+
 .slingContentDivTitle{
-    background: white;
-    width: 20%;
-    height: 10%;
-    margin-left: -10%;
-    margin-top: -5%;
-    top: 35%;
+    background: transparent;
+    width: 100%;
+    max-width: 800px;
+
 }
 
 .slingContentDivMotto{
-    background: white;
+    background: transparent;
     width: 60%;
     height: 10%;
     margin-left: -30%;
     margin-top: -5%;
     top: 55%;
+    overflow: hidden;
 }
 
 .slingContentDivMottoInner{
-    background: white;
-    width: 33%;
-    height: 100%;
-    position: relative;
+    background: transparent;
+    width: 21vw;
+    height: 10%;
+    position: fixed;
     color: black;
     text-align: center;
     font-size: 2vw;
@@ -95,10 +127,20 @@
     border: 2px solid white;
     font-size: 1.3vw;
     overflow: hidden;
+    box-shadow: 0 2px 4px 0 #2d2d2d;
 }
 
 .slingButtonCR{
     float: left;
+}
+.slingButton:hover:active {
+    background-color: rgba(255, 255, 255, 1);
+    color: black;
+}
+
+.slingButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: dimgrey;
 }
 .slingForm{
     background: whitesmoke;
@@ -111,6 +153,7 @@
     font-size: 1.3vw;
     overflow: hidden;
     display: inline-block;
+    box-shadow: 0 2px 4px 0 #2d2d2d;
 }
 .slingFormInner{
     background: whitesmoke;
@@ -127,7 +170,15 @@
 .slingFormJR {
     float: right;
 }
+.slingForm:hover:active {
+    background-color: rgba(255, 255, 255, 1);
+    color: black;
+}
 
+.slingForm:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: dimgrey;
+}
 .slingWIPDiv {
     background-color: transparent;
 }
