@@ -103,10 +103,14 @@ abstract class WebSocketServer
                     $this->on_client_join($user, $message_object, $client_room, $client_account);
                 }break;
 
+
+                case "Delete Code":
                 case "Change Uses":
                 {
                     $this->on_alter_roomcode($user, $message_object, $client_room, $client_account);
                 }break;
+
+
 
                 case "Change Name":
                 {

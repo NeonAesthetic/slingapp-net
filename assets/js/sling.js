@@ -148,6 +148,7 @@ var ContextMenu = {
     close:function(){
         if(ContextMenu.current){
             document.body.removeChild(ContextMenu.current);
+            ContextMenu.current = null;
         }
     },
     /**
@@ -394,10 +395,21 @@ function getRoomData() {
 /******************************************************************************************************************
                                               // ROOM FUNCTIONS //
  ******************************************************************************************************************/
+
 function joinroom(event, f) {
     event.preventDefault();
     console.log(f);
     var code = f["room"].value;
+
+    console.log(code);
+
+    // if(Room.data.RoomCodes[code].UsesRemaining == 0) {
+    //     code = null;
+    // }
+    // else {
+    //     Room.data.RoomCodes[code].UsesRemaining = (Room.data.RoomCodes[code].UsesRemaining - 1);
+    // }
+
     $.ajax({
         type: 'post',
         url: 'assets/php/components/room.php',

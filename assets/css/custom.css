@@ -395,6 +395,11 @@ form{
     display: flex;
 }
 
+.slider-width100
+{
+    width: 10px;
+}
+
 .settings-left {
     max-width: 400px;
     width: 30%;
@@ -503,7 +508,7 @@ form{
 
 #Invites td {
     padding: 5px;
-    width: 32%;
+    width: 25%;
 }
 
 @keyframes spin {

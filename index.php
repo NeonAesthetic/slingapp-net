@@ -8,6 +8,7 @@
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
+require_once "classes/Room.php";
 
 ?>
 <!DOCTYPE html>
@@ -119,7 +120,6 @@ require_once "classes/Account.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <!--<iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>-->
 <script>
-
     isLoggedIn();
     getRoomData();
     window.addEventListener("load", function () {
