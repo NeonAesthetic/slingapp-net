@@ -215,8 +215,17 @@ function submitLogin() {
         success: function (data) {
             if (validateCredentials(data)) {
                 var button = document.getElementById("login-button");
-                button.innerHTML = "Logout";
                 button.className = "login-button";
+
+                var loggedOutNav = document.getElementById("LoggedOutNavBar");
+                loggedOutNav.style.visibility = "hidden";
+
+                var loggedInNav = document.getElementById("LoggedInNavBar");
+                loggedInNav.style.visibility = "visible";
+
+                var navName = document.getElementById("NavName");
+                navName.innerHTML = email;
+
                 document.getElementById("loginForm").reset();
                 SetCookie("Token", data.LoginToken, 7);
                 Modal.hide();
@@ -235,6 +244,7 @@ function submitLogin() {
 function showLogin() {
     document.getElementById("login-button").className += " open";
 
+    console.log("Show Login");
     setTimeout(function () {
             Modal.create("Login Form", "", hideLogin)
         }, 700
@@ -242,6 +252,7 @@ function showLogin() {
 }
 
 function isLoggedIn() {
+
 
     var token;
 
@@ -251,10 +262,14 @@ function isLoggedIn() {
         CheckTokenValidity(token, 'tempRegister');
 
     var login = document.getElementById("login-button");
-    var screenshot = document.getElementById("screenshot");
+    //var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
-    login.innerHTML = (loggedIn) ? "Logout" : "Login<span id='reg'><br>or sign up</span>";
+
+    //login.innerHTML = (loggedIn) ? "Logout": "Login";
+    //navBar.visibility = (loggedIn) ? hidden: visible;
     //Provide Recent Rooms Info
+
+    console.log("test");
     return loggedIn;
 }
 
@@ -291,8 +306,17 @@ function submitRegister() {
         },
         success: function (data) {
             var button = document.getElementById("login-button");
-            button.innerHTML = "Logout";
             button.className = "login-button";
+
+            var navName = document.getElementById("NavName");
+            navName.innerHTML = first;
+
+            var loggedOutNav = document.getElementById("LoggedOutNavBar");
+            loggedOutNav.style.visibility = "hidden";
+
+            var loggedInNav = document.getElementById("LoggedInNavBar");
+            loggedInNav.style.visibility = "visible";
+
             console.log(data);
             SetCookie("Token", data.LoginToken, 7);
             error.innerHTML = "";
@@ -327,6 +351,13 @@ function tempRegister() {
 
 function logout() {
     DeleteCookie("Token");
+
+    var loggedOutNav = document.getElementById("LoggedOutNavBar");
+    loggedOutNav.style.visibility = "visible";
+
+    var loggedInNav = document.getElementById("LoggedInNavBar");
+    loggedInNav.style.visibility = "hidden";
+
     document.getElementById("login-button").innerHTML = "Login<span id='reg'><br>or sign up</span>";
 }
 

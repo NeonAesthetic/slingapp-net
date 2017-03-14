@@ -67,7 +67,26 @@ require_once "classes/Account.php";
         </div>
     </div>
 </div>
-<nav class="navbar " style="z-index: 999999">
+
+<nav id="LoggedInNavBar" style="visibility: hidden">
+<ul>
+    <li class="drop">
+        <div class="user-avatar"><img src="http://www.stedesign.com/ste.png"></div><a id="NavName" href="#">Stefano</a> <span aria-hidden="true" class=
+        "glyphicon glyphicon-menu-hamburger orange-txt"></span>
+        <div class="triangle"></div>
+        <div class="dropdownContain">
+            <div class="dropOut">
+                <ul>
+                    <li onclick="logout()"><span aria-hidden="true" class="icon-off"></span> Log Out</li>
+                    <li onclick=""><span aria-hidden="true" class="icon-off"></span> Settings</li>
+                </ul>
+            </div>
+        </div>
+    </li>
+</ul>
+</nav>
+
+<nav id="LoggedOutNavBar" class="navbar " style="z-index: 999999">
     <div class="container-fluid">
         <div class="navbar-header">
             <!--        Needs hamburger icon-->
@@ -81,7 +100,7 @@ require_once "classes/Account.php";
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <button id="login-button" class="login-button" onclick="(isLoggedIn()) ? logout() : showLogin()"
+                    <button id="login-button" class="login-button" onclick="showLogin()"
                             style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
                     </button>
                 </li>
@@ -106,6 +125,8 @@ require_once "classes/Account.php";
 <!--            </form>-->
         </div>
 </div>
+
+
 
 </body>
 <script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
