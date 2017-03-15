@@ -26,12 +26,26 @@ require_once "classes/Account.php";
 <div class="slingBackground" id="grad1">
     <div class="slingContentContainer">
         <div class="slingContentDiv" style=" background-color: #333333; border 6px solid black; height: 76%;">
-            <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 10%; margin-left: 1%; margin-right: 1%; margin-top: 4%;">
-                <span style="margin-left: 12%; color:white;font-weight: lighter; font-family:'Century Gothic'; min-font-size: small; font-size: 200%;">Your Recent Rooms</span>
-            </div>
-            <div class="slingContentDiv" id= "RecentRooms" style="background-color: transparent; width: 98%; height: 80%; margin-left: 1%; margin-right: 1%;">
 
-            </div>
+            <!--<div class="slingContentDiv" id= "RecentRooms" style="background-color: transparent; width: 98%; height: 80%; margin-left: 1%; margin-right: 1%;">-->
+                <nav id="RecentRoomsNav">
+                    <ul>
+                        <li class="drop">
+                            <div class="user-avatar"><img src="http://www.stedesign.com/ste.png"></div><a href="#">Recent Rooms</a> <span aria-hidden="true" class=
+                            "glyphicon glyphicon-menu-hamburger orange-txt"></span>
+                            <div class="triangle"></div>
+                            <div class="dropdownContain">
+                                <div class="dropOut">
+                                    <ul id="RoomsNav">
+                                        <li <span aria-hidden="true" class="icon-off"></span> </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+
+            <!--</div>-->
         </div>
         <div class="slingContentDiv" style="border: none; height: 76%; margin-left: 1%; margin-right: 1%; margin-top: 6%; width: 32%; min-width: 240px;">
             <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 20%; margin-left: 1%; margin-right: 1%; margin-top: 10%;">

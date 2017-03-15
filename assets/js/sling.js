@@ -396,12 +396,12 @@ function getRoomData() {
                     if(active == 0)
                         active = " INACTIVE";
 
-                    var prevRoomName = document.createElement('div');
+                    var prevRoomName = document.createElement('li');
                     var dataStream = document.createElement('span');
                     dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
                     prevRoomName.id = "Room" + elem;
                     prevRoomName.className = 'sling-prev-room';
-                    document.getElementById('RecentRooms').appendChild(prevRoomName);
+                    document.getElementById('RoomsNav').appendChild(prevRoomName);
                     // document.getElementById("Room" + elem)
                     prevRoomName.appendChild(dataStream);
                 }

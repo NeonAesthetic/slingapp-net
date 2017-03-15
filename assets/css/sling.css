@@ -82,7 +82,7 @@
 }
 
 nav {
-    width: 17em;
+    width: 18em;
     margin: 2em auto;
     background: #f6f6f6;
     -moz-border-radius: 0.4em / 0.4em;
@@ -144,7 +144,7 @@ nav {
 }
 
 .dropOut {
-    width: 13em;
+    width: 20em;
     background: #f6f6f6;
     float: left;
     position: relative;
