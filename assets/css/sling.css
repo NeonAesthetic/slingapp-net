@@ -47,6 +47,23 @@
     max-width: 600px;
 }
 
+.sling-feed-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    margin: 0 2vh 0 0;
+    max-width: 800px;
+}
+
+.sling-button-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    max-width: 600px;
+}
+
 .container-main-page{
     height: 47vh;
     position: relative;

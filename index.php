@@ -24,7 +24,22 @@ require_once "classes/Room.php";
 </head>
 <!--<body style="overflow: hidden; ">-->
 <body>
-<div class="slingBackground"></div>
+<div class="slingBackground">
+    <div class="sling-feed-container" style="margin: auto">
+        <div class="is-flex">
+            <button class="slingButton slingButtonCR"
+                    onclick="Modal.create('Create Room Modal', 'darken', null)">
+                Create Room
+            </button>
+            <form class="slingForm slingFormJR"
+                  onsubmit="joinroom(event, this);">
+                <input name="room" class="slingFormInner" type="text" size="14"
+                       value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
+            </form>
+            <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
+        </div>
+    </div>
+</div>
 <div class="slingBackground slingBackgroundUpper"></div>
 <div class="container container-main-page">
     <div class="sling-title-container">
@@ -61,17 +76,17 @@ require_once "classes/Room.php";
 </div>-->
 
 
-<div class="slingContentDiv slingContentDivButtons">
-    <button class="slingButton slingButtonCR"
-            onclick="Modal.create('Create Room Modal', 'darken', null)">
-        Create Room
-    </button>
-    <form class="slingForm slingFormJR"
-          onsubmit="joinroom(event, this);">
-        <input name="room" class="slingFormInner" type="text" size="8"
-               value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
-    </form>
-</div>
+<!--<div class="slingContentDiv slingContentDivButtons">-->
+<!--    <button class="slingButton slingButtonCR"-->
+<!--            onclick="Modal.create('Create Room Modal', 'darken', null)">-->
+<!--        Create Room-->
+<!--    </button>-->
+<!--    <form class="slingForm slingFormJR"-->
+<!--          onsubmit="joinroom(event, this);">-->
+<!--        <input name="room" class="slingFormInner" type="text" size="8"-->
+<!--               value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">-->
+<!--    </form>-->
+<!--</div>-->
 
 
 <!--<nav class="navbar " style="z-index: 999999">
