@@ -156,6 +156,127 @@ require_once "classes/Account.php";
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
 
+
+    loggedIn = isTokenSet();
+
+    function toggleform(e) {
+        if (e.value === "Join a Room") {
+            e.value = "";
+            e.style.color = "black";
+            e.style.backgroundColor = "#fefefe";
+        }
+        else if (e.value === "") {
+            e.value = "Join a Room";
+            e.style.color = "white";
+            e.style.backgroundColor = "transparent";
+        } else {
+        }
+    }
+    function joinroom(event, f) {
+        event.preventDefault();
+        console.log(f);
+        var code = f["room"].value;
+        $.ajax({
+            type: 'post',
+            url: 'assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "join",
+                token:GetToken(),
+                code:code
+            },
+            success: function (data) {
+                var roomid = data.RoomID;
+                console.log(data);
+                window.location = "/rooms/" + roomid;
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
+        return false;
+    }
+    function showLogin() {
+        var button = document.getElementById("login-button");
+        button.className += " open";
+        setTimeout(function(){
+            Modal.create("Login Form", "", function () {
+                hideLogin();
+            })}, 700
+        );
+    }
+
+    function logout() {
+        console.log("in logout");
+        var form = document.getElementById("loginForm");
+        var email = form.elements["email"].value;
+        var password = form.elements["pass1"].value;
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            data: {
+                action: "logout"
+            },
+            success: function () {
+                isTokenSet();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function submitLogin() {
+        var form = document.getElementById("loginForm");
+        var email = form.elements["email"].value;
+        var password = form.elements["pass1"].value;
+        var errorDiv = document.getElementById("error");
+        errorDiv.innerHTML = "<div class='sling' style=''></div>";
+        return $.ajax({
+            type: 'post',
+            url: 'assets/php/components/account.php',
+            dataType: 'JSON',
+            data: {
+                action: "login",
+                email: email,
+                pass1: password
+            },
+            success: function (data) {
+                noErrors(data);
+                return data;
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+    function noErrors(data) {
+        var loginError = document.getElementById("error");
+        //console.log(data);
+        if (data) {
+            loginError.innerHTML = "<br>";
+            hideLogin(data)
+        }
+        else
+            loginError.innerHTML = "Username or password is Incorrect";
+    }
+
+    function hideLogin(data) {
+        var button = document.getElementById("login-button");
+        var loginarea = document.getElementById("login-cont");
+        button.innerHTML = "Logout";
+        button.className = "login-button";
+        Modal.hide();
+        isTokenSet();
+    }
+
+    function noprop(e) {
+        e.stopPropagation();
+        return false;
+    }
+    window.addEventListener("load", function () {
+
         var sbtns = document.getElementsByClassName("sbtn");
         for (var i = sbtns.length - 1; i >= 0; i--) {
             console.log(sbtns[i]);
