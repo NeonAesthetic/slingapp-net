@@ -82,7 +82,7 @@ require_once "classes/Account.php";
     </div>
 </div>
 
-<nav id="LoggedInNavBar" style="visibility: hidden">
+<nav id="LoggedInNavBar" style="visibility: hidden; position: fixed; top: 0; float: right">
 <ul>
     <li class="drop">
         <div class="user-avatar"><img src="http://www.stedesign.com/ste.png"></div><a id="NavName" href="#">Stefano</a> <span aria-hidden="true" class=
@@ -100,7 +100,7 @@ require_once "classes/Account.php";
 </ul>
 </nav>
 
-<nav id="LoggedOutNavBar" class="navbar " style="z-index: 999999">
+<nav id="LoggedOutNavBar" class="navbar " style="z-index: 999999; position: fixed; top: 0; float: right">
     <div class="container-fluid">
         <div class="navbar-header">
             <!--        Needs hamburger icon-->
