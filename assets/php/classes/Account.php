@@ -118,7 +118,7 @@ class Account extends DatabaseObject
             ':lastLog' => $currentDate,
             ':joinDate' => $currentDate])
         ) {
-            var_dump(Database::connect()->errorInfo());
+//            var_dump(Database::connect()->errorInfo());
             $retval = json_encode(['error' => "Database could not be reached"]);
         } else
             $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate);
@@ -137,6 +137,19 @@ class Account extends DatabaseObject
      * If the user has not provided a password, then the system will return a new account provided a login token.
      * If the username or password do not match, the system will return false
      */
+
+    public static function CheckDatabase($email)
+    {
+        $sql = "SELECT *
+                    FROM Accounts AS a 
+                    WHERE Email = :email";
+
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([':email' => $email]);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return ($result) ? true:false;
+    }
     public static function Login($token_email, $password = null)
     {
         $retval = null;
@@ -197,13 +210,13 @@ class Account extends DatabaseObject
                 WHERE LoginToken = :token";
                     //if account last login doesn't update don't return account
                     if (!Database::connect()->prepare($sql)->execute([':lastLog' => $currentDate, ':token' => $token_email]))
-                        throw new Exception("Database unable to update account's last login information");
+                        throw new Exception("Database unable to update account's last login information"); //replace with log error instead
 
                 } else
-                    throw new Exception("Unable to login using token");
+                    throw new Exception("Unable to login using token");   //replace with log error instead
             }
         } catch (Exception $e) {
-            $retval = $e->getMessage();
+            $retval = json_encode(["error" => $e->getMessage()]);
         }
         return $retval;
     }

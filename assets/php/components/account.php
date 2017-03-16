@@ -17,14 +17,18 @@ switch ($p['action']) {
         echo($account->getRoomsUserIsIn());
         break;
     case "register":
-        $account = Account::CreateAccount($p['email'], $p['fname'], $p['lname'], $p['pass1'], $p['token']);
+        if (!Account::CheckDatabase($p['email'])) {
+            $account = Account::CreateAccount($p['email'], $p['fname'], $p['lname'], $p['pass1'], $p['token']);
+            echo (method_exists($account, "getJSON")) ? $account->getJSON() : $account;
+        } else {
+            echo json_encode(['error' =>"Email has already been registered"]);
+        }
         //if method getJSON exists, then an account has been created, otherwise it returned a JSON error message
-        echo (method_exists($account, "getJSON")) ? $account->getJSON() : $account;
+
         break;
 
     case "login":
         $account = Account::Login($p['email'], $p['pass1']);
-        //if method getJSON exists, then an account has been created, otherwise it returned a JSON error message
         echo (method_exists($account, "getJSON")) ? $account->getJSON() : $account;
         break;
 

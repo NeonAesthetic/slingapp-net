@@ -457,7 +457,6 @@ function uploadFile(files) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    console.log("response: ", xhr.responseText);
                     var response = JSON.parse(xhr.responseText);
                     Room.uploadFile(response);
                 } else {
@@ -469,17 +468,26 @@ function uploadFile(files) {
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("chat");
+    var chat = document.getElementById("upload-overlay");
+
+    var doc = document;
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        chat.addEventListener("dragover", fileDragHover, false);
+        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
+        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
+        chat.addEventListener("dragover", displayOverlay, false);
         chat.addEventListener("dragleave", fileDragHover, false);
         chat.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
+function displayOverlay(e) {
+    document.getElementById("upload-overlay").style.display = "block";
+    fileDragHover(e);
+}
 function fileSelectorHandler(e) {
+    document.getElementById("upload-overlay").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -587,7 +595,7 @@ function putMessage(sender, _text, before, fileid) {
 function DownloadFile(fileurl, filename) {
     var xhr = new XMLHttpRequest();
 
-    xhr.open('GET', "http://".concat(fileurl));
+    xhr.open('GET', "https://".concat(fileurl));
     xhr.responseType = "arraybuffer";
     xhr.onload = function() {
         var blob = new Blob([xhr.response], {type: "application/octet-stream"});

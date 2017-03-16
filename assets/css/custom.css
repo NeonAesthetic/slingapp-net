@@ -236,6 +236,23 @@ form{
     border-radius: 50px;
 }
 
+.form-control-error {
+    background-color: #f2f8ff;
+}
+
+.form-control-green {
+    background-color: #f2fff6;
+}
+
+.form-control-red {
+    background-color: #fff2f2;
+}
+.error-message {
+    position: relative;
+    height: 30px;
+    color: #630f0f;
+    font-size: large;
+}
 .nomargin{
     margin:0;
 }

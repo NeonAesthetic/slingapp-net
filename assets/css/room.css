@@ -339,6 +339,34 @@ body{
     display:none;
 }
 
+#upload-overlay{
+    z-index: 99999999;
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    opacity: 0.6;
+    background-color: #000000;
+    display:none;
+}
+
+#overlay-content{
+    width: 90%;
+    height: 95%;
+    margin: auto;
+    margin-top: 2.5%;
+    color: white;
+    border: dotted 10px white;
+    border-radius: 5%;
+
+}
+
+#overlay-content > p {
+    position: absolute;
+    top: 35%;
+    left: 13%;
+    font-size: 4em;
+    text-align:center;
+}
 #chat{
     max-width: 100%;
     padding: 0 5px 5px 5px;
@@ -354,7 +382,7 @@ body{
     border-color: #999999;
 }
 .chat_nav_button {
-    width:14.05em;
+    width:12.35em;
     height:1.5em;
     color: white;
     text-align: center;
@@ -364,7 +392,7 @@ body{
 }
 
 .chat_nav_button_inactive {
-    width:14.05em;
+    width:12.35em;
     height:1.5em;
     color: #999999;
     text-align: center;

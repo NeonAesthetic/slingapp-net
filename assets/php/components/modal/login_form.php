@@ -16,12 +16,12 @@
               onsubmit="return submitRegister();" onclick="return noprop(event)">
 
             <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Create an Account</h2>
-            <input name="fname" class="form-control" placeholder="first name" type="text">
-            <input name="lname" class="form-control" placeholder="last name" type="text">
-            <input name="email" class="form-control" placeholder="email" type="email">
-            <input name="pass1" class="form-control" placeholder="password" type="password">
-            <input name="pass2" class="form-control" placeholder="confirm password" type="password">
-            <div id="registererror" style="position: relative; height: 30px; color: #333; font-size: large"><br></div>
+            <input name="fname" class="form-control" placeholder="first name" type="text" onkeydown="clearError()">
+            <input name="lname" class="form-control" placeholder="last name" type="text" onkeydown="clearError()">
+            <input name="email" class="form-control" placeholder="email" type="email" onkeydown="clearError()">
+            <input name="pass1" class="form-control" placeholder="password" type="password" onkeyup="checkPasswords(this.parentNode)">
+            <input name="pass2" class="form-control" placeholder="confirm password" type="password" onkeyup="checkPasswords(this.parentNode)">
+            <div id="registererror" class="error-message"><br></div>
         </form>
 
     <div id="divider">
@@ -32,10 +32,9 @@
               onsubmit="return SubmitLogin(this);" onclick="return noprop(event)">
 
             <h2 id="loginFormHeader" style="color: #333; padding-bottom: 10%">Login</h2>
-            <input name="email" class="form-control" placeholder="email" type="email">
-            <input name="pass1" class="form-control" placeholder="password" type="password">
-            <div id="loginerror" style="position: relative; top: 0; height: 30px; color: #333; font-size: large">
-                <br></div>
+            <input name="email" class="form-control" placeholder="email" type="email" onkeydown="clearError()">
+            <input name="pass1" class="form-control" placeholder="password" type="password" onkeydown="clearError()">
+            <div id="loginerror" class="error-message"><br></div>
         </form>
     <div style="width: 100%; float: left">
 
