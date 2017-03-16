@@ -177,8 +177,10 @@ form{
 
 .login-button {
     position: relative;
-    border: 2px solid black;
-    border-radius: 50px;
+
+    border: 2px solid #38474F;
+    border-radius: 2px;
+
     background-color: white;
     width: 500vw;
     height: 500vw;
@@ -234,6 +236,23 @@ form{
     border-radius: 50px;
 }
 
+.form-control-error {
+    background-color: #f2f8ff;
+}
+
+.form-control-green {
+    background-color: #f2fff6;
+}
+
+.form-control-red {
+    background-color: #fff2f2;
+}
+.error-message {
+    position: relative;
+    height: 30px;
+    color: #630f0f;
+    font-size: large;
+}
 .nomargin{
     margin:0;
 }
@@ -393,6 +412,11 @@ form{
     display: flex;
 }
 
+.slider-width100
+{
+    width: 10px;
+}
+
 .settings-left {
     max-width: 400px;
     width: 30%;
@@ -501,7 +525,7 @@ form{
 
 #Invites td {
     padding: 5px;
-    width: 32%;
+    width: 25%;
 }
 
 @keyframes spin {

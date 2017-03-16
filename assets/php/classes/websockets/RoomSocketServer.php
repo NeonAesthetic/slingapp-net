@@ -31,9 +31,9 @@ class RoomSocketServer extends WebSocketServer
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
 
-        $room_id     = $room->getRoomID();
+        $room_id = $room->getRoomID();
         $new_user_id = $account->getAccountID();
-        $nick        = $account->getScreenName();
+        $nick = $account->getScreenName();
 
         //make sure clients for a room are an array
         if (!is_array($this->_clients[$room_id])) {
@@ -51,7 +51,7 @@ class RoomSocketServer extends WebSocketServer
         );
 
         //send message to all registered participant
-        foreach ($this->_clients[$room_id] as $k=>$participant) {
+        foreach ($this->_clients[$room_id] as $k => $participant) {
             $this->send($participant, $response);
         }
 
@@ -71,8 +71,8 @@ class RoomSocketServer extends WebSocketServer
     protected function on_client_chat($user_socket, $message, Room &$room, Account &$account)
     {
         $account_id = $account->getAccountID();
-        $room_id    = $room->getRoomID();
-        $text       = htmlspecialchars($message['text']);
+        $room_id = $room->getRoomID();
+        $text = htmlspecialchars($message['text']);
 
         if (isset($message['fileid'])) {
             $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
@@ -81,7 +81,7 @@ class RoomSocketServer extends WebSocketServer
             $file_id = null;
         }
 
-        if(strlen($text) <= 2000){
+        if (strlen($text) <= 2000) {
 
             $this->Log(SLN_MESSAGE_SENT, "", $account_id, $room_id);
 
@@ -115,13 +115,13 @@ class RoomSocketServer extends WebSocketServer
                 ]
             );
 
-        }else{
+        } else {
             $response = $this->create_response(
                 "Confirmation",
                 [
-                    'action'=>$message['action'],
-                    'success'=>false,
-                    "message"=>"Message over 2000 characters"
+                    'action' => $message['action'],
+                    'success' => false,
+                    "message" => "Message over 2000 characters"
                 ]
             );
         }
@@ -140,32 +140,29 @@ class RoomSocketServer extends WebSocketServer
     }
 
     private function create_response($type, array $optionals){
-
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
     }
 
-    private function generate_error_response($error_type){
-        $response = ["Type"=>"Error", "ErrorCode"=>$error_type];
-        switch ($error_type){
-            case SLN_NOT_AUTHORIZED:
-            {
+    private function generate_error_response($error_type)
+    {
+        $response = ["Type" => "Error", "ErrorCode" => $error_type];
+        switch ($error_type) {
+            case SLN_NOT_AUTHORIZED: {
                 $response["ErrorMessage"] = "This action requires authorization to complete";
             }
-            break;
+                break;
 
-            case SLN_NOT_AUTHENTICATED:
-            {
+            case SLN_NOT_AUTHENTICATED: {
                 $response["ErrorMessage"] = "The token provided does not exist in the database";
             }
-            break;
+                break;
 
-            case ERR_ACCESS_DENIED:
-            {
+            case ERR_ACCESS_DENIED: {
                 $response["ErrorMessage"] = "You are not authorized to perform this action";
             }
-            break;
+                break;
 
         }
         return $response;
@@ -174,21 +171,22 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
-//        echo('<script>console.log("Alter Name")</script>');
+
         $room_id           = $room->getRoomID();
         $account_id        = $account->getAccountID();
+
         $current_nick_name = $account->getScreenName();
 
-        $nick_name         = $message["user"];
+        $nick_name = $message["user"];
 
-        if(strlen($nick_name) <= 20) {
+        if (strlen($nick_name) <= 20) {
             //do not report until database has been updated
             //$this->Log(SLN_CHANGED_NAME, "", $account_id, $room_id);
 
             $account->_screenName = $nick_name;
             //There are probably better ways to take care of this...
-            foreach ($room->getAccounts() as $k=>$participant) {
-                if($message["token"] == $participant->getToken()){
+            foreach ($room->getAccounts() as $k => $participant) {
+                if ($message["token"] == $participant->getToken()) {
                     $participant->_screenName = $nick_name;
                     echo($participant->getScreenName());
                     break;
@@ -206,7 +204,7 @@ class RoomSocketServer extends WebSocketServer
             );
 
             //send message to all registered participant
-            foreach ($this->_clients[$room_id] as $k=>$participant) {
+            foreach ($this->_clients[$room_id] as $k => $participant) {
                 $this->send($participant, $response);
             }
 
@@ -218,13 +216,13 @@ class RoomSocketServer extends WebSocketServer
                 ]
             );
 
-        }else{
+        } else {
             $response = $this->create_response(
                 "Confirmation",
                 [
-                    'action'=>$message['action'],
-                    'success'=>false,
-                    "message"=>"Name over 20 characters"
+                    'action' => $message['action'],
+                    'success' => false,
+                    "message" => "Name over 20 characters"
                 ]
             );
         }
@@ -234,13 +232,13 @@ class RoomSocketServer extends WebSocketServer
     protected function on_download_file($user_socket, $message, Room &$room, Account &$account)
     {
         $account_id = $account->getAccountID();
-        $room_id    = $room->getRoomID();
+        $room_id = $room->getRoomID();
 
 //        var_dump($message);
 
         var_dump("accounts: ", $room->getAccounts());
 
-        if ($file = $room->validateDownload($message['fileid'], $message['token'])){
+        if ($file = $room->validateDownload($message['fileid'], $message['token'])) {
 
             $response = $this->create_response(
                 "Download",
@@ -255,9 +253,9 @@ class RoomSocketServer extends WebSocketServer
             $response = $this->create_response(
                 "Confirmation",
                 [
-                    'action'=>$message['action'],
-                    'success'=>false,
-                    "message"=>"Permission denied"
+                    'action' => $message['action'],
+                    'success' => false,
+                    "message" => "Permission denied"
                 ]
             );
         }
@@ -267,48 +265,71 @@ class RoomSocketServer extends WebSocketServer
 
     protected function on_alter_roomcode($user_socket, $message, Room &$room, Account &$account)
     {
-        //echo("<script>console.log('Alter Room Code')</script>");
-        $newUses = $message["remaining"];
+        $code = $message["invite"];
 
-        //echo "newUses: ", $newUses;
         $roomid = $room->getRoomID();
         $current_nick_name = $account->getScreenName();
 
-        if($newUses < 100) {
-            echo "uses: ", $newUses;
-            $room->setUsesLeft($newUses);
+        echo ("Test" . "\n");
+
+        if ($message["action"] == "Change Uses") {
+
+            $newUses = $message["remaining"];
+
+            //echo ("Code: " . $code . "\n");
+
+            $room->setUsesLeft($newUses, $code);
 
             $response = $this->create_response(
                 "Room Code Changed",
                 [
                     "uses" => $newUses,
-                    "notify" => $current_nick_name . " has modified a room code"
+                    "notify" => $current_nick_name . " has modified a room code",
+                    "inviteCode" => $code
                 ]
             );
 
-            var_dump($response);
             foreach ($this->_clients[$roomid] as $k => $participant) {
                 $this->send($participant, $response);
             }
-            //$this->_clients[$roomid][$newUses] = $user_socket;  //add the new user to the array
-            //generate message
+
+        } else if ($message.action == "Change Expiration Date") {
+
             $response = $this->create_response(
-                "Confirmation",
+                "Room Code Changed",
                 [
-                    "success" => true
+                    "notify" => $current_nick_name . " has modified a room code",
+                    "inviteCode" => $code
                 ]
             );
-        }
-        else{
+
+            foreach ($this->_clients[$roomid] as $k => $participant) {
+                $this->send($participant, $response);
+            }
+
+        } else if ($message["action"] == "Delete Code") {
+            $room->deleteCode($code);
+
             $response = $this->create_response(
-                "Confirmation",
+                "Room Code Deleted",
                 [
-                    'action'=>$message['action'],
-                    'success'=>false,
-                    "message"=>"Room Code Error"
+                    "notify" => $current_nick_name . " deleted a room code",
+                    "inviteCode" => $code
                 ]
             );
+
+            foreach ($this->_clients[$roomid] as $k => $participant) {
+                $this->send($participant, $response);
+            }
         }
+
+        $response = $this->create_response(
+            "Confirmation",
+            [
+                "success" => true
+            ]
+        );
+
         $this->send($user_socket, $response);
     }
 

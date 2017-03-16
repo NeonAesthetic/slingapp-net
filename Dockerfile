@@ -6,13 +6,19 @@ RUN 	apt-get update
 
 RUN		apt-get install -y screen
 
+RUN 	apt-get install -y zlib1g-dev \
+		&& rm -rf /var/lib/apt/lists/* \
+		&& docker-php-ext-install zip 
+
 RUN 	docker-php-ext-install pdo pdo_mysql 
 RUN 	docker-php-ext-install sockets
-
+		
 RUN 	mkdir /var/www/sling; \
 		mkdir /var/www/ssl/; \
 		rm -f /etc/apache2/sites-enabled/*;
 
+		
+		
 COPY 	. /var/www/sling
 
 COPY 	docker/sling.conf /etc/apache2/sites-enabled/

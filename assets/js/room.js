@@ -15,53 +15,54 @@ window.addEventListener("load", function () {
 
 });
 
-function getCodeNodeList(testElement){
+function getCodeNodeList(code){
+    //var label = ContextMenu.createLabel(code + " Options");
 
     //console.log("Menu Link");
     var setUses = ContextMenu.createMenuLink("Set Uses", "", function() {
-        changeRemainingUses();
+        changeRemainingUses(code);
         ContextMenu.close();
     });
 
 
     var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
-        changeExpirationDate();
+        changeExpirationDate(code);
         ContextMenu.close();
     });
 
     var deleteCode = ContextMenu.createMenuLink("Delete", "", function () {
-        deleteInviteCode();
+        deleteInviteCode(code);
         ContextMenu.close();
     });
 
     return [setUses, expiration, deleteCode];
 }
 
-
-function addCodeButtonEvents(){
-    var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
-    //console.log(codes);
-
-    codes.forEach(function(n){
-        //console.log("Button Test");
-        n.addEventListener("contextmenu", function(event) {
-            console.log("Context Menu");
-            ContextMenu.create(event, getCodeNodeList(n));
-            return false;
-        });
+function addCodeEvent(element){
+    element.addEventListener("contextmenu", function (event) {
+        // console.log(n.object.Code);
+        //console.log(n);
+        ContextMenu.create(event, getCodeNodeList(element.object.Code));
+        return false;
     });
 }
 
-function closeContextMenu(){
-    var close = Room.settings.optionsPanel.querySelectorAll("div");
 
+function addCodeButtonEvents() {
+    var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
 
-    close.forEach(function(n){
-        n.addEventListener("click", function(event){
-            console.log("Close Test");
-            ContextMenu.close();
-        })
-    })
+    console.log(close);
+
+    codes.forEach(function (n) {
+        //console.log("Button Test");
+
+        n.addEventListener("contextmenu", function (event) {
+            console.log(n.object.Code);
+            //console.log(n);
+            ContextMenu.create(event, getCodeNodeList(n.object.Code));
+            return false;
+        });
+    });
 }
 
 
@@ -100,6 +101,7 @@ var Room = {
             Room.connected = true;
         };
         Room.socket.onmessage = function (data) {
+            console.log(data.data);
             var message = JSON.parse(data.data);
             if (message.notify) {
                 Toast.pop(textNode(message.notify), 3000);
@@ -133,12 +135,20 @@ var Room = {
                 } break;
                 case "Room Code Changed":
                 {
-                    uses = message.uses;
-                    updateInvites(uses);
+                    Room.data.RoomCodes[message.inviteCode].UsesRemaining = message.uses;
+                    updateInvites();
                 } break;
+
+                case "Room Code Deleted":
+                {
+                    Room.data.RoomCodes[message.inviteCode] = null;
+                    updateInvites();
+                }
+
                 case "Participant Changed Their Name": {
                     updateUserInfo(message.id, message.nick);
                 }break;
+
                 default:{
                     console.info(message);
                 }
@@ -238,7 +248,7 @@ function showSettings(){
     Modal.create("Settings", "darken");
 }
 function leaveRoom() {
-    window.location.replace("http://localhost")
+    window.location.replace("https://dev.slingapp.net");
 }
 
 function InitSettingsModal() {
@@ -305,27 +315,30 @@ function createInviteCode(e) {
     });
 }
 
-function updateInvites(uses){
+function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
     iCodeDiv.innerHTML = "";
     for (var code in Room.data.RoomCodes) {
-        if (Room.data.RoomCodes.hasOwnProperty(code)) {
+        if (Room.data.RoomCodes.hasOwnProperty(code) && Room.data.RoomCodes[code] != null ) {
             var rc = Room.data.RoomCodes[code];
             var tr = document.createElement("tr");
+            tr.object = rc;
             tr.innerHTML += "<td><input class='form-control iv-code' onclick='this.select()' readonly value='" + rc.Code + "'></td>";
             tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
-            tr.innerHTML += "<td>" + "Remaining Uses: " + uses + "</td>";
-            iCodeDiv.appendChild(tr);
+            tr.innerHTML += "<td>"  + (rc.UsesRemaining != null ? rc.UsesRemaining : "Unlimited") + "</td>";
+            tr.innerHTML += "<td>"  + (rc.Expires != null ? rc.Expires : "none") + "</td>";
 
+            iCodeDiv.appendChild(tr);
+            addCodeEvent(tr);
         }
 
     }
-    addCodeButtonEvents();
 
 }
 
-function changeRemainingUses(){
+
+function changeRemainingUses(code){
     var uses = prompt("Enter remaining uses:");
     event.preventDefault();
     event.stopPropagation();
@@ -333,7 +346,8 @@ function changeRemainingUses(){
     var json = {
         action:"Change Uses",
         remaining:uses,
-        token:token
+        token:token,
+        invite: code
     };
     Room.socket.send(JSON.stringify(json));
 
@@ -341,7 +355,7 @@ function changeRemainingUses(){
     return false;
 }
 
-function changeExpirationDate(){
+function changeExpirationDate(code){
     var expires = prompt("Enter expiration date:", "mm/dd/yyyy");
     event.preventDefault();
     event.stopPropagation();
@@ -349,7 +363,8 @@ function changeExpirationDate(){
     var json = {
         action:"Change Expiration Date",
         expiration:expires,
-        token:token
+        token:token,
+        invite: code
     };
     Room.socket.send(JSON.stringify(json));
     updateInvites();
@@ -357,6 +372,26 @@ function changeExpirationDate(){
 
     return false;
 }
+
+function deleteInviteCode(code){
+    event.preventDefault();
+    event.stopPropagation();
+    var uses = 99;
+    var token = GetToken();
+    var json = {
+        action:"Delete Code",
+        token:token,
+        remaining:uses,
+        invite: code
+    };
+    Room.socket.send(JSON.stringify(json));
+    updateInvites();
+    //closeContextMenu();
+
+    return false;
+}
+
+
 
 function changeScreenName(){
     var name = prompt("Enter a new nickname:");
@@ -422,7 +457,6 @@ function uploadFile(files) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    console.log("response: ", xhr.responseText);
                     var response = JSON.parse(xhr.responseText);
                     Room.uploadFile(response);
                 } else {
@@ -434,17 +468,26 @@ function uploadFile(files) {
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("chat");
+    var chat = document.getElementById("upload-overlay");
+
+    var doc = document;
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        chat.addEventListener("dragover", fileDragHover, false);
+        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
+        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
+        chat.addEventListener("dragover", displayOverlay, false);
         chat.addEventListener("dragleave", fileDragHover, false);
         chat.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
+function displayOverlay(e) {
+    document.getElementById("upload-overlay").style.display = "block";
+    fileDragHover(e);
+}
 function fileSelectorHandler(e) {
+    document.getElementById("upload-overlay").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -552,7 +595,7 @@ function putMessage(sender, _text, before, fileid) {
 function DownloadFile(fileurl, filename) {
     var xhr = new XMLHttpRequest();
 
-    xhr.open('GET', "http://".concat(fileurl));
+    xhr.open('GET', "https://".concat(fileurl));
     xhr.responseType = "arraybuffer";
     xhr.onload = function() {
         var blob = new Blob([xhr.response], {type: "application/octet-stream"});
@@ -584,3 +627,4 @@ function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
 }
+

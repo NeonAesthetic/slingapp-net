@@ -1,6 +1,6 @@
 # CREATE USER AND DATABASE
 
-DROP USER 'sling'@'localhost';
+DROP USER 'sling@localhost';
 DROP DATABASE IF EXISTS sling;
 
 CREATE USER 'sling'@'localhost';
@@ -11,9 +11,20 @@ CREATE DATABASE sling
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
+<<<<<<< HEAD
+--# Was in accounts?
+--#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
+USE sling;
+
+
+
+
+--#DROP ALL TABLES
+=======
 USE sling;
 
 #DROP ALL TABLES
+>>>>>>> 2ae8c41ab8e19d4a426c568667ff12a14fd5aaee
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS Rooms;
@@ -32,7 +43,7 @@ DROP TABLE IF EXISTS RoomAccount;
 SET FOREIGN_KEY_CHECKS = 1;
 
 
-#======================START CREATE TABLES ================================
+--===============START CREATE TABLES ================================
 CREATE TABLE Rooms (
   RoomID   BIGINT UNSIGNED,
   RoomName VARCHAR(32) NOT NULL,
@@ -199,7 +210,4 @@ VALUES
 
 #===================END CREATE TABLES====================
 
-
-
 #===================START FUNCTIONS/PROCEDURES============
-
