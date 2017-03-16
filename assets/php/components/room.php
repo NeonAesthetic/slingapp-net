@@ -20,6 +20,7 @@ switch ($p['action']) {
 
         $account = Account::Login($p["token"]);
 
+
         $room->addParticipant($account);
         if($room){
             echo $room->getJSON();

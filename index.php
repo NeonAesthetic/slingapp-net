@@ -8,7 +8,6 @@
 set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
 require_once "components/Components.php";
 require_once "classes/Account.php";
-require_once "classes/Room.php";
 
 ?>
 <!DOCTYPE html>
@@ -23,76 +22,87 @@ require_once "classes/Room.php";
     <link rel="stylesheet" href="/assets/css/sling.css">
 </head>
 <!--<body style="overflow: hidden; ">-->
-<body style="background-color: #38474F; overflow: hidden">
-<div class="slingBackground" id="grad1">
-    <div class="slingContentContainer">
-        <div class="slingContentDiv" style=" background-color: #333333; border 6px solid black; height: 76%;">
-            <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 10%; margin-left: 1%; margin-right: 1%; margin-top: 4%;">
-                <span style="margin-left: 12%; color:white;font-weight: lighter; font-family:'Century Gothic'; min-font-size: small; font-size: 200%;">Your Recent Rooms</span>
-            </div>
-            <div class="slingContentDiv" id= "RecentRooms" style="background-color: transparent; width: 98%; height: 80%; margin-left: 1%; margin-right: 1%;">
+<body>
+<?php
 
-            </div>
-        </div>
-        <div class="slingContentDiv" style="border: none; height: 76%; margin-left: 1%; margin-right: 1%; margin-top: 6%; width: 32%; min-width: 240px;">
-            <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 20%; margin-left: 1%; margin-right: 1%; margin-top: 10%;">
-                <img style="margin-left: 22%; margin-top: -7%;" src="favicon.ico" alt="Sling S" height="100" width="70">
-                <span style="margin-left: 1%; color:black; font-weight: lighter; font-family:'Century Gothic'; min-font-size: large; font-size: 550%;">L I N G</span>
-            </div>
-            <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 40%; margin-left: 1%; margin-right: 1%; margin-top: 4%;">
-                <div class="slingContentDiv" style="background-color: transparent; width: 98%; height: 85%; margin-left: 1%; margin-right: 1%;">
-                    <span style="color:white;">This Is The Description Of The Sling Application</span>
-                </div>
-            </div>
-            <div class="slingContentDiv" style=" background-color: #38474F; width: 98%; height: 16%; margin-left: 1%; margin-right: 1%; margin-top: 1%;">
-                <button class="sling-btn-main"
-                  style=" width: 200px; margin: 2%; margin-left: 8%;  display: inline-block"
-                  onclick="Modal.create('Create Room Modal', 'darken', null)">
-                  Create Room
-                </button>
-                <form class="" style="width: 200px; margin: 2%; margin-left: 8%; margin-top: 4%; display: inline-block"
-                      onsubmit="joinroom(event, this);">
-                    <input name="room" class="sling-mp-form" type="text" size="8" style="width: 100%; padding-left: 30px;"
-                           value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
-                </form>
-            </div>
+    include "components/navbar.php";
 
+?>
+<div class="slingBackground">
+    <div class="sling-feed-container" style="margin: auto">
+        <div class="is-flex">
+            <button class="slingButton slingButtonCR"
+                    onclick="Modal.create('Create Room Modal', 'darken', null)">
+                Create Room
+            </button>
+            <form class="slingForm slingFormJR"
+                  onsubmit="joinroom(event, this);">
+                <input name="room" class="slingFormInner" type="text" size="14"
+                       value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
+            </form>
+            <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
         </div>
-        <div class="slingContentDiv" style=" background-color: #333333; border 6px solid black; height: 76%;">
-            <div class="slingContentDiv" style="background-color: #333333; width: 98%; height: 10%; margin-left: 1%; margin-right: 1%; margin-top: 4%;">
-                <span style="margin-left: 20%; color:white;font-weight: lighter; font-family:'Century Gothic'; min-font-size: small; font-size: 200%;">Recent Updates</span>
+    </div>
+</div>
+<div class="slingBackground slingBackgroundUpper"></div>
+<div class="container container-main-page">
+    <div class="sling-title-container">
+        <img class="sling-title" src="slingblock.png" title="Sling"/>
+        <div class="is-flex">
+            <div class="motto-div" style="border-right: 2px solid lightgray">
+                SHARE
             </div>
-            <div class="slingContentDiv" style="background-color: transparent; width: 98%; height: 80%; margin-left: 1%; margin-right: 1%;">
-                <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
+            <div class="motto-div">
+                STREAM
+            </div>
+            <div class="motto-div" style="border-left: 2px solid lightgray">
+                CONNECT
             </div>
         </div>
     </div>
 </div>
-<nav class="navbar " style="z-index: 999999">
+
+
+
+
+<!--<div class="slingBackground slingBackgroundUpper">
+    <div class="slingContentDiv slingContentDivTitle">
+        <img style="height: 100%; width: 100%; object-fit: contain" src="SlingLogo.png" alt="Sling S">
+    </div>
+    <div class="slingContentDiv slingContentDivMotto">
+        <div class="slingContentDivMottoInner">
+            <div class="slingContentDivCenterText">SHARE</div>
+        </div>
+        <div class="slingContentDivMottoInner" style="border-right: solid 3px cadetblue;border-left: solid 3px cadetblue; margin-left: 20vw">
+            <div class="slingContentDivCenterText">STREAM</div>
+        </div>
+        <div class="slingContentDivMottoInner" style=" margin-left: 40vw">
+            <div class="slingContentDivCenterText">CONNECT</div>
+        </div>
+    </div>
+</div>-->
+
+
+<!--<div class="slingContentDiv slingContentDivButtons">-->
+<!--    <button class="slingButton slingButtonCR"-->
+<!--            onclick="Modal.create('Create Room Modal', 'darken', null)">-->
+<!--        Create Room-->
+<!--    </button>-->
+<!--    <form class="slingForm slingFormJR"-->
+<!--          onsubmit="joinroom(event, this);">-->
+<!--        <input name="room" class="slingFormInner" type="text" size="8"-->
+<!--               value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">-->
+<!--    </form>-->
+<!--</div>-->
+
+
+<!--<nav class="navbar " style="z-index: 999999">
     <div class="container-fluid">
         <div class="navbar-header">
             <!--        Needs hamburger icon-->
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <button id="login-button" class="login-button" onclick="(isLoggedIn()) ? logout() : showLogin()"
-                            style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
 
 <div class="container-fluid"
-
                style="text-align: center; position: fixed; bottom: 0; width: 100%; background: #38474F;">
         <div style="margin: 0 auto; height: 20%;">
 <!--            <button class="btn-main"-->
@@ -139,10 +149,7 @@ require_once "classes/Room.php";
             })
         }
     });
+
 </script>
-
-
-
-
 
 </html>

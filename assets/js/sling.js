@@ -234,6 +234,10 @@ function submitLogin() {
                     var button = document.getElementById("login-button");
                     button.innerHTML = "Logout";
                     button.className = "login-button";
+                  
+                    document.getElementById("LoggedOutNavBar").style.display = "none";
+                    document.getElementById("LoggedInNavBar").style.display = "inline-block";
+                    document.getElementById("NavName").innerHTML = email;
                     document.getElementById("loginForm").reset();
                     SetCookie("Token", data.LoginToken, 7);
                     Modal.hide();
@@ -274,7 +278,6 @@ function isLoggedIn() {
     var login = document.getElementById("login-button");
     var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
-    login.innerHTML = (loggedIn) ? "Logout" : "Login<span id='reg'><br>or sign up</span>";
     //Provide Recent Rooms Info
     return loggedIn;
 }
@@ -358,6 +361,7 @@ function submitRegister() {
 
     if (!formError) {
         error.innerHTML = "<div class='sling' style=''></div>";
+
         return $.ajax({
             type: 'post',
             url: 'assets/php/components/account.php',
@@ -378,9 +382,12 @@ function submitRegister() {
                     var button = document.getElementById("login-button");
                     button.innerHTML = "Logout";
                     button.className = "login-button";
+                    document.getElementById("NavName").innerHTML = first;
+                    document.getElementById("LoggedOutNavBar").style.display = "none";
+                    document.getElementById("LoggedInNavBar").style.display = "inline-block";
+                    document.getElementById("registerForm").reset();
                     SetCookie("Token", data.LoginToken, 7);
                     error.innerHTML = "";
-                    document.getElementById("registerForm").reset();
                     Modal.hide();
                 } else
                     error.innerHTML = data.error;
@@ -416,6 +423,15 @@ function tempRegister() {
 
 function logout() {
     DeleteCookie("Token");
+
+    window.location.replace("https://dev.slingapp.net");
+
+    var loggedOutNav = document.getElementById("LoggedOutNavBar");
+    loggedOutNav.style.display = "inline-block";
+
+    var loggedInNav = document.getElementById("LoggedInNavBar");
+    loggedInNav.style.display = "none";
+
     document.getElementById("login-button").innerHTML = "Login<span id='reg'><br>or sign up</span>";
 }
 
@@ -443,7 +459,9 @@ function getRoomData() {
         },
         success: function (data) {
             console.log(data);
-            for(elem = 0; elem < 10; elem++){
+
+            for(elem = 0; elem < 4; elem++){
+
                 if(data.length > 0) {
                     var roomName = data[elem].RoomName;
                     var active = data[elem].Active;
@@ -454,14 +472,16 @@ function getRoomData() {
                     if(active == 0)
                         active = " INACTIVE";
 
-                    var prevRoomName = document.createElement('div');
+                    var prevRoomName = document.createElement('li');
                     var dataStream = document.createElement('span');
                     dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
                     prevRoomName.id = "Room" + elem;
-                    prevRoomName.className = 'sling-prev-room';
-                    document.getElementById('RecentRooms').appendChild(prevRoomName);
+                    prevRoomName.className = 'icon-off';
+
+                    document.getElementById('RoomsNav').appendChild(prevRoomName);
                     // document.getElementById("Room" + elem)
                     prevRoomName.appendChild(dataStream);
+                    document.getElementById("NoRooms").innerHTML = "";
                 }
             }
 
@@ -474,24 +494,20 @@ function getRoomData() {
     });
 }
 
+function clearRecentRooms() {
+    //var prevRoomName = document.createElement('li');
+    //for(i = 0; i < document.getElementById('RoomsNav').childElementCount; i++)
+        document.getElementById('RoomsNav').clearAttributes();
+    //prevRoomName.destroy();
+}
+
 /******************************************************************************************************************
  // ROOM FUNCTIONS //
  ******************************************************************************************************************/
-
 function joinroom(event, f) {
     event.preventDefault();
     console.log(f);
     var code = f["room"].value;
-
-    console.log(code);
-
-    // if(Room.data.RoomCodes[code].UsesRemaining == 0) {
-    //     code = null;
-    // }
-    // else {
-    //     Room.data.RoomCodes[code].UsesRemaining = (Room.data.RoomCodes[code].UsesRemaining - 1);
-    // }
-
     $.ajax({
         type: 'post',
         url: 'assets/php/components/room.php',
@@ -603,12 +619,12 @@ function toggleform(e) {
     if (e.value === "Join Room") {
         e.value = "";
         e.style.color = "black";
-        e.style.backgroundColor = "#fefefe";
+        e.style.backgroundColor = "#f5f5f5";
     }
     else if (e.value === "") {
         e.value = "Join Room";
-        e.style.color = "white";
-        e.style.backgroundColor = "#333333";
+        e.style.color = "black";
+        e.style.backgroundColor = "#white";
     } else {
     }
 }

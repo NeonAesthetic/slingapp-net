@@ -248,7 +248,7 @@ function showSettings(){
     Modal.create("Settings", "darken");
 }
 function leaveRoom() {
-    window.location.replace("http://localhost")
+    window.location.replace("https://dev.slingapp.net");
 }
 
 function InitSettingsModal() {
@@ -627,3 +627,4 @@ function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
 }
+
