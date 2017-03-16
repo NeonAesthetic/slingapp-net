@@ -90,9 +90,11 @@ require_once "classes/Account.php";
 <iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>
 <script>
 
+
     window.addEventListener("load", function () {
         isLoggedIn();
         getRoomData();
+
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
