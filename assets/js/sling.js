@@ -553,7 +553,7 @@ function toggleform(e) {
     else if (e.value === "") {
         e.value = "Join Room";
         e.style.color = "black";
-        e.style.backgroundColor = "#f5f5f5";
+        e.style.backgroundColor = "#white";
     } else {
     }
 }
