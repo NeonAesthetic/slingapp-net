@@ -424,7 +424,7 @@ function tempRegister() {
 function logout() {
     DeleteCookie("Token");
 
-    window.location.replace("https://dev.slingapp.net");
+    window.location.replace("/");
 
     var loggedOutNav = document.getElementById("LoggedOutNavBar");
     loggedOutNav.style.display = "inline-block";
