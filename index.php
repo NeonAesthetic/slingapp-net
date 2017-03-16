@@ -125,9 +125,14 @@ require_once "classes/Account.php";
 <script type='text/javascript' src="/assets/js/sling.js"></script>
 <iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>
 <script>
-    isLoggedIn();
+
     getRoomData();
     window.addEventListener("load", function () {
+
+//        document.getElementById("LoggedOutNavBar").style.display = "none";
+//        document.getElementById("LoggedInNavBar").style.display = "none";
+        isLoggedIn();
+
         Modal.init();
         Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
         Resource.load("/assets/php/components/modal/login_form.php", "Login Form");

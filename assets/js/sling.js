@@ -237,7 +237,7 @@ function submitLogin() {
                   
                     document.getElementById("LoggedOutNavBar").style.display = "none";
                     document.getElementById("LoggedInNavBar").style.display = "inline-block";
-                    document.getElementById("NavName").innerHTML = email;
+                    document.getElementById("NavName").innerHTML = email.value;
                     document.getElementById("loginForm").reset();
                     SetCookie("Token", data.LoginToken, 7);
                     Modal.hide();
@@ -267,19 +267,18 @@ function showLogin() {
 }
 
 function isLoggedIn() {
-
     var token;
 
-    if(!(token = GetToken()))
-        tempRegister();
-    else
-        CheckTokenValidity(token, 'tempRegister');
 
-    var login = document.getElementById("login-button");
-    var screenshot = document.getElementById("screenshot");
-    var loggedIn = (token && token[0] == '1');
-    //Provide Recent Rooms Info
-    return loggedIn;
+    (token = GetToken()) ? CheckTokenValidity(token) : tempRegister();
+
+    if(token && token[0] == '1') {
+        console.log("perminent");
+        document.getElementById("LoggedOutNavBar").style.display = "none";
+        document.getElementById("LoggedInNavBar").style.display = "inline-block";
+    }
+
+    return (token && token[0] == '1');
 }
 
 function hideLogin(data) {
@@ -382,7 +381,8 @@ function submitRegister() {
                     var button = document.getElementById("login-button");
                     button.innerHTML = "Logout";
                     button.className = "login-button";
-                    document.getElementById("NavName").innerHTML = first;
+
+                    document.getElementById("NavName").innerHTML = email.value;
                     document.getElementById("LoggedOutNavBar").style.display = "none";
                     document.getElementById("LoggedInNavBar").style.display = "inline-block";
                     document.getElementById("registerForm").reset();
@@ -596,7 +596,7 @@ function DeleteCookie(key) {
     document.cookie = key +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-function CheckTokenValidity(token, callback){
+function CheckTokenValidity(token){
     $.ajax({
         type: 'post',
         url: '/assets/php/components/account.php',
@@ -604,6 +604,9 @@ function CheckTokenValidity(token, callback){
         data: {
             action: "tokenisvalid",
             token: token
+        },
+        success: function(data){
+            return data;
         },
         error: function (error) {
             console.log(error);
