@@ -32,28 +32,19 @@ abstract class WebSocketServer
 
     private function get_client_room($room_id){
         if(array_key_exists($room_id, $this->_rooms)){
-            echo "Room in cache" .NL;
+
         }else{
-            foreach ($this->_rooms as $room_flake){
-                echo "Roomid: " . $room_flake . NL;
-            }
             $this->_rooms[$room_id] = new Room($room_id);
         }
         return $this->_rooms[$room_id];
     }
 
-    private function get_client_account($client_token, $room_id, $socket_client){
-        $account = null;
+    private function get_client_account($client_token){
         if(array_key_exists($client_token, $this->_account_cache)){
-            echo "Client in cache" .NL;
+
         }else{
-            foreach ($this->_clients as $room_flake){
-                echo "Roomid: " . $room_flake . NL;
-            }
             $this->_account_cache[$client_token] = Account::Login($client_token);
-
         }
-
         return $this->_account_cache[$client_token];
     }
 

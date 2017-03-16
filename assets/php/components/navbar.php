@@ -34,13 +34,14 @@
                 </li>
             </ul>
 
+
+
+            <ul>
                 <li id="LoggedOutNavBar" style="float: right">
                     <button id="login-button" class="login-button" onclick="showLogin()"
                             style="margin: 5px;">Login<span id="reg"><br>or sign up</span>
                     </button>
                 </li>
-
-            <ul>
                 <li id="LoggedInNavBar" class="drop" style="display: none; width: 250px; float: right">
                     <div class="user-avatar"><img src=""></div><a id="NavName" href="#">Stefano</a> <span aria-hidden="true" class=
                     "glyphicon glyphicon-menu-hamburger orange-txt"></span>
