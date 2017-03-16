@@ -42,7 +42,7 @@
 
             <ul>
                 <li id="LoggedInNavBar" class="drop" style="display: none; width: 250px; float: right">
-                    <div class="user-avatar"><img src="http://www.stedesign.com/ste.png"></div><a id="NavName" href="#">Stefano</a> <span aria-hidden="true" class=
+                    <div class="user-avatar"><img src=""></div><a id="NavName" href="#">Stefano</a> <span aria-hidden="true" class=
                     "glyphicon glyphicon-menu-hamburger orange-txt"></span>
                     <div class="triangle"></div>
                     <div class="dropdownContain">

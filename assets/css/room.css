@@ -66,8 +66,8 @@ body{
 }
     /*Room Side*/
 .roomSide{
-    -webkit-height: 20px;
-    padding: 10px;
+    height: 20px;
+    padding: 0;
     width: 98%;
     background-color: darkslategray;
     position: relative;
@@ -78,14 +78,16 @@ body{
     border-width: 2px;
     -webkit-transition: height 0.7s; /* For Safari 3.1 to 6.0 */
     transition: height 0.7s;
+    overflow: hidden;
 }
 .roomSide:hover{
-    height: 100px;
+    height: auto;
+    min-height: 20px;
 }
 
 .eRoomSide{
-    height: 100px;
-    padding: 10px;
+    height: auto;
+    min-height: 100px;
     width: 98%;
     background-color: darkslategray;
     position: relative;
@@ -94,6 +96,7 @@ body{
     border-color: #222222;
     border-radius: 2px;
     border-width: 2px;
+    overflow: auto;
 }
 
 .roomSideBack{
@@ -437,6 +440,44 @@ ul.nav a:active {
     border-top: none !important;
 }
 
+.btn-dark{
+    border: 1px solid #111;
+    background-color: #333;
+    color: #888;
+}
+
+.btn-dark:hover{
+    color: #eee;
+}
+
+.btn-dark:active{
+    color: #eee;
+    background-color: #444;
+    outline: hidden;
+}
+
+.tooltip {
+
+}
+
+.tooltip .tip {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tip {
+    visibility: visible;
+}
+
 
 #outerBox{
     max-width: 100%;
@@ -498,14 +539,11 @@ ul.nav a:active {
     border-color: #55ff55;
 }
 
+.user-preview{
+    position: relative;
+    width: 100%;
 
-
-
-
-
-
-
-
+}
 
 @keyframes e {
     from {}

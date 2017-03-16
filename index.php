@@ -30,24 +30,24 @@ require_once "classes/Account.php";
 ?>
 <div class="slingBackground">
     <div class="sling-feed-container" style="margin: auto">
-        <div class="is-flex">
-            <button class="slingButton slingButtonCR"
-                    onclick="Modal.create('Create Room Modal', 'darken', null)">
+        <div class="is-flex" >
+            <button class="slingButton" onclick="Modal.create('Create Room Modal', 'darken', null)">
                 Create Room
             </button>
-            <form class="slingForm slingFormJR"
-                  onsubmit="joinroom(event, this);">
-                <input name="room" class="slingFormInner" type="text" size="14"
-                       value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
+            <form class="slingButton" onsubmit="joinroom(event, this);">
+                <input name="room" class="slingFormInner" type="text" size="14" value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
             </form>
-            <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
+            <div style="width: 100%; margin-top: 50px; height: 150px">
+                <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
+            </div>
+
         </div>
     </div>
 </div>
 <div class="slingBackground slingBackgroundUpper"></div>
 <div class="container container-main-page">
     <div class="sling-title-container">
-        <img class="sling-title" src="slingblock.png" title="Sling"/>
+        <div class="contains-image" style="background-image: url('slingblock.png'); height: 260px; width: 100%;"></div>
         <div class="is-flex">
             <div class="motto-div" style="border-right: 2px solid lightgray">
                 SHARE
@@ -64,42 +64,6 @@ require_once "classes/Account.php";
 
 
 
-
-<!--<div class="slingBackground slingBackgroundUpper">
-    <div class="slingContentDiv slingContentDivTitle">
-        <img style="height: 100%; width: 100%; object-fit: contain" src="SlingLogo.png" alt="Sling S">
-    </div>
-    <div class="slingContentDiv slingContentDivMotto">
-        <div class="slingContentDivMottoInner">
-            <div class="slingContentDivCenterText">SHARE</div>
-        </div>
-        <div class="slingContentDivMottoInner" style="border-right: solid 3px cadetblue;border-left: solid 3px cadetblue; margin-left: 20vw">
-            <div class="slingContentDivCenterText">STREAM</div>
-        </div>
-        <div class="slingContentDivMottoInner" style=" margin-left: 40vw">
-            <div class="slingContentDivCenterText">CONNECT</div>
-        </div>
-    </div>
-</div>-->
-
-
-<!--<div class="slingContentDiv slingContentDivButtons">-->
-<!--    <button class="slingButton slingButtonCR"-->
-<!--            onclick="Modal.create('Create Room Modal', 'darken', null)">-->
-<!--        Create Room-->
-<!--    </button>-->
-<!--    <form class="slingForm slingFormJR"-->
-<!--          onsubmit="joinroom(event, this);">-->
-<!--        <input name="room" class="slingFormInner" type="text" size="8"-->
-<!--               value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">-->
-<!--    </form>-->
-<!--</div>-->
-
-
-<!--<nav class="navbar " style="z-index: 999999">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <!--        Needs hamburger icon-->
 
 
 <div class="container-fluid"

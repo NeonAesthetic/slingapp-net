@@ -26,6 +26,9 @@ var Resource = {
         });
 
     },
+    require:function(name){
+          
+    },
     get:function(name){
         return Resource.dictionary[name];
     }
@@ -621,13 +624,9 @@ function CheckTokenValidity(token){
 function toggleform(e) {
     if (e.value === "Join Room") {
         e.value = "";
-        e.style.color = "black";
-        e.style.backgroundColor = "#f5f5f5";
     }
     else if (e.value === "") {
         e.value = "Join Room";
-        e.style.color = "black";
-        e.style.backgroundColor = "#white";
     } else {
     }
 }
