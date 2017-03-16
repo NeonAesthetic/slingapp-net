@@ -159,6 +159,7 @@ class Account extends DatabaseObject
                 if ($result) {
 //                    if ($result['AccountActive']) {
                         if (password_verify($password, $result['PasswordHash'])) {
+
                             if ($result['RoomID'])   //if participating in room
                                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                                     $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
@@ -406,6 +407,8 @@ class Account extends DatabaseObject
     {
         return $this->_screenName;
     }
+    
+    
 
     /**
      * Function getEmail

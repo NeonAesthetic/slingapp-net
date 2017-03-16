@@ -8,20 +8,198 @@
 }
 
 .slingBackground{
-    background-color: #38474F;
+    background-color: whitesmoke;
     width: 100%;
     height: 100%;
     position: absolute;
 }
 
+.slingBackgroundUpper {
+    background-color: white;
+    height: 60%;
+}
+
+/*Always In the Center Unless Overridden*/
 .slingContentDiv{
-    background: rgba(255,255,255,0.05);
-    border: 2px solid #38474F;
-    height: 70%;
-    width: 21%;
-    margin: 6%;
+    background: black;
+    width:300px;
+    height:300px;
+    margin:0 auto;
+    position:fixed;
+    left:50%;
+    top:50%;
+    margin-left:-150px;
+    margin-top:-150px;
+}
+
+.sling-title{
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.sling-title-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    margin:0 auto;
+    max-width: 600px;
+}
+
+.sling-feed-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    margin: 0 2vh 0 0;
+    max-width: 800px;
+}
+
+.sling-button-container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+    max-width: 600px;
+}
+
+.container-main-page{
+    height: 47vh;
+    position: relative;
+    margin-top: 0;
+}
+
+.is-flex{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.motto-div{
+    font-size: 30px;
+    width: 33%;
+    text-align: center;
+}
+
+.slingContentDivTitle{
+    background: transparent;
+    width: 100%;
+    max-width: 800px;
+
+}
+
+.slingContentDivMotto{
+    background: transparent;
+    width: 60%;
+    height: 10%;
+    margin-left: -30%;
+    margin-top: -5%;
+    top: 55%;
+    overflow: hidden;
+}
+
+.slingContentDivMottoInner{
+    background: transparent;
+    width: 21vw;
+    height: 10%;
+    position: fixed;
+    color: black;
+    text-align: center;
+    font-size: 2vw;
+    overflow: hidden;
+    display: inline-block;
+}
+.slingContentDivCenterText{
+    width:100%;
+    color: black;
+    position: absolute;
+    text-align: center;
+    padding-top:25%;
+    -webkit-transform: translateY(-50%); /* child now centers itself relative to the midline based on own contents */
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Matrix(Dx=0,Dy=0)'; /*IE8 */
+    filter: progid:DXImageTransform.Microsoft.Matrix(Dx=0,Dy=0); /*IE6, IE7*/
+    transform: translateY(-50%);
+}
+
+.slingContentDivButtons{
+    background: whitesmoke;
+    width: 30%;
+    height: 10%;
+    margin-left: -15%;
+    margin-top: -5%;
+    top: 75%;
+}
+
+.slingButton{
+    background: whitesmoke;
+    color: black;
+    margin:0 auto;
+    width: 45%;
+    height: 100%;
+    position:relative;
+    border: 2px solid white;
+    font-size: 1.3vw;
+    overflow: hidden;
+    box-shadow: 0 2px 4px 0 #2d2d2d;
+}
+
+.slingButtonCR{
     float: left;
 }
+.slingButton:hover:active {
+    background-color: rgba(255, 255, 255, 1);
+    color: black;
+}
+
+.slingButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: dimgrey;
+}
+.slingForm{
+    background: whitesmoke;
+    color: black;
+    margin:0 auto;
+    width: 45%;
+    height: 100%;
+    position:relative;
+    border: 2px solid white;
+    font-size: 1.3vw;
+    overflow: hidden;
+    display: inline-block;
+    box-shadow: 0 2px 4px 0 #2d2d2d;
+}
+.slingFormInner{
+    background: whitesmoke;
+    color: black;
+    top: 30%;
+    left:20%;
+    text-align: center;
+    border: none;
+    position:relative;
+    font-size: 1.3vw;
+    overflow: hidden;
+    display: inline-block;
+}
+.slingFormJR {
+    float: right;
+}
+.slingForm:hover:active {
+    background-color: rgba(255, 255, 255, 1);
+    color: black;
+}
+
+.slingForm:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: dimgrey;
+}
+.slingWIPDiv {
+    background-color: transparent;
+}
+
 
 .slingContentContainer{
     width: 100%;
@@ -73,22 +251,26 @@
 }
 
 .sling-prev-room{
-    background-color: transparent;
+    background-color: #f6f6f6;
     color: white;
-    border: 2px solid darkslategray;
+    border: 2px solid darkslategrey;
     width: 98%;
     height: 2.7em;
-    margin: 7px;
+    margin: 7px 2px 9px ;
+    text-align: right;
+    font-size : 1vw;overflow: hidden;
+    /*display: inline-block;*/
+    /*display: table-header-group;*/
 }
 
 nav {
-    width: 18em;
-    margin: 2em auto;
-    background: #f6f6f6;
+    width: 100%;
+    background: #ffffff;
     -moz-border-radius: 0.4em / 0.4em;
     -webkit-border-radius: 0.4em 0.4em;
     border-radius: 0.4em / 0.4em;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    height: 50px;
 }
 
 .user-avatar img {
@@ -109,9 +291,11 @@ nav {
 }
 
 .drop {
+    margin: 5px;
     position: relative;
     font-size: 1em;
     cursor: pointer;
+    height: 40px;
 }
 .drop a {
     font-weight: 400;
@@ -170,7 +354,7 @@ nav {
 .dropOut li {
     text-align: left;
     width: 100%;
-    padding: 0.6em 0;
+    padding: 0.8em 0;
     color: gray;
     border-left: 3px solid #f7f7f7;
     -webkit-transition: all 0.1s ease-out;
@@ -184,7 +368,7 @@ nav {
     margin: 0 1.5em 0 .8em;
 }
 .dropOut li:hover {
-    border-color: #ffc568;
+    border-color: #5eaae8;
     color: #4d4d4d;
     background: #ededed;
 }
@@ -206,14 +390,14 @@ ul li:hover .dropOut {
 }
 
 .orange-txt {
-    background-color: #ffc15e;
-    background-image: -o-linear-gradient(bottom, #ffb135 0%, #ffc15e 100%);
-    background-image: -moz-linear-gradient(bottom, #ffb135 0%, #ffc15e 100%);
-    background-image: -webkit-linear-gradient(bottom, #ffb135 0%, #ffc15e 100%);
-    background-image: -ms-linear-gradient(bottom, #ffb135 0%, #ffc15e 100%);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0%, #ffb135), color-stop(100%, #ffc15e));
+    background-color: #5eaae8;
+    background-image: -o-linear-gradient(bottom, #5eaae8 0%, #5eaae8 100%);
+    background-image: -moz-linear-gradient(bottom, #5eaae8 0%, #5eaae8 100%);
+    background-image: -webkit-linear-gradient(bottom, #5eaae8 0%, #5eaae8 100%);
+    background-image: -ms-linear-gradient(bottom, #5eaae8 0%, #5eaae8 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0%, #5eaae8), color-stop(100%, #5eaae8));
 
 }
 .orange-txt:hover {
-    background: #ffb135;
+    background: #5eaae8;
 }

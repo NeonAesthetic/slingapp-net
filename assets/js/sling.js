@@ -148,6 +148,7 @@ var ContextMenu = {
     close:function(){
         if(ContextMenu.current){
             document.body.removeChild(ContextMenu.current);
+            ContextMenu.current = null;
         }
     },
     /**
@@ -213,15 +214,17 @@ function submitLogin() {
             pass1: password
         },
         success: function (data) {
+
             if (validateCredentials(data)) {
                 var button = document.getElementById("login-button");
+                button.innerHTML = "Logout";
                 button.className = "login-button";
 
                 var loggedOutNav = document.getElementById("LoggedOutNavBar");
-                loggedOutNav.style.visibility = "hidden";
+                loggedOutNav.style.display = "none";
 
                 var loggedInNav = document.getElementById("LoggedInNavBar");
-                loggedInNav.style.visibility = "visible";
+                loggedInNav.style.display = "inline-block";
 
                 var navName = document.getElementById("NavName");
                 navName.innerHTML = email;
@@ -229,7 +232,11 @@ function submitLogin() {
                 document.getElementById("loginForm").reset();
                 SetCookie("Token", data.LoginToken, 7);
                 Modal.hide();
+
+                //clearRecentRooms();
                 getRoomData();
+
+
             }
             //Provide Recent Rooms Info
 
@@ -244,7 +251,6 @@ function submitLogin() {
 function showLogin() {
     document.getElementById("login-button").className += " open";
 
-    console.log("Show Login");
     setTimeout(function () {
             Modal.create("Login Form", "", hideLogin)
         }, 700
@@ -252,7 +258,6 @@ function showLogin() {
 }
 
 function isLoggedIn() {
-
 
     var token;
 
@@ -262,14 +267,9 @@ function isLoggedIn() {
         CheckTokenValidity(token, 'tempRegister');
 
     var login = document.getElementById("login-button");
-    //var screenshot = document.getElementById("screenshot");
+    var screenshot = document.getElementById("screenshot");
     var loggedIn = (token && token[0] == '1');
-
-    //login.innerHTML = (loggedIn) ? "Logout": "Login";
-    //navBar.visibility = (loggedIn) ? hidden: visible;
     //Provide Recent Rooms Info
-
-    console.log("test");
     return loggedIn;
 }
 
@@ -306,16 +306,17 @@ function submitRegister() {
         },
         success: function (data) {
             var button = document.getElementById("login-button");
+            button.innerHTML = "Logout";
             button.className = "login-button";
 
             var navName = document.getElementById("NavName");
             navName.innerHTML = first;
 
             var loggedOutNav = document.getElementById("LoggedOutNavBar");
-            loggedOutNav.style.visibility = "hidden";
+            loggedOutNav.style.display = "none";
 
             var loggedInNav = document.getElementById("LoggedInNavBar");
-            loggedInNav.style.visibility = "visible";
+            loggedInNav.style.display = "inline-block";
 
             console.log(data);
             SetCookie("Token", data.LoginToken, 7);
@@ -352,11 +353,13 @@ function tempRegister() {
 function logout() {
     DeleteCookie("Token");
 
+    window.location.replace("https://dev.slingapp.net");
+
     var loggedOutNav = document.getElementById("LoggedOutNavBar");
-    loggedOutNav.style.visibility = "visible";
+    loggedOutNav.style.display = "inline-block";
 
     var loggedInNav = document.getElementById("LoggedInNavBar");
-    loggedInNav.style.visibility = "hidden";
+    loggedInNav.style.display = "none";
 
     document.getElementById("login-button").innerHTML = "Login<span id='reg'><br>or sign up</span>";
 }
@@ -385,7 +388,9 @@ function getRoomData() {
         },
         success: function (data) {
             console.log(data);
-            for(elem = 0; elem < 10; elem++){
+
+            for(elem = 0; elem < 4; elem++){
+
                 if(data.length > 0) {
                     var roomName = data[elem].RoomName;
                     var active = data[elem].Active;
@@ -400,10 +405,12 @@ function getRoomData() {
                     var dataStream = document.createElement('span');
                     dataStream.innerHTML = "RoomTitle: " + roomName + "\nStatus: " + active;
                     prevRoomName.id = "Room" + elem;
-                    prevRoomName.className = 'sling-prev-room';
+                    prevRoomName.className = 'icon-off';
+
                     document.getElementById('RoomsNav').appendChild(prevRoomName);
                     // document.getElementById("Room" + elem)
                     prevRoomName.appendChild(dataStream);
+                    document.getElementById("NoRooms").innerHTML = "";
                 }
             }
 
@@ -414,6 +421,13 @@ function getRoomData() {
             console.log(error);
         }
     });
+}
+
+function clearRecentRooms() {
+    //var prevRoomName = document.createElement('li');
+    //for(i = 0; i < document.getElementById('RoomsNav').childElementCount; i++)
+        document.getElementById('RoomsNav').clearAttributes();
+    //prevRoomName.destroy();
 }
 
 /******************************************************************************************************************
@@ -534,12 +548,12 @@ function toggleform(e) {
     if (e.value === "Join Room") {
         e.value = "";
         e.style.color = "black";
-        e.style.backgroundColor = "#fefefe";
+        e.style.backgroundColor = "#f5f5f5";
     }
     else if (e.value === "") {
         e.value = "Join Room";
-        e.style.color = "white";
-        e.style.backgroundColor = "#333333";
+        e.style.color = "black";
+        e.style.backgroundColor = "#f5f5f5";
     } else {
     }
 }
