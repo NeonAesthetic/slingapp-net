@@ -7,7 +7,7 @@
  */
 
 $roomid = $_GET["room"];
-require_once realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/components/StandardHeader.php";
+require_once "components/StandardHeader.php";
 require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 
@@ -44,6 +44,7 @@ else{
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 
 </head>
 <body style="background-color: #38474F; overflow: hidden" onload="newUserSet('small', null)">
@@ -56,11 +57,11 @@ else{
         </div>
         <div class="roomHeaderBack" style="height: 60px; border-radius: 2px;">
             <div class="roomSide" style="height: 50px; background-color: transparent">
-                <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="showSettings()">SHARE SCREEN</button>
+                <button class="buttonRoom" style="margin: auto 2% auto 3%; width: 30%;" onclick="AVC.connectScreenCapture()">SHARE SCREEN</button>
                 <div class="roomSideTitle" style="text-align: center; width: 30%; min-width:20%; height: 20px; margin: -25px auto 10px auto; background-color: rgba(0,0,0,0)">
                     <span class="vertical-text" id="r-title">ROOM TITLE</span>
                 </div>
-                <button class="buttonRoom" style="margin: -30px auto auto 67%; width: 30%; min-width: 50px;" onclick="leaveRoom()">LEAVE ROOM</button>
+                <button class="btn btn-default" style="" onclick="window.location = '/'">LEAVE ROOM</button>
             </div>
         </div>
 

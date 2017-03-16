@@ -5,6 +5,8 @@ if ( ! "Peer" in window ){
     console.error("peer.js required to use this library");
 };
 
+
+
 var MEDIA = {
 
     AUDIO  : {audio: true, video:false},
@@ -15,28 +17,47 @@ var MEDIA = {
         video: {
             mandatory: {
                 chromeMediaSource: 'desktop',
+                chromeMediaSourceId: null,
+                minWidth: 1280,
                 maxWidth: 1920,
-                maxHeight: 1080
+                minHeight: 720,
+                maxHeight: 1080,
+                minFrameRate:60,
+                maxFrameRate:60
             }
         },
         options:[]
     }
 };
 
+window.addEventListener("load", function(){
+    AVC.peerVideoStream = new MediaStream();
+    AVC.videoConnection = AVC.connectToPeerServer(AVC.id + "v", AVC.videoConnection, AVC.acceptPeerVideoStream);
+    AVC.getAllPeerVideo(AVC.peerVideoStream);
+})
+
 
 var AVC = {
-    connection:null,
+    audioConnection:null,
+    videoConnection:null,
     id:null,
-
+    peerAudioID:null,
+    peerVideoID:null,
     options:{
         host: 'slingapp.net',
         port: 9000,
-        secure: true
+        secure: true,
+        iceServers:[
+            { url: 'stun:stun.ekiga.net' },
+            { url: 'stun:stun1.l.google.com:19302' },
+            { url: 'stun:stun2.l.google.com:19302' },
+            { url: 'stun:stun3.l.google.com:19302' }
+        ]
     },
     audioSources:[],
     videoSources:[],
-
-    connected:false,
+    peerVideoStream:null,
+    audioConnected:false,
     connectButton:null,
     audioInput:null,
     getUserMedia:function(mediaType, callback){
@@ -45,35 +66,59 @@ var AVC = {
             return false;
         }
         if(!AVC.audioInput){
-            navigator.getUserMedia(mediaType, function(stream){
-                AVC.audioInput = stream;
+            navigator.webkitGetUserMedia(mediaType, function(stream){
                 callback(stream);
             }, function (error) {
                 console.error("IT's BORKED: ", error);
 
             })
         }else{
-            callback(AVC.audioInput);
+            if(mediaType == MEDIA.AUDIO)
+                callback(AVC.audioInput);
+            else{
+                callback(AVC.peerVideoStream);
+            }
         }
 
     },
-    connectVoice:function(){
-        if(!AVC.connection){
-            AVC.connection = new Peer(AVC.id, AVC.options);
+    connectToPeerServer:function (peer_id, connection, on_call) {
+        if(!connection){
+            connection = new Peer(peer_id, AVC.options);
 
-            AVC.connection.on("open", function (id) {
+            connection.on("open", function (id) {
                 console.log("PeerID is " + id);
             });
 
-            AVC.connection.on("call", AVC.acceptPeerAudioStream);
+            connection.on("call", on_call);
 
-            AVC.connection.on("error", function (error) {
+            connection.on("error", function (error) {
                 if (error.type == "peer-unavailable"){
                     console.log("Peer could not be found.");
                 }
             })
         }else{
-            AVC.connection.reconnect();
+            connection.reconnect();
+        }
+        return connection;
+    },
+    connectVoice:function(){
+        if(!AVC.audioConnection){
+            AVC.peerAudioID = AVC.id + "a";
+            AVC.audioConnection = new Peer(AVC.peerAudioID, AVC.options);
+
+            AVC.audioConnection.on("open", function (id) {
+                console.log("PeerID is " + id);
+            });
+
+            AVC.audioConnection.on("call", AVC.acceptPeerAudioStream);
+
+            AVC.audioConnection.on("error", function (error) {
+                if (error.type == "peer-unavailable"){
+                    console.log("Peer could not be found.");
+                }
+            })
+        }else{
+            AVC.audioConnection.reconnect();
         }
 
 
@@ -83,12 +128,12 @@ var AVC = {
         for(var peerid in accounts){
             if(accounts.hasOwnProperty(peerid) && peerid != Account.data.ID){
                 console.log("Connecting to peer with id: " + peerid);
-                AVC.getPeerAudioStream(peerid, function (stream) {
+                AVC.getPeerAudioStream(peerid + "a", function (stream) {
                     AVC.createPeerAudioNode(stream);
                 });
             }
         }
-        AVC.connected = true;
+        AVC.audioConnected = true;
         AVC.connectButton.innerHTML = "DISCONNECT VOICE";
         AVC.connectButton.classList.add("button-green");
         AVC.connectButton.onclick = function () {
@@ -96,8 +141,8 @@ var AVC = {
         }
     },
     disconnectVoice:function(){
-        AVC.connection.destroy();
-        AVC.connection = null;
+        AVC.audioConnection.destroy();
+        AVC.audioConnection = null;
         console.log("Disconnecting");
         AVC.connectButton.innerHTML = "CONNECT VOICE";
         AVC.connectButton.classList.remove("button-green");
@@ -108,11 +153,19 @@ var AVC = {
 
     getPeerAudioStream:function (peerid, callback) {
         AVC.createAudioStream(function (stream) {
-            var call = AVC.connection.call(peerid, stream);
+            var call = AVC.audioConnection.call(peerid, stream);
             call.on("stream", function(stream){
                 callback(stream);
             });
         });
+
+    },
+    getPeerVideoStream:function (peerid, callback) {
+            var call = AVC.videoConnection.call(peerid, AVC.peerVideoStream);
+            call.on("stream", function(stream){
+                callback(stream);
+            });
+
 
     },
     createAudioStream:function(callback){
@@ -120,7 +173,7 @@ var AVC = {
     },
     acceptPeerAudioStream:function (call) {
         console.log("Client attempting to connect");
-        if (AVC.connected){
+        if (AVC.audioConnected){
             AVC.createAudioStream(function (stream) {
                 call.answer(stream);
                 call.on("stream", function (stream) {
@@ -128,6 +181,18 @@ var AVC = {
                 });
             });
         }
+    },
+    acceptPeerVideoStream:function(call){
+
+
+        console.log("Peer attempting to connect");
+        call.answer(AVC.peerVideoStream);
+        call.on("stream", function (stream) {
+            console.log(stream);
+            AVC.setPeerVideoNode(call.peer.slice(0,-1), stream);
+        });
+
+
     },
     createPeerAudioNode:function (stream) {
         var audioNode = createAudioSourceNode();
@@ -140,9 +205,61 @@ var AVC = {
     createPeerVideoNode:function (stream) {
         var videoNode = createVideoSourceNode();
         videoNode.src = URL.createObjectURL(stream);
-        document.body.appendChild(videoNode);
-        AVC.videoSources.push(videoNode);
+        videoNode.className = 'user-preview';
+        return videoNode;
+    },
+    connectScreenCapture:function () {
+        AVC.getUserScreencaptureStream(function(stream){
+            AVC.getAllPeerVideo(stream);
+        });
 
+    },
+    getUserScreencaptureStream:function (callback) {
+
+        var extensionID = "kfgaafajpkopkaljlblgmijmedhcbhkm";
+        chrome.runtime.sendMessage(extensionID, {text: "wew lad"}, function(response) {
+            if(response){
+                var options = MEDIA.SCREEN;
+                options.video.mandatory.chromeMediaSourceId = response.media_id;
+                AVC.getUserMedia(options, callback);
+            }else{
+                Toast.error(textNode("Extension not installed"));
+            }
+        });
+
+
+    },
+    createUserPreviewNode:function (stream) {
+        var node = createVideoSourceNode();
+        node.src = window.URL.createObjectURL(stream);
+        node.className = "user-preview";
+        return node;
+    },
+    setPeerVideoNode:function(id, stream){
+        AVC.peerVideoStream = stream;
+        var node = AVC.createPeerVideoNode(stream);
+        var videoDiv = document.getElementById("NU" + id);
+        videoDiv.innerHTML = "";
+        videoDiv.appendChild(node);
+        // console.log(node);
+    },
+    getAllPeerVideo:function(stream){
+        AVC.peerVideoStream = stream;
+        AVC.setPeerVideoNode(AVC.id, stream);
+
+        var accounts = Room.data.Accounts;
+        var len = accounts.length;
+        console.log("Attempting to connect video");
+        for(var peerid in accounts){
+            if(accounts.hasOwnProperty(peerid) && peerid != Account.data.ID){
+                console.log("Connecting to peer with id: " + peerid);
+                AVC.getPeerVideoStream(peerid + "v", function (stream) {
+                    var id = peerid;
+                    AVC.setPeerVideoNode(id, stream);
+                });
+            }
+        }
+        AVC.videoConnected = true;
     }
 }
 
@@ -162,6 +279,10 @@ function createAudioSourceNode(){
 function createVideoSourceNode(){
     var node = document.createElement("video");
     node.autoplay = true;
+    node.addEventListener("dblclick", function (event) {
+        this.webkitRequestFullscreen();
+    });
+    node.controls = false;
     return node;
 }
 

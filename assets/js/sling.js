@@ -21,6 +21,9 @@ var Resource = {
         });
 
     },
+    require:function(name){
+          
+    },
     get:function(name){
         return Resource.dictionary[name];
     }
