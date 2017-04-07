@@ -13,6 +13,7 @@ class HTTPResponse
 {
     private $__output = "";
     private $__is_json = false;
+    private $__status = 200;
     public function __construct($string)
     {
         if(is_array($string)){
@@ -23,9 +24,15 @@ class HTTPResponse
         }
     }
 
+    public function status($status_number){
+        $this->__status = $status_number;
+        return $this;
+    }
+
     public function __toString()
     {
         if($this->__is_json) header('Content-Type: application/json');
+        http_response_code($this->__status);
         return $this->__output;
     }
 

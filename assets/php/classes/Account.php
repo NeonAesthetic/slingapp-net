@@ -126,6 +126,12 @@ class Account extends DatabaseObject
         return $retval;
     }
 
+    private function generateToken(){
+        $token = md5(uniqid(mt_rand(), true));
+        $token = ($this->_email) ? "1" . $token : "0" . $token;    // 1 is permanent account, 0 is temp
+        return $token;
+    }
+
     /**
      * Function Login
      * @param $token_email
@@ -372,6 +378,10 @@ class Account extends DatabaseObject
         return $this->_token;
     }
 
+    public function regenerateToken(){
+        $this->_token = $this->generateToken();
+    }
+
     /**
      * Function getRoomID
      * @return integer
@@ -405,7 +415,6 @@ class Account extends DatabaseObject
         $json["LoginToken"] = $this->_token;
         $json['ID'] = $this->_accountID;
         $json['ScreenName'] = $this->_screenName;
-        $json['RoomID'] = $this->_roomID;
         $json['AccountActive'] = $this->_active;
         if ($as_array)
             return $json;
@@ -419,6 +428,14 @@ class Account extends DatabaseObject
     public function getScreenName()
     {
         return $this->_screenName;
+    }
+
+    /**
+     * @return null
+     */
+    public function setScreenName($name)
+    {
+        $this->_screenName = $name;
     }
     
     
