@@ -57,7 +57,7 @@ class Account extends DatabaseObject
      * by the Delete Account-Tests function.
      */
     public function __construct($accountID, $token, $tokenGen = null, $email = null, $fName = null, $lName = null,
-                                $lastLogin = null, $joinDate = null, $roomID = null, $screenName = null, $active = true)
+                                $lastLogin = null, $joinDate = null, $screenName = null, $active = true)
     {
         $this->_accountID = $accountID;
         $this->_email = $email;
@@ -67,7 +67,7 @@ class Account extends DatabaseObject
         $this->_tokenGen = $tokenGen;
         $this->_lastLogin = $lastLogin;
         $this->_joinDate = $joinDate;
-        $this->_roomID = $roomID;
+//        $this->_roomID = $roomID;
         $this->_screenName = $screenName;
         $this->_active = $active;
     }
@@ -100,29 +100,31 @@ class Account extends DatabaseObject
 
         $currentDate = gmdate("Y-m-d H:i:s");
         $accountID = Database::getFlakeID();
+        $screenName = "Anonymous " . Database::getRandomAnimal();
 
-        $sql = "INSERT INTO Accounts 
-                (AccountID, Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate)  
-                VALUES(:accid, :email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate)";
+//        $sql = "INSERT INTO Accounts
+//                (AccountID, Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate, ScreenName)
+//                VALUES(:accid, :email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate, :sn)";
 
-        $statement = Database::connect()->prepare($sql);
+//        $statement = Database::connect()->prepare($sql);
 
-        if (!$statement->execute([
-            ":accid" => $accountID,
-            ':email' => $email,
-            ':fName' => $fName,
-            ':lName' => $lName,
-            ':passHash' => $tempPassHash,
-            ':logTok' => $token,
-            ':tokGen' => $currentDate,
-            ':lastLog' => $currentDate,
-            ':joinDate' => $currentDate])
-        ) {
-//            var_dump(Database::connect()->errorInfo());
-            $retval = json_encode(['error' => "Database could not be reached"]);
-        } else
-            $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate);
-
+//        if (!$statement->execute([
+//            ":accid" => $accountID,
+//            ':email' => $email,
+//            ':fName' => $fName,
+//            ':lName' => $lName,
+//            ':passHash' => $tempPassHash,
+//            ':logTok' => $token,
+//            ':tokGen' => $currentDate,
+//            ':lastLog' => $currentDate,
+//            ':joinDate' => $currentDate,
+//            ':sn' => $screenName])
+//        ) {
+////            var_dump(Database::connect()->errorInfo());
+//            $retval = json_encode(['error' => "Database could not be reached"]);
+//        } else{}
+            $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate, $screenName);
+            $retval->update();
         return $retval;
     }
 

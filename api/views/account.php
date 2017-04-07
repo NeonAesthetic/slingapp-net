@@ -9,6 +9,9 @@ require_once "classes/Account.php";
 
 function me(){
     $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = false;
+    if(!$token) return new HTTPResponse(["error"=>"Not authenticated"], 405);
+
     $account = Account::Login($token);
 
     if(!$account) return new HTTPResponse(["error"=>"Not authenticated"], 405);
@@ -74,5 +77,16 @@ function me(){
 
 function create_blank_account(){
     $account = Account::CreateAccount();
+    setcookie("Token", $account->getToken(), time() + 60 * 60 * 24 * 7, "/");
     return new HTTPResponse($account->getJSON(true));
+}
+
+function user_view($user_id){
+    $sql = "SELECT * FROM Accounts WHERE AccountID = :id";
+    $stmt = Database::connect()->prepare($sql);
+    $stmt->execute([
+        ":id"=>$user_id
+    ]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return new HTTPResponse($user_id);
 }

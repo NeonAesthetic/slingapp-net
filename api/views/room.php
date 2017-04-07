@@ -30,12 +30,6 @@ function create_room_and_join_account($room_name){
     return new HTTPResponse($response_object);
 }
 
-function room_action($room_id, $action){
-    ob_start();
-    echo "Action: " . $action . "<br>";
-    echo "Room: " . $room_id . "<br>";
-    return ob_get_clean();
-}
 
 function room_view($room_id){
     $room = new Room($room_id);
