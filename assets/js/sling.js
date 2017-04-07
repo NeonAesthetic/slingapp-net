@@ -221,11 +221,11 @@ function submitLogin() {
     formError = (validateEntry(password, passRegex) && !formError) ? formError : displayError(password, error, "Password Length: 6-30");
 
     if(!formError) {
-        document.getElementById("loginerror").innerHTML = "<div class='sling' style=''></div>";
+        form.classList.add("loading");
 
         return $.ajax({
             type: 'post',
-            url: 'assets/php/components/account.php',
+            url: '/assets/php/components/account.php',
             dataType: 'JSON',
             data: {
                 action: "login",
@@ -234,20 +234,16 @@ function submitLogin() {
             },
             success: function (data) {
                 if (!data.hasOwnProperty('error') && validateCredentials(data)) {
-                    var button = document.getElementById("login-button");
-                    button.innerHTML = "Logout";
-                    button.className = "login-button";
-                  
-                    document.getElementById("LoggedOutNavBar").style.display = "none";
-                    document.getElementById("LoggedInNavBar").style.display = "inline-block";
-                    document.getElementById("NavName").innerHTML = email.value;
-                    document.getElementById("loginForm").reset();
+
                     SetCookie("Token", data.LoginToken, 7);
-                    Modal.hide();
-                    getRoomData();
+                    window.location.reload();
                 }
-                else
+                else{
                     error.innerHTML = data.error;
+                    form.classList.add("error");
+                    form.classList.remove("loading");
+                }
+
 
                 //Provide Recent Rooms Info
 
@@ -257,6 +253,9 @@ function submitLogin() {
                 console.log(error);
             }
         });
+    }else{
+        form.classList.add("error");
+        form.classList.remove("loading");
     }
 }
 
@@ -277,8 +276,8 @@ function isLoggedIn() {
 
     if(token && token[0] == '1') {
         console.log("perminent");
-        document.getElementById("LoggedOutNavBar").style.display = "none";
-        document.getElementById("LoggedInNavBar").style.display = "inline-block";
+        document.getElementById("login-dropdown").style.display = "none";
+        // document.getElementById("LoggedInNavBar").style.display = "inline-block";
     }
 
     return (token && token[0] == '1');
@@ -337,7 +336,7 @@ function displayError(field, errorElement, errormsg) {
     return true;
 }
 
-function clearError(){ document.getElementById("registererror").innerHTML = ""; }
+function clearError(){ document.getElementById("loginForm").classList.remove("error");; }
 
 function submitRegister() {
     var form = document.getElementById("registerForm");
@@ -353,7 +352,7 @@ function submitRegister() {
     var emailRegex = new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
 
     //reset error message
-    error.innerHTML = "";
+    form.classList.remove('error');
 
     var formError = validateEntry(first, nameRegex) ? false : displayError(first, error, "Invalid first name, Length: 2-30");
     formError = (validateEntry(last, nameRegex) && !formError) ? formError : displayError(last, error, "Invalid last name, Length: 2-30");
@@ -362,7 +361,7 @@ function submitRegister() {
     formError = (validatePasswords(pass1, pass2) && !formError) ? formError : displayError(pass2, error, "passwords do not match");
 
     if (!formError) {
-        error.innerHTML = "<div class='sling' style=''></div>";
+        form.classList.add('loading');
 
         return $.ajax({
             type: 'post',
@@ -381,28 +380,31 @@ function submitRegister() {
                 var error = document.getElementById("registererror");
 
                 if (!data.hasOwnProperty('error')) {
-                    var button = document.getElementById("login-button");
-                    button.innerHTML = "Logout";
-                    button.className = "login-button";
 
-                    document.getElementById("NavName").innerHTML = email.value;
-                    document.getElementById("LoggedOutNavBar").style.display = "none";
-                    document.getElementById("LoggedInNavBar").style.display = "inline-block";
-                    document.getElementById("registerForm").reset();
                     SetCookie("Token", data.LoginToken, 7);
-                    error.innerHTML = "";
-                    Modal.hide();
-                } else
+                    window.location.reload();
+                } else{
                     error.innerHTML = data.error;
+                    form.classList.remove('loading');
+                    form.classList.add('error');
+                }
+
 
                 return data;
             },
             error: function (error) {
                 console.log(error);
+                error.innerHTML = data.responseText;
+                form.classList.remove('loading');
+                form.classList.add('error');
             }
         });
-    } else
+    } else{
         form.reportValidity();
+        form.classList.remove('loading');
+        form.classList.add('error');
+    }
+
 }
 
 function tempRegister() {
@@ -426,16 +428,7 @@ function tempRegister() {
 
 function logout() {
     DeleteCookie("Token");
-
-    window.location.replace("/");
-
-    var loggedOutNav = document.getElementById("LoggedOutNavBar");
-    loggedOutNav.style.display = "inline-block";
-
-    var loggedInNav = document.getElementById("LoggedInNavBar");
-    loggedInNav.style.display = "none";
-
-    document.getElementById("login-button").innerHTML = "Login<span id='reg'><br>or sign up</span>";
+    window.location.reload();
 }
 
 function validateCredentials(data) {
@@ -562,6 +555,25 @@ function CreateRoom(event, element) {
     });
     event.stopPropagation();
     event.preventDefault();
+}
+
+function CreateBlankRoom(onSuccess, onError){
+    $.ajax({
+        type: 'post',
+        url: 'assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "create",
+            roomname: "Default Room Name",
+            token: GetToken()
+        },
+        success: function (data) {
+            onSuccess(data.RoomID);
+        },
+        error: function (error) {
+            onError(error);
+        }
+    });
 }
 
 

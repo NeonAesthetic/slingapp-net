@@ -216,7 +216,7 @@ class Account extends DatabaseObject
                     throw new Exception("Unable to login using token");   //replace with log error instead
             }
         } catch (Exception $e) {
-            $retval = json_encode(["error" => $e->getMessage()]);
+            $retval = false;
         }
         return $retval;
     }
@@ -244,7 +244,7 @@ class Account extends DatabaseObject
             if($row["Active"] !== null)
                 $json['Active'] = $row['Active'];
         }
-        return json_encode($result);
+        return $result;
     }
     //14948841491605656826
     /**
