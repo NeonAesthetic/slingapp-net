@@ -7,7 +7,7 @@
  */
 
 
-
+$script_start = microtime(true);
 require_once "routes.php";
 $requested_resource = $_GET['resource'];
 
@@ -26,10 +26,12 @@ foreach (API_ROUTES as $route) {
             echo $error_message;
             http_response_code(500);
             throw new Exception($error_message);
-
         }else{
             echo $output;
         }
+        $script_end = microtime(true);
+        error_log("[API] Access Time: " . round(($script_end - $script_start)*1000, 2) . "ms");
+        exit();
     }
 
 }
