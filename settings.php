@@ -1,6 +1,6 @@
 <?php
 
-const ENVIRONMENT_NAME 	= "DOCKER";
+const ENVIRONMENT_NAME 	    = "DOCKER";
 
 const BASE_PATH 			= __DIR__;
 

@@ -11,15 +11,6 @@ require_once "classes/Room.php";
 require_once "classes/Account.php";
 
 
-function roomless_action($action){
-    switch($act)
-    return new HTTPResponse([
-        "action"=>$action,
-        "api_version"=>"2.0.1"
-    ]);
-}
-
-
 function create_room_and_join_account($room_name){
     $response_object = [];
     $token = $_COOKIE['Token'] OR $_POST['Token'];
@@ -30,17 +21,13 @@ function create_room_and_join_account($room_name){
         $room = Room::createRoom($room_name);
         $room->addParticipant($account);
         $response_object['success'] = true;
-        $response_object['room'] = $room->getJSON(true);
+        $response_object['room'] = format_room_json($room->getJSON(true));
 
     }else{
-        
+        $response_object['success'] = false;
     }
-
-
-
-
-
-    return $room->getRoomID();
+    
+    return new HTTPResponse($response_object);
 }
 
 function room_action($room_id, $action){
@@ -48,4 +35,20 @@ function room_action($room_id, $action){
     echo "Action: " . $action . "<br>";
     echo "Room: " . $room_id . "<br>";
     return ob_get_clean();
+}
+
+function room_view($room_id){
+    $room = new Room($room_id);
+    $json = $room->getJSON(true);
+
+
+    return new HTTPResponse(format_room_json($json));
+}
+
+function format_room_json($json){
+    $json['Participants'] = count($json['Accounts']);
+    unset($json['Accounts']);
+    unset($json['RoomCodes']);
+    $json['URL'] = "/rooms/" . $json['RoomID'];
+    return $json;
 }

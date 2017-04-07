@@ -9,6 +9,7 @@
 
 $script_start = microtime(true);
 require_once "routes.php";
+require_once "classes/http/HTTPResponse.php";
 $requested_resource = $_GET['resource'];
 
 foreach (API_ROUTES as $route) {
@@ -35,4 +36,9 @@ foreach (API_ROUTES as $route) {
     }
 
 }
+
+echo new HTTPResponse([
+    "status"=>404,
+    "error"=>"Route not found"
+], 404);
 
