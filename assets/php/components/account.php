@@ -29,7 +29,9 @@ switch ($p['action']) {
 
     case "login":
         $account = Account::Login($p['email'], $p['pass1']);
-        echo (method_exists($account, "getJSON")) ? $account->getJSON() : $account;
+        echo (method_exists($account, "getJSON")) ? $account->getJSON() : json_encode([
+            "error"=>"Invalid email or password"
+        ]);
         break;
 
     case "changepass":

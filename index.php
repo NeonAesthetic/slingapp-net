@@ -5,116 +5,86 @@
  * Date: 10/14/16
  * Time: 8:09 AM
  */
-set_include_path(realpath($_SERVER['DOCUMENT_ROOT']) . "/assets/php/");
-require_once "components/Components.php";
+
 require_once "classes/Account.php";
+$token = $_COOKIE['Token'];
+$account = Account::Login($token);
 
 ?>
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <title>
-        Sharing Site
+        Sling
     </title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/css/custom.css">
-    <link rel="stylesheet" href="/assets/css/sling.css">
+    <link rel="stylesheet" href="/assets/css/semantic.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <style>
+        .contains-image{
+
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+
+    </style>
 </head>
-<!--<body style="overflow: hidden; ">-->
 <body>
-<?php
+<div class="ui grid">
 
+    <?php
     include "components/navbar.php";
+    ?>
 
-?>
-<div class="slingBackground">
-    <div class="sling-feed-container" style="margin: auto">
-        <div class="is-flex" >
-            <button class="slingButton" onclick="Modal.create('Create Room Modal', 'darken', null)">
-                Create Room
-            </button>
-            <form class="slingButton" onsubmit="joinroom(event, this);">
-                <input name="room" class="slingFormInner" type="text" size="14" value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">
-            </form>
-            <div style="width: 100%; margin-top: 50px; height: 150px">
-                <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="12535/"></script> <!-- end feedwind code -->
-            </div>
-
-        </div>
-    </div>
 </div>
-<div class="slingBackground slingBackgroundUpper"></div>
-<div class="container container-main-page">
-    <div class="sling-title-container">
-        <div class="contains-image" style="background-image: url('slingblock.png'); height: 260px; width: 100%;"></div>
-        <div class="is-flex">
-            <div class="motto-div" style="border-right: 2px solid lightgray">
-                SHARE
-            </div>
-            <div class="motto-div">
-                STREAM
-            </div>
-            <div class="motto-div" style="border-left: 2px solid lightgray">
-                CONNECT
-            </div>
-        </div>
-    </div>
+<div class="ui container fluid one item" style="min-height: 80%; width: 800px; display: flex; align-items: center; justify-content: space-around; flex-flow: row wrap; align-content: center" >
+
+    <div class="contains-image" style="background-image: url('slingblock.png'); height: 260px; width: 800px;"></div>
+
+    <div class="" style="width: 98%; font-size: 3em; margin: 20px;text-align: center;"><span>Sharing so easy you'll actually die</span></div>
+
+    <button class="ui button primary huge">Join Room</button><button class="ui button primary huge">Join Room</button>
+
 </div>
 
 
-
-
-
-<div class="container-fluid"
-               style="text-align: center; position: fixed; bottom: 0; width: 100%; background: #38474F;">
-        <div style="margin: 0 auto; height: 20%;">
-<!--            <button class="btn-main"-->
-<!--                    style=" width: 200px; margin: 15px; margin-left: 30px; margin-right: 30px; display: inline-block"-->
-<!--                    onclick="Modal.create('Create Room Modal', 'darken', null)">-->
-<!--                Create Room-->
-<!--            </button>-->
-<!---->
-<!--            <form class="" style="margin: 15px; margin-left: 30px; margin-right: 30px; display: inline-block"-->
-<!--                  onsubmit="joinroom(event, this);">-->
-<!--                <input name="room" class="mp-form" type="text" size="8" style="width: 200px; padding-left: 20px;"-->
-<!--                       value="Join Room" placeholder="Room Code" onfocus="toggleform(this)" onblur="toggleform(this)">-->
-<!--            </form>-->
-        </div>
-</div>
 
 </body>
-<script type='text/javascript' src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
-<script type='text/javascript' src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/assets/js/semantic.min.js"></script>
 <script type='text/javascript' src="/assets/js/sling.js"></script>
-<iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>
+<!--<iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>-->
 <script>
-
-
+    var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
-        isLoggedIn();
-        getRoomData();
 
-        Modal.init();
-        Resource.load("/assets/php/components/modal/create_room.php", "Create Room Modal");
-        Resource.load("/assets/php/components/modal/login_form.php", "Login Form");
+//        isLoggedIn();
+//        getRoomData();
 
-        var sbtns = document.getElementsByClassName("sbtn");
-        for (var i = sbtns.length - 1; i >= 0; i--) {
-            console.log(sbtns[i]);
-            var button = sbtns[i];
-            button.addEventListener("click", function (event) {
-                var drip = document.createElement("div");
-                var brect = button.getBoundingClientRect();
-                drip.className = "drip";
-                drip.style.left = event.pageX - brect.left - 50;
-                drip.style.top = event.pageY - brect.top - 50;
-                setTimeout(function () {
-                    button.removeChild(drip)
-                }, 1000);
-                button.appendChild(drip);
+
+        $('.ui.dropdown')
+            .dropdown({
+                on:'click'
             })
-        }
+        ;
+
+        $('.ui.dropdown.login')
+            .dropdown({
+                on:'click',
+                action:'nothing'
+            })
+        ;
+
+        $('.ui.modal').modal({
+            onApprove:function () {
+                return false;
+            },
+            approve:'.positive'
+        })
+
     });
 
 </script>
