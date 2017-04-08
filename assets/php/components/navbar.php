@@ -20,10 +20,11 @@
                     $rooms = $account->getRoomsUserIsIn();
                     foreach ($rooms as $room){
                         $room_name = strlen($room['RoomName']) > 0 ? $room['RoomName'] : "Unnamed Room" ;
-
+                        $num_participants = $room['NumUsers'];
                         ?>
                         <div class="item" onclick="location='/rooms/<?=$room['RoomID']?>'">
-                            <span class=""><?=$room_name?></span>
+                            <h4 style=""><?=$room_name?> </h4>
+                            <span data-tooltip="<?=$room['NumUsers']?> user" data-position="right center"><i class="fa fa-user"></i><?=$room['NumUsers']?></span>
                         </div>
 
                         <?php
@@ -47,10 +48,10 @@
                 ?>
             </div>
         </a>
-        <a class="ui dropdown item rooms " style="padding: 0 10px 0 10px">
+        <a class="ui dropdown item rooms " style="padding: 0 10px 0 10px" >
             <i style="padding: 0; margin: 0"><img src="/assets/images/sling64.png" height="24" width="24"></i>
 
-            <div class="menu" style="min-width: 300px; ">
+            <div id='sling-context' class="menu" style="min-width: 300px; ">
                 <div class="item" onclick="CreateBlankRoom(function(roomid) { location = '/rooms/'+roomid }, function(){alert('Room Could not be created')})">
                     <h4>Create a new Room</h4>
                     <p style="white-space: normal">
@@ -62,13 +63,13 @@
             </div>
         </a>
         <?php
-        if($account){
+        if($account->getEmail()){
             ?>
             <a id="account-dropdown" class="ui dropdown item right">
                 <span id='account-label'><?=$account->getName()['First'] . " " . $account->getName()['Last'] . ' (' . $account->getScreenName() . ')' ?></span>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item">
+                    <div class="item" onclick="var name = prompt(); Account.changeName(name)">
                         <i class="fa fa-pencil"></i>
                         Change Screen Name
                     </div>
@@ -121,7 +122,7 @@
         ?>
     </div>
 </div>
-<div class="ui modal">
+<div class="ui modal register">
     <div class="header">
         Create an Account
     </div>
@@ -160,4 +161,7 @@
             <i class="fa fa-check"></i>
         </div>
     </div>
+</div>
+<div class="ui modal dialog small">
+
 </div>

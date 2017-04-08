@@ -9,16 +9,21 @@
 require_once "classes/Account.php";
 $token = $_COOKIE['Token'];
 $account = Account::Login($token);
+if(!$account){
+    $account = Account::CreateAccount();
+    setcookie("Token", $account->getToken(), time() + 60 * 60 * 24 * 7, "/");
+}
 
 ?>
 <!DOCTYPE html>
-<html class="no-js">
+<html>
 <head>
     <title>
         Sling
     </title>
 
     <link rel="stylesheet" href="/assets/css/semantic.min.css">
+    <link rel="stylesheet" href="/assets/css/extra.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
     <style>
         .contains-image{
@@ -56,9 +61,9 @@ $account = Account::Login($token);
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="/assets/js/semantic.min.js"></script>
 <script type='text/javascript' src="/assets/js/sling.js"></script>
-<!--<iframe src="https://feed.mikle.com/widget/v2/12535/"></iframe>-->
+
 <script>
-    var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
+    Account.data = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
 
 //        isLoggedIn();

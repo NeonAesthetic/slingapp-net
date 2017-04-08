@@ -37,6 +37,7 @@ class Account extends DatabaseObject
     private $_roomID;
     private $_screenName;
     private $_active;
+    private $_passhash;
 
     /**
      * Account-Tests constructor.
@@ -123,7 +124,8 @@ class Account extends DatabaseObject
 ////            var_dump(Database::connect()->errorInfo());
 //            $retval = json_encode(['error' => "Database could not be reached"]);
 //        } else{}
-            $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate, $screenName);
+        $retval = new Account($accountID, $token, $currentDate, $email, $fName, $lName, $currentDate, $currentDate, $screenName, 1);
+        $retval->_passhash = $tempPassHash;
             $retval->update();
         return $retval;
     }
@@ -184,7 +186,7 @@ class Account extends DatabaseObject
                             if ($result['RoomID'])   //if participating in room
                                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                                     $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'],
-                                    $result['RoomID'], $result['ScreenName'], $result['AccountActive']);
+                                    $result['ScreenName'], $result['AccountActive']);
                             else                    //if not participating in room
                                 $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
                                     $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate']);
@@ -211,7 +213,7 @@ class Account extends DatabaseObject
 
                 if ($result) {
                     $retval = new Account($result['AccountID'], $result['LoginToken'], $result['TokenGenTime'],
-                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], 24, $result["ScreenName"], 1);
+                        $result['Email'], $result['FirstName'], $result['LastName'], $currentDate, $result['JoinDate'], $result["ScreenName"], 1);
 
                     $sql = "UPDATE Accounts
                 SET LastLogin = :lastLog
@@ -235,23 +237,25 @@ class Account extends DatabaseObject
      */
     public function getRoomsUserIsIn()
     {
-        $sql = "SELECT * FROM RoomAccount AS a 
+        $sql = "SELECT r.RoomName, r.RoomID, COUNT(*) as NumUsers FROM RoomAccount AS a 
                 JOIN Rooms AS r ON a.RoomID = r.RoomID
-                WHERE AccountID = :accountID";
+                JOIN RoomAccount AS ra ON r.RoomID = ra.RoomID
+                WHERE a.AccountID = :accountID 
+                GROUP BY r.RoomID";
         $statement = Database::connect()->prepare($sql);
         $statement->execute([':accountID' => $this->_accountID]);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        $json = [];
-        $json['Type'] = "RoomData";
-        $json['Rooms']=[];
-
-        foreach ($result as $row) {
-            if ($row["RoomName"] !== null)
-                $json['Rooms'] = $row['RoomName'];
-            if($row["Active"] !== null)
-                $json['Active'] = $row['Active'];
-        }
+//        $json = [];
+//        $json['Type'] = "RoomData";
+//        $json['Rooms']=[];
+//
+//        foreach ($result as $row) {
+//            if ($row["RoomName"] !== null)
+//                $json['Rooms'] = $row['RoomName'];
+//            if($row["Active"] !== null)
+//                $json['Active'] = $row['Active'];
+//        }
         return $result;
     }
     //14948841491605656826
@@ -281,20 +285,22 @@ class Account extends DatabaseObject
      */
     public function update()
     {
-        $sql = "UPDATE Accounts
-                SET Email = :email,
+        $sql = "INSERT INTO Accounts
+                (AccountID, Email, FirstName, LastName, PasswordHash, LoginToken, TokenGenTime, LastLogin, JoinDate, ScreenName)                
+                VALUES(:accid, :email, :fName, :lName, :passHash, :logTok, :tokGen, :lastLog, :joinDate, :screenName) 
+                ON DUPLICATE KEY UPDATE
+                Email = :email,
                 FirstName = :fName,
                 LastName = :lName,
                 LoginToken = :logTok,
                 TokenGenTime = :tokGen,
                 LastLogin = :lastLog,
                 JoinDate = :joinDate,
-                ScreenName = :screenName,
-                AccountActive = :active  
-                WHERE AccountID = :accountID";
+                ScreenName = :screenName";
 
         $statement = Database::connect()->prepare($sql);
         if (!$statement->execute([
+            ':accid' => $this->_accountID,
             ':email' => $this->_email,
             ':fName' => $this->_fName,
             ':lName' => $this->_lName,
@@ -302,9 +308,8 @@ class Account extends DatabaseObject
             ':tokGen' => $this->_tokenGen,
             ':lastLog' => $this->_lastLogin,
             ':joinDate' => $this->_joinDate,
-            ':accountID' => $this->_accountID,
             ':screenName' => $this->_screenName,
-            ':active' => $this->_active])
+            ':passHash' => $this->_passhash,])
         ) ;
     }
 
@@ -417,7 +422,6 @@ class Account extends DatabaseObject
         $json["LoginToken"] = $this->_token;
         $json['ID'] = $this->_accountID;
         $json['ScreenName'] = $this->_screenName;
-        $json['AccountActive'] = $this->_active;
         if ($as_array)
             return $json;
         return json_encode($json);

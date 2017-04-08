@@ -559,16 +559,11 @@ function CreateRoom(event, element) {
 
 function CreateBlankRoom(onSuccess, onError){
     $.ajax({
-        type: 'post',
-        url: 'assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "create",
-            roomname: "Default Room Name",
-            token: GetToken()
-        },
+        type: 'get',
+        url: '/api/room/new/MyRoom',
         success: function (data) {
-            onSuccess(data.RoomID);
+            // console.log(data);
+            onSuccess(data.room.RoomID);
         },
         error: function (error) {
             onError(error);
@@ -650,4 +645,18 @@ function noprop(e) {
 
 HTMLElement.prototype.removeClass = function(classname) {
     this.className = this.className.replace(new RegExp(" ?" + classname), "");
+};
+
+var Account = {
+    changeName:function (newName) {
+        $.post("/api/me/", {Name:newName}, function (data) {
+            window.location.reload();
+        });
+    }
+};
+
+var Dialog = {
+    dialog:function (text, onusersubmit) {
+        $('.ui.dialog').modal('show');
+    }
 };

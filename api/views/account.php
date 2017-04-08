@@ -87,6 +87,12 @@ function user_view($user_id){
     $stmt->execute([
         ":id"=>$user_id
     ]);
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    return new HTTPResponse($user_id);
+    $results = $stmt->fetch(PDO::FETCH_ASSOC);
+    unset($results['PasswordHash']);
+    unset($results['LoginToken']);
+    unset($results['LastLogin']);
+    unset($results['TokenGenTime']);
+    unset($results['AccountActive']);
+    unset($results['Email']);
+    return new HTTPResponse($results);
 }

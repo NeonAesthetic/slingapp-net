@@ -564,7 +564,7 @@ function putMessage(sender, _text, before, fileid) {
 
     var messageLog = document.getElementById("chat-log");
     var fileLog = document.getElementById("file-log");
-
+    console.log(sender);
     var username = Room.data.Accounts[sender].ScreenName;
     var chat_messages = document.createElement("div");
     var file_messages = document.createElement("div");

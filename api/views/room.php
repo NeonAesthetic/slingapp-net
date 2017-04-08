@@ -46,3 +46,12 @@ function format_room_json($json){
     $json['URL'] = "/rooms/" . $json['RoomID'];
     return $json;
 }
+
+function room_participant_count($room_id){
+    $sql = "SELECT COUNT(*) FROM RoomAccount WHERE RoomID = :rid";
+    $stmt = Database::connect()->prepare($sql);
+    $stmt->execute([":rid" => $room_id]);
+    return new HTTPResponse([
+        "participants" => $stmt->fetch()[0]
+    ]);
+}

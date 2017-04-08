@@ -81,7 +81,6 @@ class Room extends DatabaseObject
                                                                         $row["LastName"],
                                                                         $row["LastLogin"],
                                                                         $row["JoinDate"],
-                                                                        $row["RoomID"],
                                                                         $row["ScreenName"],
                                                                         $row["AccountActive"]
                                                                     );
@@ -193,19 +192,15 @@ class Room extends DatabaseObject
     public function addParticipant(Account $account)
     {
         $retval = false;
-        if ($screenName == null) {
-            $screenName = "Anonymous " . Database::getRandomAnimal();
-        }
 
         if (!array_key_exists($account->getAccountID(), $this->_accounts) && ($this->_usesLeft === null || $this->_usesLeft > 0)) {
-            $account->_roomID = $this->_roomID;
-            $account->_screenName = $screenName;
-            //$account->updateParticipant();
+
+//            $account->updateParticipant();
             $this->_accounts[$account->getAccountID()] = $account;
 
-            if($this->_usesLeft != null) {
-                $this->_usesLeft--;
-            }
+//            if($this->_usesLeft != null) {
+//                $this->_usesLeft--;
+//            }
 
             $sql = "INSERT INTO RoomAccount
                     (AccountID, RoomID)
