@@ -371,9 +371,13 @@ class Account extends DatabaseObject
      * Function getActive
      * @return bool
      */
-    public function getActive()
+    public function isActive()
     {
         return $this->_active;
+    }
+
+    public function isFullAccount(){
+        return (bool)$this->_email;
     }
 
     /**

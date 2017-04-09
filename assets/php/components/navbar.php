@@ -9,8 +9,30 @@
 ?>
 
 <div class="computer tablet mobile only row">
-    <div class="ui fixed menu navbar ">
+    <div class="ui inverted fixed menu navbar ">
+        <a class="ui dropdown item rooms inverted" style="padding: 0 10px 0 10px" >
+            <i style="padding: 0; margin: 0; background-image: url('/assets/images/sling_title_w.png'); height: 24px; width: 80px;" class="contains-image">
+<!--                <img src="/assets/images/sling_title_w.png" draggable="false" height="24" width="80">-->
+            </i>
+            <i class="dropdown icon"></i>
 
+            <div id='sling-context' class="menu" style="min-width: 300px; ">
+                <div class="item no-hover" onclick="Room.showCreateRoomDialog()">
+                    <h4>Create a new Room</h4>
+                    <p style="white-space: normal">
+                        A Room is an initially private container for messages, files, and
+                        audio conversations that happen within it.  Others can be invited
+                        to a Room at any time using Invite Codes.
+                    </p>
+                </div>
+                <div class="item" onclick="Room.showJoinRoomDialog()">
+                    <h4>Join Someone Else's Room</h4>
+                    <p style="white-space: normal">
+                        If you have an Invite Code, you can use it to join someone else's room.  Click here to input a code.
+                    </p>
+                </div>
+            </div>
+        </a>
         <a class="ui dropdown item rooms ">Recent Rooms
             <i class="dropdown icon"></i>
 
@@ -23,7 +45,7 @@
                         $num_participants = $room['NumUsers'];
                         ?>
                         <div class="item" onclick="location='/rooms/<?=$room['RoomID']?>'">
-                            <h4 style=""><?=$room_name?> </h4>
+                            <span class="title"><?=$room_name?> </span>
                             <span data-tooltip="<?=$room['NumUsers']?> user" data-position="right center"><i class="fa fa-user"></i><?=$room['NumUsers']?></span>
                         </div>
 
@@ -48,35 +70,22 @@
                 ?>
             </div>
         </a>
-        <a class="ui dropdown item rooms " style="padding: 0 10px 0 10px" >
-            <i style="padding: 0; margin: 0"><img src="/assets/images/sling64.png" height="24" width="24"></i>
 
-            <div id='sling-context' class="menu" style="min-width: 300px; ">
-                <div class="item" onclick="CreateBlankRoom(function(roomid) { location = '/rooms/'+roomid }, function(){alert('Room Could not be created')})">
-                    <h4>Create a new Room</h4>
-                    <p style="white-space: normal">
-                        A Room is an initially private container for messages, files, and
-                        audio conversations that happen within it.  Others can be invited
-                        to a Room at any time using Invite Codes.
-                    </p>
-                </div>
-            </div>
-        </a>
         <?php
-        if($account->getEmail()){
+        if($account->isFullAccount()){
             ?>
             <a id="account-dropdown" class="ui dropdown item right">
                 <span id='account-label'><?=$account->getName()['First'] . " " . $account->getName()['Last'] . ' (' . $account->getScreenName() . ')' ?></span>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item" onclick="var name = prompt(); Account.changeName(name)">
+                    <div class="item" onclick="Account.showChangeNameDialog()">
                         <i class="fa fa-pencil"></i>
                         Change Screen Name
                     </div>
                     <div class="divider"></div>
-                    <div class="item" onclick="logout()">
+                    <div class="item" onclick="Account.logout()">
                         <i class="fa fa-sign-out"></i>
-                        Logout
+                        Sign out
                     </div>
                 </div>
             </a>
@@ -85,34 +94,36 @@
             ?>
 
             <a id='login-dropdown' class="ui dropdown item login right">
-                Login
+                Sign In &nbsp;<span style="color: #888;;"> or </span>&nbsp; Sign up
                 <i class="dropdown icon"></i>
 
-                <div class="menu">
-                    <div class="item">
-                        <form id="loginForm" class="ui form" style="min-width: 400px;"
-                              onsubmit="submitLogin(); noprop(event)">
+                <div class="menu themed">
+                    <div class="item" style="background: transparent !important; ">
+                        <form id="loginForm" class="ui form" style="min-width: 300px;"
+                              onsubmit="submitLogin()">
                             <div class="field">
                                 <label>Email</label>
-                                <input type="email" name="email" placeholder="Email" onkeydown="clearError()">
+                                <input type="email" name="email" placeholder="Email"  oninput="Form.validate(this, Regex.email)" data-position="left center" data-offset="12">
                             </div>
 
                             <div class="field">
                                 <label>Password</label>
-                                <input type="password" name="pass1" placeholder="Password" onkeydown="clearError()">
-                            </div>
-                            <div class="ui two buttons fluid">
-                                <button onclick="submitLogin()" type="button" class="ui button primary" style="">Login
-                                </button>
-                                <div class="or"></div>
-                                <button type='button' class="ui button" onclick="$('.ui.modal').modal('show')">Register
-                                    instead
-                                </button>
+                                <input type="password" name="pass1" placeholder="Password" onchange="Form.validate(this, Regex.password)" data-position="left center" data-offset="12">
                             </div>
 
-                            <div class="ui error message">
-                                <p id="loginerror"></p>
+                            <div class="ui two buttons fluid">
+                                <button onclick="SubmitLoginForm()" type="button" class="ui button primary" style="">
+                                    Sign in
+                                </button>
+                                <div class="or"></div>
+                                <button type='button' class="ui button" onclick="$('.ui.register').modal('show')">
+                                    Sign up
+                                </button>
                             </div>
+                            <div class="ui error message">
+                                <p id="loginerror">&nbsp;</p>
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -126,42 +137,92 @@
     <div class="header">
         Create an Account
     </div>
-    <div class="image content">
-        <div class="ui medium image">
-            <img src="/assets/images/sling.png">
-        </div>
-        <form class="ui form fluid" id="registerForm" style="min-width: 400px;">
-            <div class="field">
-                <input name="fname"  placeholder="first name" type="text" onkeydown="clearError()">
-            </div>
-            <div class="field">
-                <input name="lname"  placeholder="last name" type="text" onkeydown="clearError()">
-            </div>
-            <div class="field">
-                <input name="email"  placeholder="email" type="email" onkeydown="clearError()">
-            </div>
-            <div class="field">
-                <input name="pass1"  placeholder="password" type="password" onkeyup="checkPasswords(this.parentNode.parentNode)">
-            </div>
-            <div class="field">
-                <input name="pass2"  placeholder="confirm password" type="password" onkeyup="checkPasswords(this.parentNode.parentNode)">
-            </div>
+    <div class="ui grid very padded">
+        <div class="two column row">
+            <div class="column" style="">
+                <div class="ui segments">
+                    <div class="ui segment">
+                        <h4 class="ui header">Signing in gives you benefits:</h4>
+                    </div>
+                    <div class="ui segment">
+                        <p>
+                            <ul class="ui list">
+                                <li>Rooms you create last forever</li>
+                                <li>Never lose track of Rooms you've joined</li>
+                                <li>Change your in Room name</li>
+                                <li>And More!</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
 
-            <div class="ui error message">
-                <p id="registererror"></p>
+
             </div>
-        </form>
+            <div class="ui column very padded"  style="">
+                <form class="ui form" id="registerForm" style="">
+                    <div class="ui two fields">
+                        <div class="field">
+                            <label>First Name</label>
+                            <input name="fname"  placeholder="first name" type="text" oninput="Form.validate(this, Regex.name)" data-position="left center" data-offset="12">
+                        </div>
+                        <div class="field">
+                            <label>Last Name</label>
+                            <input name="lname"  placeholder="last name" type="text" oninput="Form.validate(this, Regex.name)" data-position="left center" data-offset="12">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Email Address</label>
+                        <input name="email"  placeholder="email" type="email" oninput="Form.validate(this, Regex.email)" data-position="left center" data-offset="12">
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input name="pass1"  placeholder="password" type="password" oninput="Form.validate(this, Regex.password)" data-position="left center" data-offset="12">
+                    </div>
+                    <div class="field">
+                        <label>Confirm Password</label>
+                        <input name="pass2"  placeholder="confirm password" type="password" oninput="Form.areEqual(this, this.parentNode.parentNode['pass1'])" data-position="left center" data-offset="12">
+                    </div>
+
+                    <div class="ui error message">
+                        <p id="registererror"></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
     </div>
-    <div class="actions">
+    <div class="ui actions">
+        <div class="ui positive button" onclick="SubmitRegisterForm(); return false">
+            Submit
+        </div>
         <div class="ui black deny button">
             No thanks
         </div>
-        <div class="ui positive right labeled icon button" onclick="submitRegister(); return false">
-            Submit
-            <i class="fa fa-check"></i>
-        </div>
+
     </div>
 </div>
-<div class="ui modal dialog small">
+<div id="dialog-box" class="ui tiny modal" style="">
+    <div class="content text">
+        <h2 class="dialog-title">Title</h2>
+        <p class="dialog-content"></p>
+        <form class="ui form">
+            <input id="dialog-input">
+        </form>
+    </div>
+    <div class="content">
+        <div class="actions">
+            <div class="ui two buttons">
+                <button class="ui green approve button">
+                    Submit
+                </button>
+                <button class="ui black deny button">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
 
 </div>

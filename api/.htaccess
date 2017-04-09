@@ -1,6 +1,6 @@
 RewriteEngine on
 RewriteCond %{HTTP:Upgrade} =websocket [NC]
 RewriteRule /(.*)           ws://localhost:8001/$1 [P,L]
-RewriteCond %{REQUEST_URI} ^[^.?]+$
+RewriteCond %{REQUEST_URI} ^[^.]+$
 RewriteRule "([\s\S]+)?$"  "/api/router.php?resource=$1"
 

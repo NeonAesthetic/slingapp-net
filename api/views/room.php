@@ -55,3 +55,20 @@ function room_participant_count($room_id){
         "participants" => $stmt->fetch()[0]
     ]);
 }
+
+function join_existing_room($invite_code){
+    $response_object = [];
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account){
+        return new HTTPResponse(["error"=>"Not authorized"], 401);
+    }
+    $room = Room::GetFromCode($invite_code);
+
+    if(!$room){
+        return new HTTPResponse(["error"=>"Room not found"], 404);
+    }
+    $room->addParticipant($account);
+    return new HTTPResponse(format_room_json($room->getJSON(true)), 200);
+
+}

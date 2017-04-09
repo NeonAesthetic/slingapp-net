@@ -130,10 +130,9 @@ class Room extends DatabaseObject
         $sql = "SELECT RoomID FROM RoomCodes WHERE RoomCode = :rc";
         $statement = Database::connect()->prepare($sql);
         $result = $statement->execute([":rc" => $code]);
+        $result = $statement->fetch();
         if ($result) {
-            $id = $statement->fetch()[0];
-            error_log($id);
-            return new Room($id);
+            return new Room($result[0]);
         } else {
             return false;
         }
@@ -260,56 +259,28 @@ class Room extends DatabaseObject
      * and deleting the participant, it will return 'true'.
      * This function should be called when a rooms expires.
      */
-    public function deleteParticipant($accountID)
+    public function removeParticipant($accountID)
     {
-        $sql = "UPDATE Accounts
-                SET ScreenName = NULL,
-                AccountActive = 0
-                WHERE AccountID = :accid";
+        $sql = "DELETE FROM RoomAccounts 
+                WHERE AccountID = :accid AND RoomID = :rid";
 
-        if (Database::connect()->prepare($sql)->execute([":accid" => $accountID])) {
+        if (Database::connect()->prepare($sql)->execute([
+            ":accid" => $accountID,
+            ":rid" => $this->_roomID
+        ])) {
             unset($this->_accounts[$accountID]);
             return true;
         }
         return false;
-//        $sql = "DELETE FROM Participants WHERE AccountID = :accid";
-//        if(Database::connect()->prepare($sql)->execute([":accid" => $accountID])){
-//            unset($this->_accounts[$accountID]);
-//            return true;
-//        }
-//        return false;
+    }
 
-//        $sql = "SELECT p.RoomID
-//                FROM Participants AS p
-//                  JOIN RoomCodes AS rc
-//                    ON p.RoomID = rc.RoomID
-//                WHERE AccountID = :accountID";
-//        $statement = Database::connect()->prepare($sql);
-//        $statement->execute(array(':accountID' => $accountID));
-//        if ($result = $statement->fetch(PDO::FETCH_ASSOC)) {
-//            $sql = "DELETE
-//                    FROM RoomCodes
-//                    WHERE RoomID = :roomID";
-//            $statement = Database::connect()->prepare($sql);
-//            if ($statement->execute(array(':roomID' => $result['RoomID']))) {
-//
-//                $sql = "DELETE
-//                    FROM Participants
-//                    WHERE AccountID = :accountID";
-//
-//                if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
-//                    foreach ($this->_accounts as $a) {
-//                        if ($a->getAccountID() == $accountID) {
-//                            $a->_roomID = null;
-//                            $a->_screenName = null;
-//                            $a->_active = false;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-//    }
+    public function getCreatorID(){
+        $sql = "SELECT AccountID FROM RoomAccount WHERE RoomID = :rid LIMIT 1";
+        $stmt = Database::connect()->prepare($sql);
+        $stmt->execute([
+            ":rid" => $this->_roomID
+        ]);
+        return $stmt->fetch()[0];
     }
 
     /**
@@ -511,6 +482,7 @@ class Room extends DatabaseObject
 
         $json["RoomID"] = $this->_roomID;
         $json["RoomName"] = $this->_roomName;
+        $json['Creator'] = $this->getCreatorID();
 
         if ($as_array)
             return $json;

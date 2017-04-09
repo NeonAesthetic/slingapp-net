@@ -19,3 +19,21 @@ function index(){
         ]
     ]);
 }
+
+function dev_feed($num){
+    $feed = implode(file('https://github.com/NeonAesthetic/slingapp-net/commits/dev.atom'));
+    $xml = simplexml_load_string($feed);
+    $json = json_encode($xml);
+    $array = json_decode($json,TRUE);
+    return new HTTPResponse(get_last_num_entries($array, $num));
+}
+
+
+function get_last_num_entries($object, $num){
+    $results = [];
+    for ($i = 0; $i<$num;$i++){
+        $entry = $object['entry'][$i];
+        $results[] = $entry;
+    }
+    return $results;
+}

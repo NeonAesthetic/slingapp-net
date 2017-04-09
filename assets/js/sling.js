@@ -215,43 +215,21 @@ function submitLogin() {
     var emailRegex = new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
     var passRegex = new RegExp(".{6,30}");
 
+
     error.innerHTML = "";
 
     var formError = (validateEntry(email, emailRegex)) ? false : displayError(email, error, "Invalid email address");
     formError = (validateEntry(password, passRegex) && !formError) ? formError : displayError(password, error, "Password Length: 6-30");
-
+    console.log("here");
     if(!formError) {
         form.classList.add("loading");
-
-        return $.ajax({
-            type: 'post',
-            url: '/assets/php/components/account.php',
-            dataType: 'JSON',
-            data: {
-                action: "login",
-                email: email.value,
-                pass1: password.value
-            },
-            success: function (data) {
-                if (!data.hasOwnProperty('error') && validateCredentials(data)) {
-
-                    SetCookie("Token", data.LoginToken, 7);
-                    window.location.reload();
-                }
-                else{
-                    error.innerHTML = data.error;
-                    form.classList.add("error");
-                    form.classList.remove("loading");
-                }
-
-
-                //Provide Recent Rooms Info
-
-                return data;
-            },
-            error: function (error) {
-                console.log(error);
-            }
+        Account.authenticate(email.value, password.value, function (data) {
+            window.location.reload();
+        }, function (errorMsg) {
+            console.log(errorMsg);
+            error.innerHTML = errorMsg.responseJSON.error;
+            form.classList.add("error");
+            form.classList.remove("loading");
         });
     }else{
         form.classList.add("error");
@@ -283,18 +261,13 @@ function isLoggedIn() {
     return (token && token[0] == '1');
 }
 
-function hideLogin(data) {
-    var button = document.getElementById("login-button").className = "login-button";
-    Modal.hide();
-}
 
 function validateEntry(entry, regex) {
     if((regex && regex.test(entry.value)) && !(entry.value == "")) {
-        entry.classList.remove("form-control-error");
+        entry.parentNode.classList.remove("error");
         return true;
     } else
-        entry.classList.add("form-control-error");
-
+        entry.parentNode.classList.add("error");
     return false;
 }
 
@@ -331,12 +304,13 @@ function displayError(field, errorElement, errormsg) {
     if(errorElement.innerHTML == "") {
         errorElement.innerHTML = errormsg;
         field.focus();
+
     }
 
     return true;
 }
 
-function clearError(){ document.getElementById("loginForm").classList.remove("error");; }
+function clearError(){ $("#loginForm > input").popup('hide');document.getElementById("registerForm").classList.remove("error"); }
 
 function submitRegister() {
     var form = document.getElementById("registerForm");
@@ -346,15 +320,11 @@ function submitRegister() {
     var email = form.elements["email"];
     var pass1 = form.elements["pass1"];
     var pass2 = form.elements["pass2"];
-    var token = GetToken();
-    var nameRegex = new RegExp("[a-zA-Z]{2,30}");
-    var passRegex = new RegExp(".{6,30}");
-    var emailRegex = new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
 
     //reset error message
     form.classList.remove('error');
 
-    var formError = validateEntry(first, nameRegex) ? false : displayError(first, error, "Invalid first name, Length: 2-30");
+    var formError = validateEntry(first, Regex.name) ? false : displayError(first, error, "Invalid first name, Length: 2-30");
     formError = (validateEntry(last, nameRegex) && !formError) ? formError : displayError(last, error, "Invalid last name, Length: 2-30");
     formError = (validateEntry(email, emailRegex) && !formError) ? formError : displayError(email, error, "Invalid email address");
     formError = (validateEntry(pass1, passRegex) && !formError) ? formError : displayError(pass1, error, "Password Length: 6-30");
@@ -363,68 +333,21 @@ function submitRegister() {
     if (!formError) {
         form.classList.add('loading');
 
-        return $.ajax({
-            type: 'post',
-            url: 'assets/php/components/account.php',
-            dataType: 'JSON',
-            data: {
-                action: "register",
-                fname: first.value,
-                lname: last.value,
-                email: email.value,
-                pass1: pass1.value,
-                pass2: pass2.value,
-                token: token
-            },
-            success: function (data) {
-                var error = document.getElementById("registererror");
-
-                if (!data.hasOwnProperty('error')) {
-
-                    SetCookie("Token", data.LoginToken, 7);
-                    window.location.reload();
-                } else{
-                    error.innerHTML = data.error;
-                    form.classList.remove('loading');
-                    form.classList.add('error');
-                }
-
-
-                return data;
-            },
-            error: function (error) {
-                console.log(error);
-                error.innerHTML = data.responseText;
-                form.classList.remove('loading');
-                form.classList.add('error');
-            }
+        API.user.register(email.value, first.value, last.value, pass1.value, function (data) {
+            window.location.reload();
+        }, function (errorMsg) {
+            console.log(error);
+            error.innerHTML = errorMsg.responseJSON.error;
+            form.classList.remove('loading');
+            form.classList.add('error');
         });
+
     } else{
-        form.reportValidity();
         form.classList.remove('loading');
         form.classList.add('error');
     }
-
 }
 
-function tempRegister() {
-    return $.ajax({
-        type: 'post',
-        url: 'assets/php/components/account.php',
-        dataType: 'JSON',
-        data: {
-            action: "nocookie"
-        },
-        success: function (data) {
-            SetCookie("Token", data.LoginToken, 7);
-            Modal.hide();
-            return data;
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-}
 
 function logout() {
     DeleteCookie("Token");
@@ -647,16 +570,135 @@ HTMLElement.prototype.removeClass = function(classname) {
     this.className = this.className.replace(new RegExp(" ?" + classname), "");
 };
 
+var Room = {
+    showCreateRoomDialog:function () {
+        Dialog.dialog({
+            title:"Create a Room",
+            content:"Before your room is create, you must name it.",
+            placeholder:"Room Name",
+            button:{
+                cancel:"Cancel",
+                submit:"Create"
+            }
+        }, function (name) {
+            API.room.new(name, function (result) {
+                window.location.replace("/rooms/" + result.room.RoomID);
+            })
+        })
+    }  
+};
+
 var Account = {
     changeName:function (newName) {
-        $.post("/api/me/", {Name:newName}, function (data) {
+        API.me({Name:newName}, function (data) {
             window.location.reload();
         });
+    },
+    authenticate:function (email, password, onSuccess, onError) {
+        API.user.authenticate(email, password, onSuccess, onError);
+    },
+    showChangeNameDialog:function () {
+        Dialog.dialog({
+            title:"Change Name",
+            content:"Change how you appear inside a Room",
+            placeholder:"Screen Name",
+            button:{
+                cancel:"Cancel",
+                submit:"Change"
+            }
+        }, function (name) {
+            Account.changeName(name);
+        })
     }
 };
 
 var Dialog = {
-    dialog:function (text, onusersubmit) {
-        $('.ui.dialog').modal('show');
+    box:$('#dialog-box'),
+    title:$('#dialog-box').find(".dialog-title")[0],
+    content:$('#dialog-box').find(".dialog-content")[0],
+    buttonCancel:$('#dialog-box').find(".deny")[0],
+    buttonSubmit:$('#dialog-box').find(".approve")[0],
+    placeholder:$('#dialog-box').find("input")[0],
+    dialog:function (settings, onusersubmit) {
+        Dialog.title.innerHTML = settings.title;
+        Dialog.content.innerHTML = settings.content;
+        Dialog.buttonCancel.innerHTML = settings.button.cancel;
+        Dialog.buttonSubmit.innerHTML = settings.button.submit;
+        Dialog.placeholder.setAttribute("placeholder", settings.placeholder);
+
+
+        $('#dialog-box').modal({
+            onApprove:function () {
+                var value = $('#dialog-input')[0].value;
+                onusersubmit(value);
+            },
+            approve:'.approve'
+        }).modal('show');
+    }
+};
+
+var API = {
+    me:function (postData, onSuccess) {
+        if(typeof postData == "object"){
+            $.post("/api/me/", postData, onSuccess);
+        }else{
+            console.error("API.me requires the second argument be an object")
+        }
+    },
+    user:{
+        new:function(onSuccess){
+            $.get("/api/user/new/", "", onSuccess);
+        },
+        authenticate:function (email, password, onSuccess, onError) {
+            $.ajax({
+                method: 'post',
+                url: '/api/user/authenticate/',
+                data: {
+                    Email:email,
+                    Password:password
+                },
+                success: onSuccess,
+                error: onError
+            });
+        },
+        register:function (email, firstName, lastName, password, onSuccess, onError) {
+            $.ajax({
+                method: 'post',
+                url: '/api/user/register/',
+                data: {
+                    Email:email,
+                    FirstName:firstName,
+                    LastName:lastName,
+                    Password:password
+                },
+                success: onSuccess,
+                error: onError
+            });
+        }
+    },
+    room:{
+        new:function(roomName, onSuccess){
+            $.get("/api/room/new/" + roomName, onSuccess);
+        }
+    }
+};
+
+var Regex = {
+    password:[new RegExp(".{6,30}"), "Password Length: 6-30"],
+    name:[new RegExp("[a-zA-Z]{2,30}"), "Name Length: 2-30"],
+    email:[new RegExp("[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"), "Invalid email address"]
+};
+
+var Form = {
+    validate:function (element, regex) {
+        var field = element.parentNode;
+        field.classList.remove('error');
+        if(!regex[0].test(element.value)){
+            field.classList.add('error');
+            $(element).attr("data-content", regex[1]);
+            $(element).popup('show');
+        }else{
+            $(element).popup('hide');
+        }
     }
 };
