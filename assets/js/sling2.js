@@ -296,7 +296,12 @@ var Feed = {
         Feed.entries.forEach(function (entry) {
             console.log(entry);
             var date = new Date(entry.updated);
-            div.innerHTML += "<div class='entry' onclick='location=\""+ entry.link['@attributes'].href +"\"'><span style='color: #54c8ff'>" + entry.author.name.toUpperCase() +"</span> ON <span>" + date.toLocaleDateString().toUpperCase() + "</span>: <span style='color: #54c8ff'>\"" + entry.title.toUpperCase().trim() + "\"</span></div><span style='color: #54c8ff'> &middot; </span>";
+            div.innerHTML += "" +
+                "<div class='entry' onclick='location=\""+ entry.link['@attributes'].href +"\"'>" +
+                "<span class='author'>" + entry.author.name.toUpperCase() +"</span> " +
+                "<span class='date'>ON " + date.toLocaleDateString().toUpperCase() + ": </span>" +
+                "<span class='comment'>\"" + entry.title.toUpperCase().trim() + "\"</span></div>" +
+                "<span class='dot'> &middot; </span>";
         });
         Feed.container.appendChild(div);
     }

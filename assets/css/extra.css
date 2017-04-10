@@ -42,7 +42,7 @@
     height: 50px;
     display: inline-block;
     position: relative;
-    animation: 60s marquee linear infinite;
+    animation: 120s marquee linear infinite;
     font-family: monospace;
     color: white;
     width: auto !important;
@@ -59,6 +59,22 @@
     display: inline-block;
     padding: 0 1em 0 1em;
     cursor: pointer;
+}
+
+.rss-feed .entry .author{
+    color: #33dd77;
+}
+
+.rss-feed .entry .date{
+    color: #aaa;
+}
+
+.rss-feed .entry .comment{
+    color: #eee;
+}
+
+.rss-feed .entry .dot{
+    color: white;
 }
 
 .rss-feed .entry:hover{
