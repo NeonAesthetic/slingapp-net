@@ -48,7 +48,7 @@ if(!$account){
         <!-- BEGIN MAIN CONTENT  -->
 
         <!-- BIG THING WITH IMAGE -->
-        <div class="contains-image column sixteen wide" style="background-image: url('/assets/images/boats.jpg'); width: 100%; background-size: cover; padding: 0;">
+        <div class="contains-image column sixteen wide" style="background-image: url('/assets/images/lake.jpg'); width: 100%; background-size: cover; padding: 0;">
             <div class="" style="background-color: rgba(0,0,0,0.85);padding: 10em 0 10em 0">
                 <div class="ui container text" style="color: white; text-align: center;">
                     <h1 style="font-size: 2.7em">Sling lets you share and collaborate better than ever before.</h1>
@@ -69,8 +69,9 @@ if(!$account){
         <!-- SCREENSHOTS -->
         <div class="column sixteen wide" style="background-image: url('/assets/images/dgrey-noise.png'); box-shadow: 0 4px 10px rgba(0,0,0,0.5) inset; padding: 7em 0 7em 0; position: relative">
             <div class="ui container text" style="text-align: center;font-size: 2em; color: #ccc; font-weight: 100">
-                <p>Have an Invite Code? &nbsp; Sling doesn't require an account.</p>
+                <p>Make or Join a Room, no account necessary.</p>
                 <p>
+                    <button class="ui button inverted blue huge" onclick="Room.showCreateRoomDialog()">Make a Room</button>
                     <button class="ui button inverted blue huge" onclick="Room.showJoinRoomDialog()">Join a Room</button>
                 </p>
 
@@ -85,16 +86,16 @@ if(!$account){
                 <p>
                     All data is transfered over SSL and video and audio streams never even touch our servers.
                 </p>
-                <button class="ui button inverted blue huge" onclick="Room.showCreateRoomDialog()">Create a Room</button>
+
             </div>
             <div class="rss-feed">
-                
+
             </div>
         </div>
         <!-- FOOTER -->
         <footer class="ui column sixteen wide" style="background-color: #111; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); color: #888;padding: 50px; text-align: center">
             <div class="ui container text" style="display: flex; justify-content: space-around; align-items: center;font-size: 1.5em">
-                <a href="https://github.com/NeonAesthetic/slingapp-net/issues">Submit a bug</a>
+                <a class="ui link" href="https://github.com/NeonAesthetic/slingapp-net/issues">Submit a bug</a>
                 <a href="https://github.com/NeonAesthetic/slingapp-net/wiki">Read the documentation</a>
                 <a href="mailto:ian@slingapp.net">Contact</a>
             </div>

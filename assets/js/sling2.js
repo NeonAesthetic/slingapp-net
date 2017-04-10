@@ -6,7 +6,7 @@ var Room = {
     showCreateRoomDialog:function () {
         Dialog.dialog({
             title:"Create a Room",
-            content:"Before your room is create, you must name it.",
+            content:"Before your room is ready, you must name it.",
             placeholder:"Room Name",
             button:{
                 cancel:"Cancel",
@@ -271,10 +271,10 @@ var Feed = {
     entries:[],
     container:$('.rss-feed')[0],
     init:function () {
-        const numEntries = 3;
+        const numEntries = 20;
         $.get("/api/feed/" + numEntries, function (data) {
             Feed.entries = data;
-            Feed.appendEntry(0);
+            Feed.run(20);
         })
     },
     appendEntry:function (entryNumber) {
@@ -286,6 +286,17 @@ var Feed = {
         div.addEventListener("animationend", function () {
             Feed.container.removeChild(div);
             Feed.appendEntry(entryNumber + 1);
+        });
+        Feed.container.appendChild(div);
+    },
+    run:function (entryNumber) {
+        var div = document.createElement("div");
+        div.className = 'wrap';
+
+        Feed.entries.forEach(function (entry) {
+            console.log(entry);
+            var date = new Date(entry.updated);
+            div.innerHTML += "<div class='entry' onclick='location=\""+ entry.link['@attributes'].href +"\"'><span style='color: #54c8ff'>" + entry.author.name.toUpperCase() +"</span> ON <span>" + date.toLocaleDateString().toUpperCase() + "</span>: <span style='color: #54c8ff'>\"" + entry.title.toUpperCase().trim() + "\"</span></div><span style='color: #54c8ff'> &middot; </span>";
         });
         Feed.container.appendChild(div);
     }

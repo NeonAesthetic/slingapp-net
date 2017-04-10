@@ -33,28 +33,41 @@
     background-color: rgba(255,255,255, 0.1);
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 200%;
     overflow: hidden;
+    white-space: nowrap;
 }
 
-.rss-feed div{
+.rss-feed .wrap{
     height: 50px;
-    display: block;
+    display: inline-block;
     position: relative;
-    float: right;
-    animation: 10s marquee linear;
+    animation: 60s marquee linear infinite;
+    font-family: monospace;
     color: white;
-    font-size: large;
+    width: auto !important;
+    font-size: 20px;
     line-height: 50px;
 }
 
-.rss-feed div:hover{
+.rss-feed .wrap:hover{
     animation-play-state: paused;
+
+}
+
+.rss-feed .entry{
+    display: inline-block;
+    padding: 0 1em 0 1em;
+    cursor: pointer;
+}
+
+.rss-feed .entry:hover{
+    background-color: rgba(255,255,255,0.1);
 }
 
 @keyframes marquee {
-    0% { right: 0; }
-    100% { right: 100%; }
+    0% { transform: translateX(100vw) }
+    100% { transform: translateX(-100%) }
 }
 
 
