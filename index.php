@@ -103,6 +103,11 @@ if(!$account){
             <p>
                 <span>&copy; Copyright 2017, Sling.  All rights reserved.</span>
             </p>
+            <h4 style="color: #888">Website Health</h4>
+            <p id="metrics">
+
+                
+            </p>
 
         </footer>
     </div>
@@ -115,22 +120,17 @@ if(!$account){
     Account.data = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
 
-//        isLoggedIn();
-//        getRoomData();
-
 
         $('.ui.dropdown')
             .dropdown({
                 on:'hover'
-            })
-        ;
+            });
 
         $('.ui.dropdown.login')
             .dropdown({
                 on:'click',
                 action:'nothing'
-            })
-        ;
+            });
 
         $('.ui.modal').modal({
             onApprove:function () {
@@ -148,6 +148,7 @@ if(!$account){
         });
 
         Feed.init();
+        Metrics.init();
 
     });
 

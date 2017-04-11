@@ -348,3 +348,46 @@ var Feed = {
     }
 
 };
+
+var Metrics = {
+    metrics:{},
+    container:$('#metrics')[0],
+    init:function () {
+        $.get("/api/metrics", function (data) {
+            console.log(data);
+            for(var m of data){
+                Metrics.metrics[m.Event] = parseFloat(m.AvgTime);
+            }
+            Metrics.setPropertiesConditional('API_AUTHENTICATE', "Authentication", 90, 120);
+            Metrics.setPropertiesConditional('WSS_SEND_MESSAGE', "WSS Publish Message", 5, 15);
+            Metrics.setPropertiesConditional('WSS_REGISTER', "WSS Subscribe", 5, 15);
+            Metrics.setPropertiesConditional('API_CREATE_BLANK_ACCOUNT', "Account Creation", 40, 80);
+            Metrics.setPropertiesConditional('API_CREATE_ROOM_AND_JOIN_ACCOUNT', "Room Creation", 40, 80);
+            // Metrics.setPropertiesConditional('API_CREATE_ROOM_AND_JOIN_ACCOUNT', "Room Creation", 40, 80);
+
+
+        })
+    },
+    setPropertiesConditional:function (key, eventLabel, good, intermediate) {
+        if(!key in Metrics.metrics) return;
+        var time = Metrics.metrics[key];
+        var div = document.createElement("div");
+        div.className = "ui button tiny inverted basic metric";
+        div.innerHTML = eventLabel;
+        div.setAttribute("data-tooltip", time + "ms average process time");
+        div.setAttribute("data-inverted", "");
+        if(time < good){
+            div.classList.add("green");
+            // div.innerHTML += ": Good";
+        }
+        else if (time < intermediate){
+            div.classList.add("orange");
+            // div.innerHTML += ": Alright";
+        }
+        else{
+            div.classList.add("red");
+            // div.innerHTML = ": Bad";
+        }
+        Metrics.container.appendChild(div);
+    }
+};
