@@ -10,6 +10,7 @@
 $script_start = microtime(true);
 require_once "routes.php";
 require_once "classes/http/HTTPResponse.php";
+require_once "classes/logging/PerformanceMetricsLogger.php";
 $requested_resource = $_GET['resource'];
 
 foreach (API_ROUTES as $route) {
@@ -31,7 +32,8 @@ foreach (API_ROUTES as $route) {
             echo $output;
         }
         $script_end = microtime(true);
-        error_log("[API] Access Time: " . round(($script_end - $script_start)*1000, 2) . "ms");
+        $api_event_process_time = round(($script_end - $script_start)*1000, 2);
+        PerformanceMetricsLogger::Log("API_" . strtoupper($view), $api_event_process_time, NULL);
         exit();
     }
 

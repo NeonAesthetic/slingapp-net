@@ -12,6 +12,7 @@ require_once "classes/Account.php";
 
 
 function create_room_and_join_account($room_name){
+    
     $response_object = [];
     $token = $_COOKIE['Token'] OR $_POST['Token'];
     $account = Account::Login($token);

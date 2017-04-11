@@ -45,8 +45,10 @@ var Room = {
         }, function (name) {
             document.body.classList.add("loading");
             API.room.join(name, function (result) {
+                console.log(result);
                 window.location.replace("/rooms/" + result.room.RoomID);
             },function (error) {
+                console.error(error);
                 var err = error.responseJSON.error;
                 Toast.error(err);
             })
@@ -333,7 +335,7 @@ var Feed = {
         div.className = 'wrap';
 
         Feed.entries.forEach(function (entry) {
-            console.log(entry);
+            // console.log(entry);
             var date = new Date(entry.updated);
             div.innerHTML += "" +
                 "<div class='entry' onclick='location=\""+ entry.link['@attributes'].href +"\"'>" +

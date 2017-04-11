@@ -7,6 +7,7 @@
  */
 
 require_once "classes/http/HTTPResponse.php";
+require_once "classes/logging/PerformanceMetricsLogger.php";
 
 
 
@@ -36,4 +37,8 @@ function get_last_num_entries($object, $num){
         $results[] = $entry;
     }
     return $results;
+}
+
+function website_health(){
+    return new HTTPResponse(PerformanceMetricsLogger::GetRecentMetrics());
 }

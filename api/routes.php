@@ -20,4 +20,5 @@ const API_ROUTES = [
     ["^user/([0-9]+)/?", "account.php", "user_view"],
     ["^user/authenticate/?", "account.php", "authenticate"],
     ["^user/register/?", "account.php", "register"],
+    ["^metrics/?", "api.php", "website_health"],
 ];
