@@ -72,3 +72,30 @@ function join_existing_room($invite_code){
     return new HTTPResponse(format_room_json($room->getJSON(true)), 200);
 
 }
+
+function delete_room($room_id){
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account) return new HTTPResponse(["error" => "Not authorized"], 401);
+    try{
+        $room = new Room($room_id);
+        if($room->getCreatorID() != $account->getAccountID()) return new HTTPResponse(["error" => "Forbidden: you don't have access to this room"], 401);
+        $room->delete();
+        return new HTTPResponse(["success" => true], 200);
+    }catch (Exception $e){
+        return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
+    }
+}
+
+function leave_room($room_id){
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account) return new HTTPResponse(["error" => "Not authorized"], 401);
+    try{
+        $room = new Room($room_id);
+        $room->removeParticipant($account->getAccountID());
+        return new HTTPResponse(["success" => true], 200);
+    }catch (Exception $e){
+        return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
+    }
+}

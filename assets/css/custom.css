@@ -536,11 +536,3 @@ form{
     }
 }
 
-@keyframes toast-pop {
-    from {
-        margin-bottom: 0;
-    }
-    to {
-        margin-bottom: 100px;
-    }
-}

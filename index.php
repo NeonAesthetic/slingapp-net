@@ -121,7 +121,7 @@ if(!$account){
 
         $('.ui.dropdown')
             .dropdown({
-                on:'click'
+                on:'hover'
             })
         ;
 

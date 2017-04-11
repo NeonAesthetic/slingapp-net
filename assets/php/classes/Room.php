@@ -31,7 +31,6 @@ class Room extends DatabaseObject
     private $_roomID;
     private $_roomName;
     private $_usesLeft;
-    private $_expirationDate;
     private $_chat;
     //pass account object to constructor or just the needed parameters to factor out the select statement
     /**
@@ -64,33 +63,33 @@ class Room extends DatabaseObject
             $this->_roomName = $result[0]["RoomName"];
 
             foreach ($result as $row) {
-                if ($row["RoomCode"] != null)
-                    $this->_room_codes[$row["RoomCode"]] = new RoomCode($row["RoomCode"], $row["RoomID"], $row["CreatedBy"],
-                        $row["RemainingUses"], $row["ExpirationDate"]);
+                if ($row["RoomCode"] != null){
+                    $this->_room_codes[$row["RoomCode"]] = new RoomCode(
+                        $row["RoomCode"],
+                        $row["RoomID"],
+                        $row["CreatedBy"],
+                        $row["RemainingUses"],
+                        $row["ExpirationDate"]
+                    );
+                }
+
                 if ($row["AccountID"] != null) {
-//                    $this->_accounts[$row["AccountID"]] = Account::Login($row["LoginToken"]);
                     /**
                      *          THIS WORKS, PLS NO TOUCH
                      */
                     $this->_accounts[$row["AccountID"]] = new Account(
-                                                                        $row["AccountID"],
-                                                                        $row["LoginToken"],
-                                                                        $row["TokenGenTime"],
-                                                                        $row["Email"],
-                                                                        $row["FirstName"],
-                                                                        $row["LastName"],
-                                                                        $row["LastLogin"],
-                                                                        $row["JoinDate"],
-                                                                        $row["ScreenName"],
-                                                                        $row["AccountActive"]
-                                                                    );
-
-//                    $this->_accounts[$row["AccountID"]]->_roomID = $roomID;
-//                    $this->_accounts[$row["AccountID"]]->setParticipantID($row["ParticipantID"]);
-//                    $this->_accounts[$row["AccountID"]]->_screenName = $row["ScreenName"];
+                        $row["AccountID"],
+                        $row["LoginToken"],
+                        $row["TokenGenTime"],
+                        $row["Email"],
+                        $row["FirstName"],
+                        $row["LastName"],
+                        $row["LastLogin"],
+                        $row["JoinDate"],
+                        $row["ScreenName"],
+                        $row["AccountActive"]
+                    );
                 }
-
-//                $this->_accounts = array_unique($this->_accounts);
             }
 
         } else {
@@ -118,7 +117,7 @@ class Room extends DatabaseObject
             ":id" => $id,
             ":name" => $roomName
         ])) {
-            throw new Exception("Could not create room");
+            return false;
         }
 
         $room = new Room($id);
@@ -165,6 +164,7 @@ class Room extends DatabaseObject
 
     public function accountInRoom(Account $account)
     {
+        return (bool)array_key_exists($account->getAccountID(), $this->_accounts);
         $id = $account->getAccountID();
         $rid = $this->_roomID;
         $sql = "SELECT COUNT(*) 
@@ -192,14 +192,9 @@ class Room extends DatabaseObject
     {
         $retval = false;
 
-        if (!array_key_exists($account->getAccountID(), $this->_accounts) && ($this->_usesLeft === null || $this->_usesLeft > 0)) {
+        if (!array_key_exists($account->getAccountID(), $this->_accounts)) {
 
-//            $account->updateParticipant();
             $this->_accounts[$account->getAccountID()] = $account;
-
-//            if($this->_usesLeft != null) {
-//                $this->_usesLeft--;
-//            }
 
             $sql = "INSERT INTO RoomAccount
                     (AccountID, RoomID)
@@ -218,39 +213,24 @@ class Room extends DatabaseObject
      */
     public function delete()
     {
-        $sql = "DELETE FROM RoomCodes WHERE RoomID=:roomid";
-        if (!Database::connect()->prepare($sql)->execute([":roomid" => $this->_roomID])) {
-            echo Database::connect()->errorInfo()[2] . "<br>";
+        $sql_queries = [
+            "DELETE FROM RoomAccount WHERE RoomID = :roomid",
+            "DELETE FROM RoomCodes WHERE RoomID = :roomid",
+            "DELETE FROM Messages WHERE RoomID = :roomid",
+            "DELETE FROM Files WHERE FileID NOT IN (SELECT FileID FROM Messages)",
+            "DELETE FROM Logs WHERE RoomID = :roomid",
+            "DELETE FROM Rooms WHERE RoomID = :roomid",
+
+        ];
+        foreach ($sql_queries as $sql_query) {
+            $result = Database::connect()->prepare($sql_query)->execute([
+                ":roomid" => $this->_roomID
+            ]);
         }
-        $this->_room_codes = [];
-
-        $sql = "UPDATE Accounts AS a
-                  JOIN RoomAccount AS ra
-                    ON a.AccountID = ra.AccountID
-                  JOIN Rooms AS r
-                    ON ra.RoomID = r.RoomID
-                SET ScreenName = NULL,
-                a.AccountActive = 0,
-                r.Active = 0
-                WHERE r.RoomID = :roomid";
-
-        if (!Database::connect()->prepare($sql)->execute([":roomid" => $this->_roomID])) {
-            echo Database::connect()->errorInfo()[2] . "<br>";
-        }
-        $this->_accounts = [];
-
-        $sql = "DELETE FROM RoomAccount WHERE RoomID=:roomid";
-        if (Database::connect()->prepare($sql)->execute([":roomid" => $this->_roomID])) {
-            $sql = "DELETE FROM Rooms WHERE RoomID=:roomid";
-            Database::connect()->prepare($sql)->execute([":roomid" => $this->_roomID]);
-        } else
-            echo Database::connect()->errorInfo()[2] . "<br>";
-
-        $this->_roomID = null;
     }
 
     /**
-     * Function deleteParticipant
+     * Function removeParticipant
      * @param $accountID
      * @return boolean
      * This function will remove the account's participant from the database.
@@ -283,14 +263,6 @@ class Room extends DatabaseObject
         return $stmt->fetch()[0];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUsesLeft()
-    {
-        return $this->_usesLeft;
-    }
-
     public function setUsesLeft($uses, $code)
     {
         $this->_room_codes[$code]->setUses($uses);
@@ -300,59 +272,6 @@ class Room extends DatabaseObject
     public function deleteCode($code)
     {
         $this->_room_codes[$code]->delete();
-    }
-
-
-    public function setParticipantInactive($accountID)
-    {
-        $retval = false;
-
-        $sql = "SELECT a.RoomID
-                FROM Accounts AS a
-                  JOIN RoomCodes AS rc
-                    ON a.RoomID = rc.RoomID
-                WHERE AccountID = :accountID";
-        $statement = Database::connect()->prepare($sql);
-        $statement->execute(array(':accountID' => $accountID));
-
-        if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
-            foreach ($this->_accounts as $a) {
-                if ($a->getAccountID() == $accountID) {
-                    $a->_active = false;
-                }
-            }
-        }
-        return $retval;
-//        $retval = false;
-//
-//        $sql = "SELECT p.RoomID
-//                FROM Participants AS p
-//                  JOIN RoomCodes AS rc
-//                    ON p.RoomID = rc.RoomID
-//                WHERE AccountID = :accountID";
-//        $statement = Database::connect()->prepare($sql);
-//        $statement->execute(array(':accountID' => $accountID));
-//        if ($result = $statement->fetch(PDO::FETCH_ASSOC)) {
-//            $sql = "SELECT
-//                    FROM RoomCodes
-//                    WHERE RoomID = :roomID";
-//            $statement = Database::connect()->prepare($sql);
-//            if ($statement->execute(array(':roomID' => $result['RoomID']))) {
-//
-//                $sql = "SELECT *
-//                    FROM Participants
-//                    WHERE AccountID = :accountID";
-//
-//                if ($retval = Database::connect()->prepare($sql)->execute(array(':accountID' => $accountID))) {
-//                    foreach ($this->_accounts as $a) {
-//                        if ($a->getAccountID() == $accountID) {
-//                            $a->_active = false;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return $retval;
     }
 
     /**
@@ -402,8 +321,6 @@ class Room extends DatabaseObject
             if($uses && $uses > $this->_usesLeft) {
                 $this->_usesLeft = $uses;
             }
-//            $participantID = $this->_accounts[$accountID]->getParticipantID();
-//            $this->_room_codes[] = $retval = RoomCode::createRoomCode($this->_roomID, $participantID, $uses, $expires);
         }
         return $retval;
     }
@@ -426,19 +343,6 @@ class Room extends DatabaseObject
             $participants[] = $p->getScreenName();
         }
         return $participants;
-    }
-
-    /**
-     * @param $accountID
-     * @return true|false
-     */
-    public function checkForAccountInRoom($accountID)
-    {
-        foreach ($this->_accounts as $p) {
-            if($accountID == $p->getAccountID())
-                return true;
-        }
-        return false;
     }
 
     /**

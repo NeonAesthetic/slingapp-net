@@ -2,6 +2,22 @@
  * Created by Ian Murphy on 4/9/2017.
  */
 
+var Toast = {
+    pop:function(text, classname, timeout){
+        if(!timeout) timeout = 3000;
+        var toast = document.createElement("div");
+        toast.className = "toast " + classname;
+        toast.innerHTML = text;
+        document.body.appendChild(toast);
+        setTimeout(function(){
+            document.body.removeChild(toast);
+        },timeout)
+    },
+    error:function (text, timeout) {
+        Toast.pop(text, "error", timeout);
+    }
+};
+
 var Room = {
     showCreateRoomDialog:function () {
         Dialog.dialog({
@@ -27,8 +43,12 @@ var Room = {
                 submit:"Join"
             }
         }, function (name) {
-            API.room.new(name, function (result) {
+            document.body.classList.add("loading");
+            API.room.join(name, function (result) {
                 window.location.replace("/rooms/" + result.room.RoomID);
+            },function (error) {
+                var err = error.responseJSON.error;
+                Toast.error(err);
             })
         })
     }
@@ -127,11 +147,30 @@ var API = {
         }
     },
     room:{
-        new:function(roomName, onSuccess){
-            $.get("/api/room/new/" + roomName, onSuccess);
+        new:function(roomName, onSuccess, onError){
+            $.ajax({
+                method: 'get',
+                url: '/api/room/new/'+roomName,
+                success: onSuccess,
+                error: onError
+            });
         },
-        join:function (code) {
-            
+        join:function (code, onSuccess, onError) {
+            $.ajax({
+                method: 'get',
+                url: '/api/room/join/'+code,
+                success: onSuccess,
+                error: onError
+            });
+        },
+        delete:function (roomid, onSuccess, onError) {
+            $.get("/api/room/" + roomid + "/delete/", onSuccess);
+            $.ajax({
+                method: 'get',
+                url: '/api/room/'+roomid+'/delete',
+                success: onSuccess,
+                error: onError
+            });
         }
     }
 };
@@ -274,7 +313,7 @@ var Feed = {
         const numEntries = 20;
         $.get("/api/feed/" + numEntries, function (data) {
             Feed.entries = data;
-            Feed.run(20);
+            Feed.run();
         })
     },
     appendEntry:function (entryNumber) {
@@ -289,7 +328,7 @@ var Feed = {
         });
         Feed.container.appendChild(div);
     },
-    run:function (entryNumber) {
+    run:function () {
         var div = document.createElement("div");
         div.className = 'wrap';
 

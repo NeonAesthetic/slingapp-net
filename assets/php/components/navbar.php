@@ -10,14 +10,14 @@
 
 <div class="computer tablet mobile only row">
     <div class="ui inverted fixed menu navbar ">
-        <a class="ui dropdown item rooms inverted" style="padding: 0 10px 0 10px" >
+        <a class="ui dropdown item rooms" style="padding: 0 10px 0 10px" >
             <i style="padding: 0; margin: 0; background-image: url('/assets/images/sling_title_w.png'); height: 24px; width: 80px;" class="contains-image">
 <!--                <img src="/assets/images/sling_title_w.png" draggable="false" height="24" width="80">-->
             </i>
             <i class="dropdown icon"></i>
 
             <div id='sling-context' class="menu" style="min-width: 300px; ">
-                <div class="item no-hover" onclick="Room.showCreateRoomDialog()">
+                <div class="item" onclick="Room.showCreateRoomDialog()">
                     <h4>Create a new Room</h4>
                     <p style="white-space: normal">
                         A Room is an initially private container for messages, files, and
@@ -44,9 +44,18 @@
                         $room_name = strlen($room['RoomName']) > 0 ? $room['RoomName'] : "Unnamed Room" ;
                         $num_participants = $room['NumUsers'];
                         ?>
-                        <div class="item" onclick="location='/rooms/<?=$room['RoomID']?>'">
-                            <span class="title"><?=$room_name?> </span>
-                            <span data-tooltip="<?=$room['NumUsers']?> user" data-position="right center"><i class="fa fa-user"></i><?=$room['NumUsers']?></span>
+                        <div class="item" onclick="location='/rooms/<?=$room['RoomID']?>'" style="white-space: nowrap; min-width: 200px">
+                            <div class="" style="display: inline-block"><?=$room_name?> </div>
+                            <div class="ui right floated" style="display: inline-block">
+                                <span data-tooltip="<?=$room['NumUsers']?> user(s)" style="color: inherit">
+                                    <i class="fa fa-user"></i>
+                                    <?=$room['NumUsers']?>
+                                </span> &nbsp;
+                                <span onclick="API.roo" class="ui icon button red basic" data-tooltip="Delete this room" style=" margin: 0; padding: 0.2em 0.3em 0.2em 0.3em;">
+                                    <i class="fa fa-times"></i>
+                                </span>
+
+                            </div>
                         </div>
 
                         <?php

@@ -627,4 +627,3 @@ function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
 }
-

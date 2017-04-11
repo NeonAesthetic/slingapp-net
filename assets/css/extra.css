@@ -8,7 +8,7 @@
     border-radius: 4px;
     border: 1px solid lightgrey;
     box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
-    background-color: white;
+    background-color: whitesmoke;
     width: 200px;
     overflow: visible;
     overflow-wrap: break-word;
@@ -120,4 +120,22 @@
         width: 400px;
         margin: 0em 0em 0em -200px;
     }
+}
+
+@keyframes toast-pop {
+    from {
+        transform: translateY(100px);
+    }
+    to {
+        transform: translateY(-100px);
+    }
+}
+
+.inverted > .item{
+    color: #eee !important;
+}
+
+.menu .inverted{
+    background-color: #444 !important;
+    color: #fff !important;
 }
