@@ -1,6 +1,7 @@
 <?php
 
 require_once('classes/websockets/users.php');
+require_once "classes/logging/PerformanceMetricsLogger.php";
 
 abstract class WebSocketServer
 {
@@ -87,6 +88,7 @@ abstract class WebSocketServer
                 case "Send Message":
                 {
                     $this->on_client_chat($user, $message_object, $client_room, $client_account);
+
                 }break;
 
                 case "Register":
@@ -105,8 +107,6 @@ abstract class WebSocketServer
 
                 case "Change Name":
                 {
-
-
                     $this->on_client_alter_name($user, $message_object, $client_room, $client_account);
                 }break;
 
@@ -129,7 +129,9 @@ abstract class WebSocketServer
                 default:
                     echo "\n" . $message . "\n";
             }
-            error_log("Event processed in " . round((microtime(true) - $loop_start)*1000, 3) . " ms");
+            $event_process_time =round((microtime(true) - $loop_start)*1000, 3);
+            error_log("Event processed in " . $event_process_time . " ms");
+            PerformanceMetricsLogger::Log("WSS_" . strtoupper(str_replace(" ", "_", $message_object['action'])), $event_process_time, NULL);
         }catch (Throwable $e){
             error_log($e->getMessage());
             echo $e->getMessage() . NL;

@@ -1,0 +1,141 @@
+.toast {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    bottom: 0;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid lightgrey;
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
+    background-color: whitesmoke;
+    width: 200px;
+    overflow: visible;
+    overflow-wrap: break-word;
+    overflow-clip: wrap;
+    padding: 15px;
+    animation: 0.3s toast-pop forwards;
+}
+
+.toast.error {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: white;
+    font-weight: 600;
+}
+
+.no-hover:hover{
+    background: white !important;
+}
+
+.rss-feed{
+    height: 50px;
+    background-color: rgba(255,255,255, 0.1);
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.rss-feed .wrap{
+    height: 50px;
+    display: inline-block;
+    position: relative;
+    animation: 120s marquee linear infinite;
+    font-family: monospace;
+    color: white;
+    width: auto !important;
+    font-size: 20px;
+    line-height: 50px;
+}
+
+.rss-feed .wrap:hover{
+    animation-play-state: paused;
+
+}
+
+.rss-feed .entry{
+    display: inline-block;
+    padding: 0 1em 0 1em;
+    cursor: pointer;
+}
+
+.rss-feed .entry .author{
+    color: #33dd77;
+}
+
+.rss-feed .entry .date{
+    color: #aaa;
+}
+
+.rss-feed .entry .comment{
+    color: #eee;
+}
+
+.rss-feed .entry .dot{
+    color: white;
+}
+
+.rss-feed .entry:hover{
+    background-color: rgba(255,255,255,0.1);
+}
+
+@keyframes marquee {
+    0% { transform: translateX(100vw) }
+    100% { transform: translateX(-100%) }
+}
+
+
+@media only screen and (max-width: 767px) {
+    .ui.tiny.modal {
+        width: 95%;
+        margin: 0em 0em 0em -47.5%;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .ui.tiny.modal {
+        width: 50%;
+        margin: 0em 0em 0em -25%;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    .ui.tiny.modal {
+        width: 200px;
+        margin: 0em 0em 0em -100px;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .ui.tiny.modal {
+        width: 300px;
+        margin: 0em 0em 0em -150px;
+    }
+}
+
+@media only screen and (min-width: 1920px) {
+    .ui.tiny.modal {
+        width: 400px;
+        margin: 0em 0em 0em -200px;
+    }
+}
+
+@keyframes toast-pop {
+    from {
+        transform: translateY(100px);
+    }
+    to {
+        transform: translateY(-100px);
+    }
+}
+
+.inverted > .item{
+    color: #eee !important;
+}
+
+.menu .inverted{
+    background-color: #444 !important;
+    color: #fff !important;
+}

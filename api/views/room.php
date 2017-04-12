@@ -12,6 +12,7 @@ require_once "classes/Account.php";
 
 
 function create_room_and_join_account($room_name){
+    
     $response_object = [];
     $token = $_COOKIE['Token'] OR $_POST['Token'];
     $account = Account::Login($token);
@@ -30,12 +31,6 @@ function create_room_and_join_account($room_name){
     return new HTTPResponse($response_object);
 }
 
-function room_action($room_id, $action){
-    ob_start();
-    echo "Action: " . $action . "<br>";
-    echo "Room: " . $room_id . "<br>";
-    return ob_get_clean();
-}
 
 function room_view($room_id){
     $room = new Room($room_id);
@@ -51,4 +46,57 @@ function format_room_json($json){
     unset($json['RoomCodes']);
     $json['URL'] = "/rooms/" . $json['RoomID'];
     return $json;
+}
+
+function room_participant_count($room_id){
+    $sql = "SELECT COUNT(*) FROM RoomAccount WHERE RoomID = :rid";
+    $stmt = Database::connect()->prepare($sql);
+    $stmt->execute([":rid" => $room_id]);
+    return new HTTPResponse([
+        "participants" => $stmt->fetch()[0]
+    ]);
+}
+
+function join_existing_room($invite_code){
+    $response_object = [];
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account){
+        return new HTTPResponse(["error"=>"Not authorized"], 401);
+    }
+    $room = Room::GetFromCode($invite_code);
+
+    if(!$room){
+        return new HTTPResponse(["error"=>"Room not found"], 404);
+    }
+    $room->addParticipant($account);
+    return new HTTPResponse(format_room_json($room->getJSON(true)), 200);
+
+}
+
+function delete_room($room_id){
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account) return new HTTPResponse(["error" => "Not authorized"], 401);
+    try{
+        $room = new Room($room_id);
+        if($room->getCreatorID() != $account->getAccountID()) return new HTTPResponse(["error" => "Forbidden: you don't have access to this room"], 401);
+        $room->delete();
+        return new HTTPResponse(["success" => true], 200);
+    }catch (Exception $e){
+        return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
+    }
+}
+
+function leave_room($room_id){
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+    if(!$account) return new HTTPResponse(["error" => "Not authorized"], 401);
+    try{
+        $room = new Room($room_id);
+        $room->removeParticipant($account->getAccountID());
+        return new HTTPResponse(["success" => true], 200);
+    }catch (Exception $e){
+        return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
+    }
 }

@@ -11,20 +11,8 @@ CREATE DATABASE sling
 
 GRANT ALL PRIVILEGES ON sling.* TO 'sling';
 
-<<<<<<< HEAD
---# Was in accounts?
---#FullName VARCHAR(64) NULL,     split fullname to conform to 1NF
 USE sling;
 
-
-
-
---#DROP ALL TABLES
-=======
-USE sling;
-
-#DROP ALL TABLES
->>>>>>> 2ae8c41ab8e19d4a426c568667ff12a14fd5aaee
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS Rooms;
@@ -40,10 +28,11 @@ DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS LogTypes;
 DROP TABLE IF EXISTS Animals;
 DROP TABLE IF EXISTS RoomAccount;
+DROP TABLE IF EXISTS PerformanceMetrics;
 SET FOREIGN_KEY_CHECKS = 1;
 
 
---===============START CREATE TABLES ================================
+#===============START CREATE TABLES ================================
 CREATE TABLE Rooms (
   RoomID   BIGINT UNSIGNED,
   RoomName VARCHAR(32) NOT NULL,
@@ -207,6 +196,17 @@ VALUES
   ('Fox'),
   ('Turtle'),
   ('Harambe');
+
+
+
+CREATE TABLE PerformanceMetrics (
+  ID                SERIAL,
+  Event             VARCHAR(32),
+  ProcessTime       DOUBLE,
+  Time              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  Other             VARCHAR(2048),
+  PRIMARY KEY (ID)
+);
 
 #===================END CREATE TABLES====================
 

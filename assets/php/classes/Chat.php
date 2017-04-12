@@ -23,11 +23,6 @@ class Chat
         $this->_roomid = $roomid;
     }
 
-    private function _get_messages($number, $before = -1)
-    {
-
-    }
-
     public function getMessages($number, $before = 99999999999999999999999999)
     {
         $retval = false;

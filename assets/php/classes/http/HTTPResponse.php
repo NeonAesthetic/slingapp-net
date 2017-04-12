@@ -13,9 +13,10 @@ class HTTPResponse
 {
     private $__output = "";
     private $__is_json = false;
-    private $__status = 200;
-    public function __construct($string)
+    private $__status;
+    public function __construct($string, $status=200)
     {
+        $this->__status = $status;
         if(is_array($string)){
             $this->__output = json_encode($string, JSON_PRETTY_PRINT);
             $this->__is_json = true;

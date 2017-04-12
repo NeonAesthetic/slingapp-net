@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{REQUEST_URI} /i/[a-zA-Z0-9]+$
+RewriteRule "([a-zA-Z0-9]+)/?$"  "/i/index.php?invite=$1"
+

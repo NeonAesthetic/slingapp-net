@@ -7,33 +7,27 @@
  */
 
 $roomid = $_GET["room"];
-require_once "components/StandardHeader.php";
 require_once "classes/Room.php";
 $token = $_COOKIE["Token"];
 
-$room = new Room($roomid);
 $account = Account::Login($token);
 
 if(!$account){
     header("HTTP/1.1 401 Unauthorized");
     header("Location: /assets/error/401.html");
 }
-if(!$room->accountInRoom($account))
-{
-    echo "Hi:";
-    error_log($room->accountInRoom($account));
-    exit();
+$room = false;
+try{
+    $room = new Room($roomid);
+}catch (Exception $e){
+    
 }
-
-if($room){
+if(!$room OR !$room->accountInRoom($account))
+{
+    header("Location: /");
+}else{
     $room_json = $room->getJSON();
 }
-else{
-//    ApacheError(404);
-}
-
-
-
 
 ?>
 <!DOCTYPE html>
