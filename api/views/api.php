@@ -29,6 +29,19 @@ function dev_feed($num){
     return new HTTPResponse(get_last_num_entries($array, $num));
 }
 
+function commit_feed($num){
+    $feed = implode(file('https://github.com/NeonAesthetic/slingapp-net/commits/dev.atom'));
+    $xml = simplexml_load_string($feed);
+    $json = json_encode($xml);
+    $array = json_decode($json,TRUE);
+//    $array = get_last_num_entries($array, $num);
+//    $build = "";
+//    foreach ($array as $item) {
+//        $build .= $item['content'];
+//    }
+    return new HTTPResponse($array);
+}
+
 
 function get_last_num_entries($object, $num){
     $results = [];
