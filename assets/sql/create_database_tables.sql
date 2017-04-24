@@ -1,9 +1,9 @@
 # CREATE USER AND DATABASE
 
-DROP USER 'sling@localhost';
+# DROP USER 'sling@localhost';
 DROP DATABASE IF EXISTS sling;
 
-CREATE USER 'sling'@'localhost';
+# CREATE USER 'sling'@'localhost';
 
 CREATE DATABASE sling
   CHARACTER SET utf8
