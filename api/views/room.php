@@ -33,11 +33,18 @@ function create_room_and_join_account($room_name){
 
 
 function room_view($room_id){
-    $room = new Room($room_id);
-    $json = $room->getJSON(true);
+    try{
+        $room = new Room($room_id);
+        return new HTTPResponse(format_room_json($room->getJSON(true)), 200);
+    }catch(Exception $e){
+        return new HTTPResponse([
+            "error" => $e->getMessage()
+        ], 404);
+    }
 
 
-    return new HTTPResponse(format_room_json($json));
+
+
 }
 
 function format_room_json($json){
@@ -100,6 +107,7 @@ function leave_room($room_id){
         return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
     }
 }
+
 function room_create_invite($room_id){
     $token = $_COOKIE['Token'] OR $_POST['Token'];
     $account = Account::Login($token);

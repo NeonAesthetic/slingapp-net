@@ -51,7 +51,7 @@
                                     <i class="fa fa-user"></i>
                                     <?=$room['NumUsers']?>
                                 </span> &nbsp;
-                                <span onclick="API.roo" class="ui icon button red basic" data-tooltip="Delete this room" style=" margin: 0; padding: 0.2em 0.3em 0.2em 0.3em;">
+                                <span onclick="API.room" class="ui icon button red basic" data-tooltip="Delete this room" style=" margin: 0; padding: 0.2em 0.3em 0.2em 0.3em;">
                                     <i class="fa fa-times"></i>
                                 </span>
 

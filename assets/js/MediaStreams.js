@@ -216,7 +216,7 @@ var AVC = {
     },
     getUserScreencaptureStream:function (callback) {
 
-        var extensionID = "kfgaafajpkopkaljlblgmijmedhcbhkm";
+        var extensionID = "pecpbndlndfegjibmbaplkjdkhdgmnei";
         chrome.runtime.sendMessage(extensionID, {text: "wew lad"}, function(response) {
             if(response){
                 var options = MEDIA.SCREEN;

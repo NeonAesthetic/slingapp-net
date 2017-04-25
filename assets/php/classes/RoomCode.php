@@ -83,10 +83,10 @@ class RoomCode extends DatabaseObject
                     ":rem_uses" => $uses
                 ])
                 ) {
-//                    throw new PDOException($statement->errorInfo()[2]);
+
                     return false;
                 } else {
-//                    Logger::Log(__FILE__, SLN_CREATE_CODE, $accountID, null, $code);
+      
                 }
             }
         } while ($result);
@@ -182,6 +182,7 @@ class RoomCode extends DatabaseObject
         $json["Creator"] = $this->_accountID;
         $json["Expires"] = $this->_expire_date;
         $json["UsesRemaining"] = $this->_uses;
+        $json['url'] = "/i/" . $this->_code;
 
         if ($as_array)
             return $json;
