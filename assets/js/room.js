@@ -5,7 +5,6 @@
 
 window.addEventListener("load", function () {
     Chat.init();
-    // Modal.init();
     Room.connect();
     window.document.title = Room.data.RoomName;
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
@@ -100,8 +99,8 @@ var Room = {
             Room.connected = true;
         };
         Room.socket.onmessage = function (data) {
-            console.log(data.data);
             var message = JSON.parse(data.data);
+            console.log(message);
             if (message.notify) {
                 Toast.pop(textNode(message.notify), 3000);
             }
@@ -119,8 +118,8 @@ var Room = {
                     var accountID = message.id;
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
-                    updateUsersHere();
-                    newUserSet('small', null);
+                    // updateUsersHere();
+                    // newUserSet('small', null);
                 } break;
 
                 case "Confirmation": {
@@ -142,6 +141,7 @@ var Room = {
                 {
                     Room.data.RoomCodes[message.inviteCode] = null;
                     updateInvites();
+                    break;
                 }
 
                 case "Participant Changed Their Name": {
@@ -149,7 +149,7 @@ var Room = {
                 }break;
 
                 default:{
-                    console.info(message);
+                    // console.info(message);
                 }
             }
         };
@@ -562,7 +562,7 @@ function switchLog(logtype) {
 }
 
 function putMessage(sender, _text, before, fileid) {
-    console.log("fileid: ", fileid);
+    // console.log("fileid: ", fileid);
     var text;
     if (fileid)
         text = "<a class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
@@ -571,7 +571,7 @@ function putMessage(sender, _text, before, fileid) {
 
     var messageLog = document.getElementById("chat_feed");
     // var fileLog = document.getElementById("file-log");
-    console.log(sender);
+    // console.log(sender);
     var username = Room.data.Accounts[sender].ScreenName;
     var chat_messages = document.createElement("div");
     var file_messages = document.createElement("div");

@@ -77,8 +77,9 @@ abstract class WebSocketServer
             $response = null;
             /** Make sure that the account has permissions to access the room */
             if (!$client_room->accountInRoom($client_account)) {
-                $this->Log(SLN_NOT_AUTHORIZED, "", $client_account_id, $client_room_id);
-                $response = $this->generate_error_response(ERR_ACCESS_DENIED);
+                $response = json_encode([
+                    "error"=>"Not authroized"
+                ]);
                 $this->send($user, $response);
                 echo "Invalid user" . "\n";
                 return;

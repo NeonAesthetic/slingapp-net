@@ -34,7 +34,7 @@ window.addEventListener("load", function(){
     AVC.peerVideoStream = new MediaStream();
     AVC.videoConnection = AVC.connectToPeerServer(AVC.id + "v", AVC.videoConnection, AVC.acceptPeerVideoStream);
     AVC.getAllPeerVideo(AVC.peerVideoStream);
-})
+});
 
 
 var AVC = {
@@ -46,13 +46,8 @@ var AVC = {
     options:{
         host: 'slingapp.net',
         port: 9000,
-        secure: true,
-        iceServers:[
-            { url: 'stun:stun.ekiga.net' },
-            { url: 'stun:stun1.l.google.com:19302' },
-            { url: 'stun:stun2.l.google.com:19302' },
-            { url: 'stun:stun3.l.google.com:19302' }
-        ]
+        secure: true
+
     },
     audioSources:[],
     videoSources:[],
@@ -89,12 +84,13 @@ var AVC = {
                 console.log("PeerID is " + id);
             });
 
-            connection.on("call", on_call);
+            connection.on("call", on_call, null);
 
             connection.on("error", function (error) {
                 if (error.type == "peer-unavailable"){
                     console.log("Peer could not be found.");
-                }
+                }else
+                console.error(error);
             })
         }else{
             connection.reconnect();
@@ -161,12 +157,11 @@ var AVC = {
 
     },
     getPeerVideoStream:function (peerid, callback) {
-            var call = AVC.videoConnection.call(peerid, AVC.peerVideoStream);
-            call.on("stream", function(stream){
-                callback(stream);
-            });
-
-
+        var call = AVC.videoConnection.call(peerid, AVC.peerVideoStream);
+        call.on("stream", callback);
+        // call.on("error", function (error) {
+        //     console.error(error);
+        // })
     },
     createAudioStream:function(callback){
         AVC.getUserMedia(MEDIA.AUDIO, callback);
@@ -183,14 +178,17 @@ var AVC = {
         }
     },
     acceptPeerVideoStream:function(call){
-
-
         console.log("Peer attempting to connect");
+        // console.log(AVC.peerVideoStream);
         call.answer(AVC.peerVideoStream);
         call.on("stream", function (stream) {
             console.log(stream);
+            console.log("Accepted Peer Media Stream");
             AVC.setPeerVideoNode(call.peer.slice(0,-1), stream);
         });
+        call.on("error", function (error) {
+            console.log(error);
+        })
 
 
     },
@@ -229,32 +227,24 @@ var AVC = {
 
 
     },
-    createUserPreviewNode:function (stream) {
-        var node = createVideoSourceNode();
-        node.src = window.URL.createObjectURL(stream);
-        node.className = "user-preview";
-        return node;
-    },
     setPeerVideoNode:function(id, stream){
-        // AVC.peerVideoStream = stream;
-        // var node = AVC.createPeerVideoNode(stream);
-        // var videoDiv = document.getElementById("NU" + id);
-        // videoDiv.innerHTML = "";
-        // videoDiv.appendChild(node);
-        // // console.log(node);
+
+        var videoDiv = document.getElementById("video-" + id);
+        videoDiv.src = URL.createObjectURL(stream);
+        videoDiv.autoplay=true;
     },
     getAllPeerVideo:function(stream){
         AVC.peerVideoStream = stream;
         AVC.setPeerVideoNode(AVC.id, stream);
 
         var accounts = Room.data.Accounts;
-        var len = accounts.length;
         console.log("Attempting to connect video");
         for(var peerid in accounts){
             if(accounts.hasOwnProperty(peerid) && peerid != Account.data.ID){
                 console.log("Connecting to peer with id: " + peerid);
                 AVC.getPeerVideoStream(peerid + "v", function (stream) {
                     var id = peerid;
+                    console.log('got peer video');
                     AVC.setPeerVideoNode(id, stream);
                 });
             }
@@ -264,10 +254,6 @@ var AVC = {
 }
 
 
-window.addEventListener("load", function(){
-    AVC.connectButton = document.getElementById("connect-voice");
-
-});
 
 function createAudioSourceNode(){
     var node = document.createElement("audio");
