@@ -82,6 +82,7 @@ function join_existing_room($invite_code){
         "room" => format_room_json($room->getJSON(true))
     ], 200);
 
+
 }
 
 function delete_room($room_id){
