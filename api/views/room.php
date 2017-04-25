@@ -77,7 +77,10 @@ function join_existing_room($invite_code){
         return new HTTPResponse(["error"=>"Room not found"], 404);
     }
     $room->addParticipant($account);
-    return new HTTPResponse(format_room_json($room->getJSON(true)), 200);
+    return new HTTPResponse([
+        "success" => true,
+        "room" => format_room_json($room->getJSON(true))
+    ], 200);
 
 }
 
