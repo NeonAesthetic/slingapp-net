@@ -83,9 +83,10 @@ class RoomCode extends DatabaseObject
                     ":rem_uses" => $uses
                 ])
                 ) {
-                    throw new PDOException($statement->errorInfo()[2]);
+//                    throw new PDOException($statement->errorInfo()[2]);
+                    return false;
                 } else {
-                    Logger::Log(__FILE__, SLN_CREATE_CODE, $accountID, null, $code);
+//                    Logger::Log(__FILE__, SLN_CREATE_CODE, $accountID, null, $code);
                 }
             }
         } while ($result);

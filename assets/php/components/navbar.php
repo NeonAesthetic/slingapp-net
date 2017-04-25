@@ -217,8 +217,8 @@
     <div class="content text">
         <h2 class="dialog-title">Title</h2>
         <p class="dialog-content"></p>
-        <form class="ui form">
-            <input id="dialog-input">
+        <form class="ui form" onsubmit="event.preventDefault()">
+            <input id="dialog-input" onkeypress="if (event.keyCode == 13) Dialog.buttonSubmit.click()">
         </form>
     </div>
     <div class="content">

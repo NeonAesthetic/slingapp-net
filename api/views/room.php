@@ -100,3 +100,21 @@ function leave_room($room_id){
         return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
     }
 }
+function room_create_invite($room_id){
+    $token = $_COOKIE['Token'] OR $_POST['Token'];
+    $account = Account::Login($token);
+
+    if(!$account){
+        return new HTTPResponse(["error"=>"Not authorized"], 401);
+    }
+    try{
+        $room = new Room($room_id);
+        $code = $room->addRoomCode($account->getAccountID(), -1);
+        return new HTTPResponse([
+            "success" => true,
+            "code" => $code->getJSON(true)
+        ], 200);
+    }catch (Exception $e){
+        return new HTTPResponse(["success" => false, "error" => $e->getMessage()], 500);
+    }
+}

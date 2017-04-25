@@ -21,4 +21,5 @@ const API_ROUTES = [
     ["^user/authenticate/?", "account.php", "authenticate"],
     ["^user/register/?", "account.php", "register"],
     ["^metrics/?", "api.php", "website_health"],
+    ["^room/([0-9]+)/invite/?$", "room.php", "room_create_invite"],
 ];
