@@ -5,8 +5,7 @@
 
 window.addEventListener("load", function () {
     Chat.init();
-    Modal.init();
-    Resource.load("/assets/php/components/modal/room_settings.php", "Settings", InitSettingsModal);
+    // Modal.init();
     Room.connect();
     window.document.title = Room.data.RoomName;
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
@@ -69,7 +68,7 @@ function addCodeButtonEvents() {
 var Chat = {
     chatlog: null,
     init: function () {
-        Chat.chatlog = document.getElementById("chat");
+        Chat.chatlog = document.getElementById("chat_feed");
 
     },
     send: function () {
@@ -457,7 +456,9 @@ function uploadFile(files) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
+
                     var response = JSON.parse(xhr.responseText);
+                    console.log("response: ", xhr);
                     Room.uploadFile(response);
                 } else {
                     console.log("Error", xhr.statusText);
@@ -524,12 +525,17 @@ function uploadAbort(e) {
     console.log("upload canceled by user");
 }
 
-function updateScroll() {
-    var element = document.getElementById("chat-log");
-    var element2 = document.getElementById("file-log");
+// function updateScroll() {
+//     var element = document.getElementById("right_hand_pane");
+//     // var element2 = document.getElementById("file-log");
+//
+//     element.scrollTop = element.scrollHeight;
+//     element2.scrollTop = element.scrollHeight;
+// }
 
+function updateScroll(){
+    var element = document.getElementById("right_hand_pane");
     element.scrollTop = element.scrollHeight;
-    element2.scrollTop = element.scrollHeight;
 }
 
 function switchLog(logtype) {
@@ -556,38 +562,41 @@ function switchLog(logtype) {
 }
 
 function putMessage(sender, _text, before, fileid) {
+    console.log("fileid: ", fileid);
     var text;
     if (fileid)
-        text = "<a href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
+        text = "<a class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
     else
         text = Autolinker.link(_text);
 
-    var messageLog = document.getElementById("chat-log");
-    var fileLog = document.getElementById("file-log");
+    var messageLog = document.getElementById("chat_feed");
+    // var fileLog = document.getElementById("file-log");
     console.log(sender);
     var username = Room.data.Accounts[sender].ScreenName;
     var chat_messages = document.createElement("div");
     var file_messages = document.createElement("div");
+    var author;
 
     if (sender == Account.data.ID) {
-        chat_messages.className = "message mine";
-        file_messages.className = "message mine";
+        author = "<p class='author user mine'>";
+        // file_messages.className = "message mine";
         username += " (you)";
     }
     else {
-        chat_messages.className = "message";
-        file_messages.className = "message";
+        author = "<p class='author user'>";
+        // file_messages.className = "message";
     }
-    chat_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
-    file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
+
+    chat_messages.innerHTML = "<div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
+    //file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
         messageLog.insertBefore(chat_messages, messageLog.firstChild);
-        if(fileid)
-            fileLog.insertBefore(file_messages, fileLog.firstChild);
+        // if(fileid)
+        //     fileLog.insertBefore(file_messages, fileLog.firstChild);
     } else {
         messageLog.appendChild(chat_messages);
-        if(fileid)
-            fileLog.appendChild(file_messages);
+        // if(fileid)
+        //     fileLog.appendChild(file_messages);
     }
     updateScroll();
 }
@@ -626,4 +635,50 @@ function repopulateMessages() {
 function openInvites() {
     Modal.create("Settings", "darken");
     document.getElementById("InvitesLink").click();
+}
+//////////////////////////////////
+// Cookie Room Instance Values  //
+//////////////////////////////////
+function setCookie(cookieName, cookieValue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
+}
+function getCookie(cookieName) {
+    var name = cookieName + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+function checkOutVol() {
+    var outVol = getCookie("outVol");
+    if (outVol != "") {
+        //On Reload Get This value
+    } else {
+        setCookie("outVol", 100, 365);
+        if (outVol != "" && outVol != null) {
+            setCookie("outVol", 100, 365);
+        }
+    }
+}
+function checkInVol() {
+    var inVol = getCookie("inVol");
+    if (inVol != "") {
+        //On Reload Get This value
+    } else {
+        setCookie("inVol", 100, 365);
+        if (inVol != "" && inVol != null) {
+            setCookie("inVol", 100, 365);
+        }
+    }
 }

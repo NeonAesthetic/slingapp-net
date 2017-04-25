@@ -173,6 +173,14 @@ var API = {
                 success: onSuccess,
                 error: onError
             });
+        },
+        createInvite:function(roomid, onSuccess, onError){
+            $.ajax({
+                method: 'get',
+                url: "/api/room/" + roomid + "/invite/",
+                success: onSuccess,
+                error: onError
+            });
         }
     }
 };

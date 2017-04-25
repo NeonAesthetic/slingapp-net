@@ -83,9 +83,10 @@ class RoomCode extends DatabaseObject
                     ":rem_uses" => $uses
                 ])
                 ) {
+
                     return false;
                 } else {
-                    
+      
                 }
             }
         } while ($result);

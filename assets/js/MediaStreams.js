@@ -236,12 +236,12 @@ var AVC = {
         return node;
     },
     setPeerVideoNode:function(id, stream){
-        AVC.peerVideoStream = stream;
-        var node = AVC.createPeerVideoNode(stream);
-        var videoDiv = document.getElementById("NU" + id);
-        videoDiv.innerHTML = "";
-        videoDiv.appendChild(node);
-        // console.log(node);
+        // AVC.peerVideoStream = stream;
+        // var node = AVC.createPeerVideoNode(stream);
+        // var videoDiv = document.getElementById("NU" + id);
+        // videoDiv.innerHTML = "";
+        // videoDiv.appendChild(node);
+        // // console.log(node);
     },
     getAllPeerVideo:function(stream){
         AVC.peerVideoStream = stream;
@@ -285,4 +285,3 @@ function createVideoSourceNode(){
     node.controls = false;
     return node;
 }
-

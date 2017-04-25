@@ -323,7 +323,7 @@ body{
 #file-upload input {
     display: none;
 }
-#chat-log{
+#right_hand_pane {
     font-size: 12px;
     color: white;
     overflow-y: scroll;

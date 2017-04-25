@@ -1,0 +1,76 @@
+.pusher {
+    background-color: #383838 !important;
+}
+
+.screen {
+    position: fixed;
+
+}
+
+.text *{
+    color: white;
+}
+
+.ui.comments {
+    font-size: .9em;
+}
+.ui.right.fixed.menu {
+    width: 300px!important;
+}
+
+.ui.top.menu{
+    margin: 0 2em 0 1em;
+    z-index: 999;
+}
+.ui.fluid.action.input {
+    position:fixed;
+    width:280px;
+    right:10px;
+    bottom:20px;
+}
+
+input {
+    background-color: #383838 !important;
+    color: #C4C4C4 !important;
+}
+
+.mine.user {
+    color:#28f200;
+}
+
+.user {
+    color: grey;
+    margin: 0;
+}
+
+.hyperlink {
+    color: #9e9e9e;
+    text-decoration: underline;
+}
+#chat_feed {
+    margin: 3em 1.5em
+}
+
+#file-upload{
+    background-color: #383838;
+    color:#a6a6a6;
+    width:25px;
+}
+
+#file-upload i {
+    cursor: pointer;
+}
+
+#file-upload input {
+    display: none;
+}
+
+#r-title {
+    color: white;
+    margin: auto;
+}
+
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}

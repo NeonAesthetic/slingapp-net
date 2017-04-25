@@ -108,7 +108,6 @@ function leave_room($room_id){
     }
 }
 
-
 function room_create_invite($room_id){
     $token = $_COOKIE['Token'] OR $_POST['Token'];
     $account = Account::Login($token);
