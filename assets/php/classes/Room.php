@@ -164,7 +164,7 @@ class Room extends DatabaseObject
 
     public function accountInRoom(Account $account)
     {
-        return (bool)array_key_exists($account->getAccountID(), $this->_accounts);
+
         $id = $account->getAccountID();
         $rid = $this->_roomID;
         $sql = "SELECT COUNT(*) 

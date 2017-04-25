@@ -51,16 +51,16 @@ if ($room) {
 <div class="ui inverted left vertical sidebar menu">
     <div class="ui styled accordion">
         <?php
-        $users = $room->getParticipants();
-        foreach ($users as $name) {
+        $users = $room->getAccounts();
+        foreach ($users as $id=>$user) {
             ?>
             <div class="title">
                 <i class="dropdown icon"></i>
-                <?= $name ?>
+                <?= $user->getScreenName() ?>
             </div>
             <div class="content">
-                <video width="235" height="170" ondblclick="this.webkitRequestFullScreen()">
-                    <source src="/assets/images/videoplayback.mp4">
+                <video width="235" height="170" ondblclick="this.webkitRequestFullScreen()" id="video-<?=$id?>">
+
                 </video>
             </div>
             <?php
@@ -82,6 +82,9 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
+                <button id="leave_button" class="ui circular black icon right floated button" data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
+                    <i class="inverted video icon"></i>
+                </button>
                 <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room" onclick="location='/'">
                     <i class="inverted sign out icon"></i>
                 </button>
@@ -309,7 +312,6 @@ if ($room) {
             }
         }
 
-        Room.connect();
 
     });
 
