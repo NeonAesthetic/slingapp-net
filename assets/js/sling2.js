@@ -81,7 +81,8 @@ var Account = {
         }, function (name) {
             Account.changeName(name);
         })
-    }
+    },
+    data: null
 };
 
 var Dialog = {

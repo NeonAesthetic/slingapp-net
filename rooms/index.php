@@ -78,10 +78,17 @@ if ($room) {
                     <i id="settings_icon" class="inverted setting icon"></i>
                 </button>
                 <div class="ui flowing popup bottom left transition inverted hidden">
+                    <div id="quick_input" style="width: 250px; display:none">
+                        <div class="ui large icon input">
+                            <input type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) quickScreenNameClose(this)">
+                            <i class="checkmark icon" style="color:#28f200"></i>
+                        </div>
+                    </div>
                     <div class="ui vertical buttons">
-                        <div class="ui button" onclick="openSettings('users-tab')">Change Screen Name</div>
-                        <div class="ui button" onclick="openSettings('invite-tab')">Create Invite Code</div>
-                        <div class="ui button" onclick="openSettings('audio-tab')">Media Settings</div>
+<!--                        <div id="quick_screen_name_change" class="ui button" onclick="openSettings('users-tab')">Change Screen Name</div>-->
+                        <div class="ui button quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
+                        <div class="ui button quickbutton" onclick="openSettings('invite-tab')">Create Invite Code</div>
+                        <div class="ui button quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
                     </div>
                 </div>
             </div>
@@ -346,8 +353,23 @@ if ($room) {
         ;
 
     }
-    function openAudio() {
+    function quickScreenNameChange() {
+        document.getElementsByClassName("quickbutton")[0].style.display = "none";
+        document.getElementsByClassName("quickbutton")[1].style.display = "none";
+        document.getElementsByClassName("quickbutton")[2].style.display = "none";
+        document.getElementById("quick_input").style.display = "block";
+    }
 
+    function quickScreenNameClose(event) {
+        document.getElementsByClassName("quickbutton")[0].style.display = "block";
+        document.getElementsByClassName("quickbutton")[1].style.display = "block";
+        document.getElementsByClassName("quickbutton")[2].style.display = "block";
+        document.getElementById("quick_input").style.display = "none";
+        if(event.value != ""){
+//            Account.changeName(event.value);
+            changeScreenName(event.value);
+
+        }
     }
     function closeSettings() {
         $('.ui.modal')
@@ -374,12 +396,15 @@ if ($room) {
 
     function updateUserInfo(accountID, nickname) {
 
-        console.log("account: ", accountID);
-        console.log("nickname", nickname);
-        console.log(Room.data.Accounts[accountID]);
-        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
-        document.getElementById('UN' + accountID.toString() + 'mainScreen').innerHTML = nickname;
-        document.getElementById("modalUsername").innerHTML = nickname;
+//        console.log("account: ", accountID);
+//        console.log("nickname", nickname);
+//        console.log(Room.data.Accounts[accountID]);
+          Room.data.Accounts[accountID].ScreenName= nickname;
+        $('.uid-'+accountID ).html(nickname);
+//
+//        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
+//        document.getElementById('UN' + accountID.toString() + 'mainScreen').innerHTML = nickname;
+//        document.getElementById("modalUsername").innerHTML = nickname;
     }
 
     function newUserSet(size, target) {
