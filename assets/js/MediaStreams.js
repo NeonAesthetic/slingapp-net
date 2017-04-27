@@ -33,7 +33,7 @@ var MEDIA = {
 window.addEventListener("load", function(){
     AVC.peerVideoStream = new MediaStream();
     AVC.videoConnection = AVC.connectToPeerServer(AVC.id + "v", AVC.videoConnection, AVC.acceptPeerVideoStream);
-    AVC.getAllPeerVideo(AVC.peerVideoStream);
+
 });
 
 
@@ -82,9 +82,12 @@ var AVC = {
 
             connection.on("open", function (id) {
                 console.log("PeerID is " + id);
+                AVC.getAllPeerVideo(AVC.peerVideoStream);
             });
 
             connection.on("call", on_call, null);
+
+
 
             connection.on("error", function (error) {
                 if (error.type == "peer-unavailable"){
@@ -157,11 +160,20 @@ var AVC = {
 
     },
     getPeerVideoStream:function (peerid, callback) {
+        console.log("Get Peer Video Stream: ", peerid);
         var call = AVC.videoConnection.call(peerid, AVC.peerVideoStream);
         call.on("stream", callback);
-        // call.on("error", function (error) {
-        //     console.error(error);
-        // })
+        call.on("close", function () {
+            console.info("Close");
+            var video = $('#video-' + call.peer)[0];
+
+            $('.ui.sidebar .accordion').removeChild(video.divTitle);
+            $('.ui.sidebar .accordion').removeChild(video.divContent);
+            $('.ui.sidebar .accordion').removeChild(video);
+        });
+        call.on("error", function (err) {
+            console.error(err);
+        })
     },
     createAudioStream:function(callback){
         AVC.getUserMedia(MEDIA.AUDIO, callback);
@@ -179,7 +191,7 @@ var AVC = {
     },
     acceptPeerVideoStream:function(call){
         console.log("Peer attempting to connect");
-        // console.log(AVC.peerVideoStream);
+        console.log(AVC.peerVideoStream);
         call.answer(AVC.peerVideoStream);
         call.on("stream", function (stream) {
             console.log(stream);
@@ -188,7 +200,16 @@ var AVC = {
         });
         call.on("error", function (error) {
             console.log(error);
-        })
+        });
+        call.on("close", function () {
+            var id = call.peer.slice(0,-1);
+            console.info("Disconnect: ", id);
+            var video = $('#video-' + id)[0];
+
+            var accordion = $('.ui.sidebar .accordion')[0];
+            accordion.removeChild(video.divTitle);
+            accordion.removeChild(video.divContent);
+        });
 
 
     },
@@ -208,6 +229,8 @@ var AVC = {
     },
     connectScreenCapture:function () {
         AVC.getUserScreencaptureStream(function(stream){
+            AVC.peerVideoStream = stream;
+            console.log("CAPTURE:", stream);
             AVC.getAllPeerVideo(stream);
         });
 
@@ -228,13 +251,39 @@ var AVC = {
 
     },
     setPeerVideoNode:function(id, stream){
+        var video = document.getElementById("video-" + id);
+        if(!video){
 
-        var videoDiv = document.getElementById("video-" + id);
-        videoDiv.src = URL.createObjectURL(stream);
-        videoDiv.autoplay=true;
+            var title = document.createElement("div");
+            var content = document.createElement("div");
+            video = document.createElement("video");
+            var sn = snFromId(id);
+            title.className = "title";
+            title.innerHTML = "<i class='dropdown icon'></i>" + sn + "</div>";
+            content.className = "content";
+
+            video.setAttribute("id", "video-" + id);
+            video.setAttribute("height", 170);
+            video.setAttribute("width", 235);
+            video.ondblclick = function(){
+                this.webkitRequestFullScreen();
+            };
+
+            video.divTitle = title;
+            video.divContent = content;
+
+            content.appendChild(video);
+
+            $('.ui.sidebar .accordion').append(title);
+            $('.ui.sidebar .accordion').append(content);
+        }
+
+
+        video.src = URL.createObjectURL(stream);
+        video.autoplay=true;
     },
     getAllPeerVideo:function(stream){
-        AVC.peerVideoStream = stream;
+        // AVC.peerVideoStream = stream;
         AVC.setPeerVideoNode(AVC.id, stream);
 
         var accounts = Room.data.Accounts;
