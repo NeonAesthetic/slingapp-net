@@ -50,22 +50,8 @@ if ($room) {
 
 <div class="ui inverted left vertical sidebar menu">
     <div class="ui styled accordion">
-        <?php
-        $users = $room->getAccounts();
-        foreach ($users as $id => $user) {
-            ?>
-            <div class="title" style="color: #28f200">
-                <i class="dropdown icon"></i>
-                <?= $user->getScreenName() ?>
-            </div>
-            <div class="content">
-                <video width="235" height="170" ondblclick="this.webkitRequestFullScreen()" id="video-<?= $id ?>">
+        
 
-                </video>
-            </div>
-            <?php
-        }
-        ?>
 
     </div>
 </div>

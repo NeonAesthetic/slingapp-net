@@ -28,6 +28,19 @@ class RoomSocketServer extends WebSocketServer
      * @param Room $room
      * @param Account $account
      */
+
+    protected function on_client_alter_video($user_socket, $message, Room &$room, Account &$account)
+    {
+        $room_id = $room->getRoomID();
+        $response = $this->create_response($message['action'], [
+            "id" => $account->getAccountID()
+        ]);
+        foreach ($this->_clients[$room_id] as $k => $participant) {
+            $this->send($participant, $response);
+        }
+    }
+
+
     protected function on_client_join($user_socket, $message, Room &$room, Account &$account)
     {
 
@@ -139,7 +152,8 @@ class RoomSocketServer extends WebSocketServer
 
     }
 
-    private function create_response($type, array $optionals){
+    private function create_response($type, array $optionals)
+    {
         $response = $optionals;
         $response["type"] = $type;
         return json_encode($response);
@@ -172,8 +186,8 @@ class RoomSocketServer extends WebSocketServer
     protected function on_client_alter_name($user_socket, $message, Room &$room, Account &$account)
     {
 
-        $room_id           = $room->getRoomID();
-        $account_id        = $account->getAccountID();
+        $room_id = $room->getRoomID();
+        $account_id = $account->getAccountID();
 
         $current_nick_name = $account->getScreenName();
 
@@ -270,7 +284,7 @@ class RoomSocketServer extends WebSocketServer
         $roomid = $room->getRoomID();
         $current_nick_name = $account->getScreenName();
 
-        echo ("Test" . "\n");
+        echo("Test" . "\n");
 
         if ($message["action"] == "Change Uses") {
 
@@ -293,7 +307,7 @@ class RoomSocketServer extends WebSocketServer
                 $this->send($participant, $response);
             }
 
-        } else if ($message.action == "Change Expiration Date") {
+        } else if ($message . action == "Change Expiration Date") {
 
             $response = $this->create_response(
                 "Room Code Changed",
@@ -338,9 +352,5 @@ class RoomSocketServer extends WebSocketServer
         // TODO: Implement on_client_alter_voice() method.
     }
 
-    protected function on_client_alter_video($user_socket, $message, Room &$room, Account &$account)
-    {
-        // TODO: Implement on_client_alter_video() method.
-    }
 }
 
