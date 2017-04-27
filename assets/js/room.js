@@ -13,6 +13,25 @@ window.addEventListener("load", function () {
 
 });
 
+function GetToken() {
+    var cstring = document.cookie;
+    var cookies = cstring.split(";");
+    var tokenstr = null;
+    var rvalue;
+    cookies.forEach(function (c) {
+        if (c.search(/Token/) != -1)
+            tokenstr = c;
+    });
+    if (tokenstr != null) {
+        var keynval = tokenstr.split("=");
+        // var key = keynval[0];
+        rvalue = keynval[1];
+    }
+    else
+        rvalue = null;
+    return rvalue;
+}
+
 function getCodeNodeList(code){
     //var label = ContextMenu.createLabel(code + " Options");
 
@@ -220,28 +239,28 @@ var Room = {
 
 };
 
-var Account = {
-    data: null,
-    login: function () {
-        var token = GetToken();
-        console.log(token);
-        $.ajax({
-            type: 'post',
-            url: '/assets/php/components/account2.php',
-            dataType: 'JSON',
-            data: {
-                action: "login",
-                token: token
-            },
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
-};
+// var Account = {
+//     data: null,
+//     login: function () {
+//         var token = GetToken();
+//         console.log(token);
+//         $.ajax({
+//             type: 'post',
+//             url: '/assets/php/components/account2.php',
+//             dataType: 'JSON',
+//             data: {
+//                 action: "login",
+//                 token: token
+//             },
+//             success: function (data) {
+//                 console.log(data);
+//             },
+//             error: function (error) {
+//                 console.log(error);
+//             }
+//         });
+//     }
+// };
 
 function showSettings(){
     Modal.create("Settings", "darken");
@@ -276,6 +295,7 @@ function InitSettingsModal() {
 }
 
 function updateUsersHere() {
+    //Found it
     var userPanel = Room.settings.optionsPanel.querySelector("#Users");
     var here = userPanel.querySelector("#users-here");
     var you = userPanel.querySelector("#you");
@@ -392,11 +412,11 @@ function deleteInviteCode(code){
 
 
 
-function changeScreenName(){
-    var name = prompt("Enter a new nickname:");
+function changeScreenName(name){
+    //var name = prompt("Enter a new nickname:");
     if(name.length > 0 && name[0] != " ") {
-        event.preventDefault();
-        event.stopPropagation();
+        // event.preventDefault();
+        // event.stopPropagation();
         var token = GetToken();
         var json = {
             action: "Change Name",
@@ -405,7 +425,7 @@ function changeScreenName(){
         };
         Room.socket.send(JSON.stringify(json));
         //Page reload needed
-        updateUsersHere();
+        //updateUsersHere();
     }
     // return false;
 }
@@ -578,12 +598,12 @@ function putMessage(sender, _text, before, fileid) {
     var author;
 
     if (sender == Account.data.ID) {
-        author = "<p class='author user mine'>";
+        author = "<p class='author user mine uid-"+ sender + "'>";
         // file_messages.className = "message mine";
         username += " (you)";
     }
     else {
-        author = "<p class='author user'>";
+        author = "<p class='author user uid-"+ sender + "'>";
         // file_messages.className = "message";
     }
 
