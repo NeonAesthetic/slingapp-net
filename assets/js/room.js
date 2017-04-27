@@ -114,12 +114,25 @@ var Room = {
 
                 } break;
 
+                case "Connect Video":
+                {
+                    
+                } break;
+
+                case "Disconnect Video":
+                {
+
+                }break;
+
                 case "Participant Joined": {
                     var accountID = message.id;
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
-                    // updateUsersHere();
-                    // newUserSet('small', null);
+                    AVC.getPeerVideoStream(accountID + "v", function (stream) {
+                        var id = peerid;
+                        console.log('got peer video');
+                        AVC.setPeerVideoNode(id, stream);
+                    });
                 } break;
 
                 case "Confirmation": {
