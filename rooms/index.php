@@ -57,9 +57,6 @@ if ($room) {
 </div>
 
 <div class="pusher">
-    <div id="ScreenContainer">
-
-    </div>
     <div class="ui grid">
         <div class="row">
             <div class="ui inverted top attached menu">
@@ -68,10 +65,12 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <button id="leave_button" class="ui circular black icon right floated button" data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
+                <button id="share_button" class="ui circular black icon right floated button"
+                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
                     <i class="inverted video icon"></i>
                 </button>
-                <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room" onclick="location='/'">
+                <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room"
+                        onclick="location='/'">
                     <i class="inverted sign out icon"></i>
                 </button>
                 <button id="settings_button" class="ui circular black icon right floated button"
@@ -82,7 +81,7 @@ if ($room) {
                     <div class="ui vertical buttons">
                         <div class="ui button" onclick="openSettings('users-tab')">Change Screen Name</div>
                         <div class="ui button" onclick="openSettings('invite-tab')">Create Invite Code</div>
-                        <div class="ui button" onclick="openSettings('audio-tab')">Audio Settings</div>
+                        <div class="ui button" onclick="openSettings('audio-tab')">Media Settings</div>
                     </div>
                 </div>
             </div>
@@ -109,7 +108,7 @@ if ($room) {
 </div>
 
 <div class="ui very wide modal">
-    <div class="ui grid" style="height: 25em; ">
+    <div class="ui grid" style="height: 30em; ">
         <div class="four wide column">
             <div class="ui vertical fluid tabular menu">
                 <a class="item users-tab" data-tab="tab-name">
@@ -119,7 +118,7 @@ if ($room) {
                     Invite Codes
                 </a>
                 <a class="item audio-tab" data-tab="tab-name2">
-                    Audio Settings
+                    Media Settings
                 </a>
             </div>
         </div>
@@ -129,32 +128,45 @@ if ($room) {
                     This is an stretched grid column. This AFFsegment will always match the tab height
                 </div>
             </div>
-            <div class="ui tab invites" data-tab="tab-name1" style="">
+
+            <div class="ui tab" data-tab="tab-name1" style="overflow-y: scroll">
                 <table class="ui celled table" style="">
-                    <thead style="">
-                    <tr><th>Code</th>
-                        <th>Creator</th>
-                        <th>Uses</th>
-                    </tr></thead>
-                    <tbody id="invite-code-table" style=" ">
+                    <thead style="position: fixed; ">
+                    <tr>
+                        <th style="width: 32%">Code</th>
+                        <th style="width: 58%">Creator</th>
+                        <th style="width: 8%">Uses</th>
+                        <th colspan="3">
+                            <div class="ui button green" onclick="createInvite()">Create Code</div>
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+                <div class="ui inverted divider"></div>
+                <table class="ui celled table" style="">
+                    <tbody id="invite-code-table" style="">
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3">
-                                <div class="ui button green" onclick="createInvite()" >Create Invite Code</div>
-                            </th>
-                        </tr>
-                    </tfoot>
+                </table>
+                <div class="ui inverted divider"></div>
+                <table class="ui celled table" style="">
+                    <thead style="position: fixed; ">
+                    <tr>
+<!--                        <th colspan="3">-->
+<!--                            <div class="ui button green" onclick="createInvite()">Create Invite Code</div>-->
+<!--                        </th>-->
+                    </tr>
+                    </thead>
                 </table>
             </div>
             <div class="ui tab" data-tab="tab-name2">
                 <div class="ui segment">
-                    <h3 class="ui header">Audio & Sounds</h3>
+                    <h3 class="ui header">Media Settings</h3>
                     <div class="ui section divider"></div>
                     <div class="ui grid padded">
+
                         <div class="eight wide column">
                             <h3 class="ui header">Audio Input Device</h3>
-                            <select name="audioInputDevice" class="ui dropdown" id="select">
+                            <select name="audioInputDevice" class="ui dropdown fluid" id="audioSource">
                                 <option value="">Default</option>
                                 <option value="default">Device 1</option>
                             </select>
@@ -168,7 +180,7 @@ if ($room) {
                         </div>
                         <div class="eight wide column">
                             <h3 class="ui header">Audio Output Device</h3>
-                            <select name="audioOutputDevice" class="ui dropdown" id="select">
+                            <select name="audioOutputDevice" class="ui dropdown fluid" id="audioOutput">
                                 <option value="">Default</option>
                                 <option value="default">Device 1</option>
                             </select>
@@ -179,6 +191,13 @@ if ($room) {
                                 <span id="display-2"></span>
                             </div>
                         </div>
+
+                        <div class="ui field">
+                            <h3 class="ui header">Video Source</h3>
+                            <select class="ui dropdown fluid" id="videoSource"></select>
+                        </div>
+
+                        <!--                        <video id="video" autoplay></video>-->
                     </div>
                     <!--                    <div class="ui grid padded ">-->
                     <!--                        <div class="row column">-->
@@ -220,6 +239,9 @@ if ($room) {
 <script src="/assets/js/peer.js"></script>
 <script src="/assets/js/Autolinker.js"></script>
 <script src="/assets/js/MediaStreams.js"></script>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="/assets/js/common.js"></script>
+<script src="/assets/js/main.js"></script>
 <script>
 
     $(document).ready(function () {
@@ -237,6 +259,8 @@ if ($room) {
         })
             .sidebar('attach events', '#menu');
         ;
+
+        $('.ui.dropdown').dropdown();
 
         $("#settings_button")
             .popup({
@@ -290,8 +314,8 @@ if ($room) {
                 setCookie('outVol', value, 365);
             }
         });
-        for (var key in Room.data.RoomCodes){
-            if(Room.data.RoomCodes.hasOwnProperty(key)){
+        for (var key in Room.data.RoomCodes) {
+            if (Room.data.RoomCodes.hasOwnProperty(key)) {
                 var code = Room.data.RoomCodes[key];
                 appendInviteCode(code);
 
@@ -338,11 +362,11 @@ if ($room) {
     function appendInviteCode(code) {
         var table = document.getElementById('invite-code-table');
         var row = document.createElement('tr');
-        row.innerHTML = "<td>" + code.Code + "</td><td>"+ snFromId(code.Creator) +"</td><td>"+  + "</td>";
+        row.innerHTML = "<td>" + code.Code + "</td><td>" + snFromId(code.Creator) + "</td><td>" + + "</td><td>" + +"</td>";
         table.appendChild(row);
     }
-    function createInvite(){
-        API.room.createInvite(Room.data.RoomID,function(data){
+    function createInvite() {
+        API.room.createInvite(Room.data.RoomID, function (data) {
             console.log(data);
             appendInviteCode(data.code);
         });
