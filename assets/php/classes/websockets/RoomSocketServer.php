@@ -87,12 +87,14 @@ class RoomSocketServer extends WebSocketServer
         $room_id = $room->getRoomID();
         $text = htmlspecialchars($message['text']);
 
-        if (isset($message['fileid'])) {
-            $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
+        if (isset($message['fileid'])) //{
+//            $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
+//
+//            $filepath = $message['filepath'];
             $file_id = $message['fileid'];
-        } else {
+        else
             $file_id = null;
-        }
+//        }
 
         if (strlen($text) <= 2000) {
 
@@ -246,21 +248,16 @@ class RoomSocketServer extends WebSocketServer
     protected function on_download_file($user_socket, $message, Room &$room, Account &$account)
     {
         $account_id = $account->getAccountID();
-        $room_id = $room->getRoomID();
 
-//        var_dump($message);
-
-        var_dump("accounts: ", $room->getAccounts());
-
-        if ($file = $room->validateDownload($message['fileid'], $message['token'])) {
+        if ($file = $room->validateDownload($message['fileid'], $account_id)) {
 
             $response = $this->create_response(
                 "Download",
                 [
                     "sender" => $account_id,
-                    "fileid" => $file->fileID,
-                    "filename" => $file->fileName,
-                    "filepath" => $file->filePath
+                    "fileid" => $message['fileid'],
+                    "filename" => $file['Name'],
+                    "filepath" => $file['FilePath']
                 ]
             );
         } else {

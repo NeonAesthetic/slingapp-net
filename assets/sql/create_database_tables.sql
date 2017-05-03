@@ -1,17 +1,17 @@
 # CREATE USER AND DATABASE
 
 # DROP USER 'sling@localhost';
-DROP DATABASE IF EXISTS sling;
+DROP DATABASE IF EXISTS sling_testing;
 
 # CREATE USER 'sling'@'localhost';
 
-CREATE DATABASE sling
+CREATE DATABASE sling_testing
   CHARACTER SET utf8
   COLLATE utf8_bin;
 
-GRANT ALL PRIVILEGES ON sling.* TO 'sling';
+GRANT ALL PRIVILEGES ON sling_testing.* TO 'sling_testing';
 
-USE sling;
+USE sling_testing;
 
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -91,8 +91,8 @@ CREATE TABLE RoomCodes (
 
 CREATE TABLE Files (
   FileID        SERIAL,
-  FilePath      VARCHAR(512),
-  Name          VARCHAR(64),
+  FilePath      VARCHAR(1028),
+  Name          VARCHAR(256),
   Ext           VARCHAR(16),
   PRIMARY KEY (FileID)
 );

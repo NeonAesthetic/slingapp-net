@@ -222,6 +222,7 @@ var Room = {
         Room.send(fileJSON);
     },
     requestDownload: function (fileid) {
+        console.log("requesting to download");
         Room.socket.send(JSON.stringify({
             action: "Download File",
             token: Account.data.LoginToken,

@@ -95,11 +95,17 @@ switch ($p['action']) {
         $filePath = $_FILES['upload']['tmp_name'];
         $fileName = $_FILES['upload']['name'];
         $alias = randStrGen();
-        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $p['room'] . "/";
+        $uploadfldr = $_SERVER['DOCUMENT_ROOT'] . '/uploads/';
+        $uploadDir = $uploadfldr . $p['room'] . "/";
         $urlPath = $_SERVER['SERVER_NAME'] . '/uploads/' . $p['room'] . "/" . $alias;
         $fullPath = $uploadDir . $alias;
 
-        mkdir($uploadDir);
+        if (!file_exists($uploadfldr))
+            mkdir($uploadfldr);
+
+        if (!file_exists($uploadDir))
+            mkdir($uploadDir);
+
         if(move_uploaded_file($filePath, $fullPath)) {
             if ($zip->open($fullPath . ".zip", ZipArchive::CREATE) === true) {
                 $zip->addFile($fullPath, $fileName);

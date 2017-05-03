@@ -410,14 +410,18 @@ class Room extends DatabaseObject
      * This Function ensures the user requesting to download file
      * has permission
      */
-    public function validateDownload($fileid, $token){
+    public function validateDownload($fileid, $accountID){
+        $sql = "SELECT FilePath, Name FROM Rooms r
+                LEFT JOIN Messages m
+                  ON r.RoomID = m.RoomID
+                LEFT JOIN Files f
+                  ON m.FileID = f.FileID
+                LEFT JOIN RoomAccount ra
+                  ON ra.RoomID = r.RoomID
+                WHERE m.FileID = :fileid AND ra.AccountID = :accountID";
 
-        foreach ($this->_accounts as $account)
-            if($account->getToken() == $token)
-                foreach($this->_chat->getFiles() as $file)
-                    if($file->getFileID() == $fileid)
-                        return $file;
-
-        return false;
+        $statement = Database::connect()->prepare($sql);
+        $statement->execute([":fileid" => $fileid, ":accountID" => $accountID]);
+        return $statement->fetch(PDO::FETCH_ASSOC);
     }
 }
