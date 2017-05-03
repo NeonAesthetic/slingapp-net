@@ -97,17 +97,23 @@ if ($room) {
                      style="overflow-y:scroll; padding-bottom: 3em;">
                     <div id="chat_feed" class="ui comments"></div>
 
-                    <div id="send-box" class="ui fluid action input">
-                        <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
-                        <div id="file-upload">
-                            <label for="file-input">
-                                <i class="upload icon" style="margin-top: 8px"></i>
-                            </label>
-                            <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                    <div>
+                        <div id="file_prog" class="ui progress">
+                            <div class="bar">
+                                <div class="progress"></div>
+                            </div>
                         </div>
-                        <div class="ui button" onclick="sendMessage()">Send</div>
+                        <div id="send-box" class="ui fluid action input">
+                            <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
+                            <div id="file-upload">
+                                <label for="file-input">
+                                    <i class="upload icon" style="margin-top: 8px"></i>
+                                </label>
+                                <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                            </div>
+                            <div class="ui button" onclick="sendMessage()">Send</div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

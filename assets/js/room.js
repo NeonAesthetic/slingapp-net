@@ -474,6 +474,7 @@ function uploadFile(files) {
     var file = files[0];
     var token = GetToken();
     if (file.size > 0) {
+        document.getElementById("file_prog").style.display = "block";
         var form = new FormData();
         var xhr = new XMLHttpRequest();
         form.append("action", "upload");
@@ -481,10 +482,20 @@ function uploadFile(files) {
         form.append("upload", file);
         form.append("room", Room.data["RoomID"]);
         xhr.open("POST", "/assets/php/components/room.php");
-        xhr.upload.addEventListener("progress", uploadProgress(), false);
-        xhr.addEventListener("load", uploadComplete(this), false);
-        xhr.addEventListener("error", uploadFailed(this), false);
-        xhr.addEventListener("abort", uploadAbort(this), false);
+        xhr.upload.onprogress = function(e) {
+            console.log("inside uploadProgress\n");
+
+            $('#file_prog').progress({
+                percent: Math.ceil((e.loaded / e.total) * 100)
+            });
+
+        };
+        xhr.upload.onloadend = function(e) {
+                setTimeout(function(){
+                    document.getElementById("file_prog").style.display = "none";
+                }, 5000);
+        };
+
         xhr.send(form);
 
         xhr.onreadystatechange = function () {
@@ -534,7 +545,7 @@ function fileDragHover(e) {
 }
 
 function uploadProgress(e) {
-    console.log("uploadProgress");
+
     // var progressNumber = document.getElementById('progressNumber');
     // var percentComplete = Math.round(e.loaded * 100 / e.total);
     // var progressBar = document.getElementById('prog');
@@ -548,7 +559,10 @@ function uploadProgress(e) {
 }
 
 function uploadComplete(e) {
-    console.log("upload complete");
+    if( e.readyState === 4 ) {
+        console.log("upload complete");
+        document.getElementById("file_prog").style.display = "none";
+    }
 }
 
 function uploadFailed(e) {
