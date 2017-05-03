@@ -33,6 +33,10 @@
     display: none;
 }
 
+*[id^='fileprog-']{
+    margin-bottom: 0!important;
+}
+
 #file_prog {
     display: none;
     position:fixed;

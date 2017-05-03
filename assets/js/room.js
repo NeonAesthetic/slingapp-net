@@ -161,7 +161,7 @@ var Room = {
                 } break;
 
                 case "Download": {
-                    DownloadFile(message.filepath, message.filename);
+                    DownloadFile(message.filepath, message.filename, message.fileid);
                 } break;
                 case "Room Code Changed":
                 {
@@ -483,12 +483,9 @@ function uploadFile(files) {
         form.append("room", Room.data["RoomID"]);
         xhr.open("POST", "/assets/php/components/room.php");
         xhr.upload.onprogress = function(e) {
-            console.log("inside uploadProgress\n");
-
             $('#file_prog').progress({
                 percent: Math.ceil((e.loaded / e.total) * 100)
             });
-
         };
         xhr.upload.onloadend = function(e) {
                 setTimeout(function(){
@@ -576,10 +573,9 @@ function switchLog(logtype) {
 }
 
 function putMessage(sender, _text, before, fileid) {
-    // console.log("fileid: ", fileid);
     var text;
     if (fileid)
-        text = "<a class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
+        text = "<a id='file-" + fileid + "' class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
     else
         text = Autolinker.link(_text);
 
@@ -591,7 +587,7 @@ function putMessage(sender, _text, before, fileid) {
     var file_messages = document.createElement("div");
     var author;
 
-    if (sender == Account.data.ID) {
+    if (sender === Account.data.ID) {
         author = "<p class='author user mine uid-"+ sender + "'>";
         // file_messages.className = "message mine";
         username += " (you)";
@@ -615,9 +611,15 @@ function putMessage(sender, _text, before, fileid) {
     updateScroll();
 }
 
-function DownloadFile(fileurl, filename) {
+function DownloadFile(fileurl, filename, fileid) {
     var xhr = new XMLHttpRequest();
-    document.getElementById("file_prog").style.display = "block";
+    var file_selected = document.getElementById("file-" + fileid);
+    var download_prog = document.createElement("div");
+    download_prog.className = "ui tiny progress";
+    download_prog.id = "fileprog-" + fileid;
+    download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
+    file_selected.appendChild(download_prog);
+
     xhr.open('GET', "https://".concat(fileurl));
     xhr.responseType = "arraybuffer";
     xhr.onload = function() {
@@ -626,20 +628,14 @@ function DownloadFile(fileurl, filename) {
     };
 
     xhr.onprogress = function(e) {
-        console.log("inside uploadProgress\n");
-
-        $('#file_prog').progress({
+        $('#fileprog-' + fileid).progress({
             percent: Math.ceil((e.loaded / e.total) * 100)
         });
-
     };
     xhr.onloadend = function(e) {
         setTimeout(function(){
-            document.getElementById("file_prog").style.display = "none";
-            $('#file_prog').progress({
-                percent: 0
-            })
-        }, 5000);
+            document.getElementById('file-' + fileid).removeChild(download_prog);
+        }, 1000);
     };
     xhr.send(null);
 }

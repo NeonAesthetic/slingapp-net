@@ -86,15 +86,7 @@ class RoomSocketServer extends WebSocketServer
         $account_id = $account->getAccountID();
         $room_id = $room->getRoomID();
         $text = htmlspecialchars($message['text']);
-
-        if (isset($message['fileid'])) //{
-//            $room->getChat()->AddFile($message['fileid'], $message['filepath'], $message['text']);
-//
-//            $filepath = $message['filepath'];
-            $file_id = $message['fileid'];
-        else
-            $file_id = null;
-//        }
+        $file_id = (isset($message['fileid'])) ? $message['fileid'] : null;
 
         if (strlen($text) <= 2000) {
 
