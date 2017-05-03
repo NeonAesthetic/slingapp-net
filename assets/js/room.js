@@ -493,6 +493,9 @@ function uploadFile(files) {
         xhr.upload.onloadend = function(e) {
                 setTimeout(function(){
                     document.getElementById("file_prog").style.display = "none";
+                    $('#file_prog').progress({
+                        percent: 0
+                    })
                 }, 5000);
         };
 
@@ -543,43 +546,6 @@ function fileDragHover(e) {
     e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
     //e.target.className = (e.type == "dragover" ? "hover" : "");
 }
-
-function uploadProgress(e) {
-
-    // var progressNumber = document.getElementById('progressNumber');
-    // var percentComplete = Math.round(e.loaded * 100 / e.total);
-    // var progressBar = document.getElementById('prog');
-    //
-    // if(e.lengthComputable) {
-    //     progressNumber.innerHTML = percentComplete + '%';
-    //     progressBar.value = percentComplete;
-    // } else {
-    //     progressNumber.innerHTML = 'error';
-    // }
-}
-
-function uploadComplete(e) {
-    if( e.readyState === 4 ) {
-        console.log("upload complete");
-        document.getElementById("file_prog").style.display = "none";
-    }
-}
-
-function uploadFailed(e) {
-    console.log("error uploading file");
-}
-
-function uploadAbort(e) {
-    console.log("upload canceled by user");
-}
-
-// function updateScroll() {
-//     var element = document.getElementById("right_hand_pane");
-//     // var element2 = document.getElementById("file-log");
-//
-//     element.scrollTop = element.scrollHeight;
-//     element2.scrollTop = element.scrollHeight;
-// }
 
 function updateScroll(){
     var element = document.getElementById("right_hand_pane");
@@ -651,14 +617,30 @@ function putMessage(sender, _text, before, fileid) {
 
 function DownloadFile(fileurl, filename) {
     var xhr = new XMLHttpRequest();
-
+    document.getElementById("file_prog").style.display = "block";
     xhr.open('GET', "https://".concat(fileurl));
     xhr.responseType = "arraybuffer";
     xhr.onload = function() {
         var blob = new Blob([xhr.response], {type: "application/octet-stream"});
         saveAs(blob, filename.concat(".zip"));
-    }
-    ;
+    };
+
+    xhr.onprogress = function(e) {
+        console.log("inside uploadProgress\n");
+
+        $('#file_prog').progress({
+            percent: Math.ceil((e.loaded / e.total) * 100)
+        });
+
+    };
+    xhr.onloadend = function(e) {
+        setTimeout(function(){
+            document.getElementById("file_prog").style.display = "none";
+            $('#file_prog').progress({
+                percent: 0
+            })
+        }, 5000);
+    };
     xhr.send(null);
 }
 
