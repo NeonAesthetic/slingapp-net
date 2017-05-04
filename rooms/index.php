@@ -41,7 +41,7 @@ if ($room) {
     <link rel="stylesheet" type="text/css" href="/assets/css/semantic.min.css">
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
-    <link id="pagestyle" rel="stylesheet" type="text/css" href="/assets/css/room_dark.css">
+    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
     <link rel="stylesheet" href="/assets/css/range.css">
 </head>
 
@@ -253,10 +253,8 @@ if ($room) {
 
     $(document).ready(function () {
 
-        if (getCookie("theme") === "light") {
-            var btn = document.getElementById("quick-theme-button");
-            toggleTheme(btn, true);
-        }
+        if(getCookie("theme") === "light")
+            resetTheme();
 
         $('.ui.accordion')
             .accordion({
@@ -404,20 +402,10 @@ if ($room) {
         var colored_elems = document.getElementsByClassName("theme2");
         var themeChoice = getCookie("theme");
 
-        if(!init) //if the website isn't being loaded, toggle the theme
-            themeChoice = (themeChoice === "dark") ? "light" : "dark";
-
-        if(themeChoice === "light"){
+        if(themeChoice === "dark"){
             setCookie("theme", "light");
-
-            [].forEach.call(themed_elems, function(e) {
-                e.classList.remove("inverted");
-            });
-            [].forEach.call(colored_elems, function(e) {
-                e.classList.remove("black");
-            });
+            resetTheme();
             swapStyleSheet("room_light.css");
-            elem.innerHTML = "Dark Theme"
         } else {
             setCookie("theme", "dark");
 
@@ -430,6 +418,19 @@ if ($room) {
             swapStyleSheet("room_dark.css");
             elem.innerHTML = "Light Theme"
         }
+    }
+
+    function resetTheme() {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+
+        [].forEach.call(themed_elems, function(e) {
+            e.classList.remove("inverted");
+        });
+        [].forEach.call(colored_elems, function(e) {
+            e.classList.remove("black");
+        });
+        document.getElementById("quick-theme-button").innerHTML = "Dark Theme"
     }
 
     function swapStyleSheet(sheet) {
