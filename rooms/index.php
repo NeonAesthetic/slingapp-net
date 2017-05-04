@@ -63,15 +63,15 @@ if ($room) {
                 <p id="r-title">Room Name</p>
                 <button id="share_button" class="ui circular black icon right floated theme2 button"
                         data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video theme1 theme2 icon"></i>
+                    <i class="inverted video theme1 icon"></i>
                 </button>
                 <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
-                    <i class="inverted sign out theme1 theme2 icon"></i>
+                    <i class="inverted sign out theme1 icon"></i>
                 </button>
                 <button id="settings_button" class="ui circular black icon right floated theme2 button"
                         onclick="openSettings('users-tab')">
-                    <i id="settings_icon" class="inverted setting theme1 theme2 icon"></i>
+                    <i id="settings_icon" class="inverted setting theme1 icon"></i>
                 </button>
                 <div class="ui flowing popup bottom left transition inverted theme1 hidden">
                     <div class="ui middle aligned" style="width: 15em">
@@ -120,7 +120,7 @@ if ($room) {
 <!--                                <button class="ui inverted black button" onclick="changeTheme('inv_black')"><i class="align icon"></i></button>-->
 <!--                            </div>-->
 
-                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)">Light Theme</div>
+                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "dark") ? "Light Theme" : "Dark Theme" ?></div>
                         </div>
                     </div>
                 </div>
@@ -275,6 +275,12 @@ if ($room) {
 
     $(document).ready(function () {
 
+        if (getCookie("theme") === "light") {
+            console.log("inside!");
+            var btn = document.getElementById("quick-invite-button");
+            toggleTheme(btn);
+        }
+
         $('.ui.accordion')
             .accordion({
                 exclusive: false
@@ -359,9 +365,9 @@ if ($room) {
 
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
-        if (window.File && window.FileList && window.FileReader) {
-            initDragDrop();
-        }
+//        if (window.File && window.FileList && window.FileReader) {
+//            initDragDrop();
+//        }
     });
 
     Account.data = <?=$account->getJSON()?>;
@@ -418,6 +424,8 @@ if ($room) {
         var colored_elems = document.getElementsByClassName("theme2");
 
         if(elem.innerHTML === "Dark Theme"){
+            setCookie("theme", "dark");
+            console.log("theme: " + getCookie("theme"));
             [].forEach.call(themed_elems, function(e) {
                 e.classList.add("inverted");
             });
@@ -427,6 +435,8 @@ if ($room) {
             swapStyleSheet("room_dark.css");
             elem.innerHTML = "Light Theme"
         } else {
+            setCookie("theme", "light");
+            console.log("theme: " + getCookie("theme"));
             [].forEach.call(themed_elems, function(e) {
                 e.classList.remove("inverted");
             });
