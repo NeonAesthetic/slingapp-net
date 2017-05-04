@@ -1,5 +1,6 @@
 .pusher {
-    background-color: #383838 !important;
+    background-color: #dadada !important;
+    border: none !important;
 }
 
 .screen {
@@ -8,9 +9,17 @@
 }
 
 .text *{
-    color: white;
+    color: black;
 }
 
+.theme1 {
+    background-color: #EEEEEE !important;
+}
+
+.theme2 {
+    background-color: #EEEEEE !important;
+    color: #484848 !important;
+}
 .ui.comments {
     font-size: .9em;
 }
@@ -28,7 +37,6 @@
     right:10px;
     bottom:20px;
 }
-
 .progress {
     display: none;
 }
@@ -49,8 +57,9 @@
     bottom:0;
 }
 #send-box input {
-    background-color: #383838 !important;
-    color: #C4C4C4 !important;
+    background-color: #DADADA !important;
+    border: none;
+    color: black !important;
 }
 
 .quick_input {
@@ -60,16 +69,18 @@
     text-align: center !important;
 }
 .mine.user {
-    color:#28f200;
+    color: #5488ad;
+    font-weight: bold;
 }
 
 .user {
-    color: grey;
+    color: black;
     margin: 0;
+    font-weight: bold;
 }
 
 .hyperlink {
-    color: #9e9e9e;
+    color: rgba(21, 73, 85, 0.51);
     text-decoration: underline;
 }
 #chat_feed {
@@ -77,8 +88,8 @@
 }
 
 #file-upload{
-    background-color: #383838;
-    color:#a6a6a6;
+    background-color: #DADADA;
+    color:#5a5a5a;
     width:25px;
 }
 
@@ -90,12 +101,19 @@
     display: none;
 }
 
+#send-button {
+    background-color: #b9b8b9 !important;
+}
 #r-title {
-    color: white;
+    color: #484848;
     margin: auto;
 }
 
 ::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+::-webkit-input-placeholder { /* Chrome */
+    color: #5a5a5a !important;
 }

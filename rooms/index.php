@@ -41,39 +41,39 @@ if ($room) {
     <link rel="stylesheet" type="text/css" href="/assets/css/semantic.min.css">
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
-    <link rel="stylesheet" type="text/css" href="/assets/css/room2.css">
+    <link id="pagestyle" rel="stylesheet" type="text/css" href="/assets/css/room_dark.css">
     <link rel="stylesheet" href="/assets/css/range.css">
 </head>
 
 
 <body>
 
-<div class="ui inverted left vertical sidebar menu">
+<div class="ui inverted left vertical sidebar theme1 menu">
     <div class="ui styled accordion"></div>
 </div>
 
 <div class="pusher">
     <div class="ui grid">
         <div class="row">
-            <div class="ui inverted top attached menu">
+            <div class="ui inverted top attached theme1 menu" style="border: none !important;">
                 <a class="item" id="menu">
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <button id="share_button" class="ui circular black icon right floated button"
+                <button id="share_button" class="ui circular black icon right floated theme2 button"
                         data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video icon"></i>
+                    <i class="inverted video theme1 theme2 icon"></i>
                 </button>
-                <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room"
+                <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
-                    <i class="inverted sign out icon"></i>
+                    <i class="inverted sign out theme1 theme2 icon"></i>
                 </button>
-                <button id="settings_button" class="ui circular black icon right floated button"
+                <button id="settings_button" class="ui circular black icon right floated theme2 button"
                         onclick="openSettings('users-tab')">
-                    <i id="settings_icon" class="inverted setting icon"></i>
+                    <i id="settings_icon" class="inverted setting theme1 theme2 icon"></i>
                 </button>
-                <div class="ui flowing popup bottom left transition inverted hidden">
+                <div class="ui flowing popup bottom left transition inverted theme1 hidden">
                     <div class="ui middle aligned" style="width: 15em">
                         <div class="row">
                             <div id="quick_input" style="display:none">
@@ -97,11 +97,36 @@ if ($room) {
                         <div class="row">
                             <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
                         </div>
+                        <div class="row">
+<!--                            <div class="ui icon fluid buttons">-->
+<!--                                <button class="ui button" onclick="changeTheme('standard')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui black button" onclick="changeTheme('black')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui red button" onclick="changeTheme('red')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui orange button" onclick="changeTheme('orange')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui yellow button" onclick="changeTheme('yellow')"><i class="align icon"></i></button>-->
+<!--                            </div>-->
+<!--                            <div class="ui icon fluid buttons">-->
+<!--                                <button class="ui olive button" onclick="changeTheme('olive')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui green button" onclick="changeTheme('green')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui teal button" onclick="changeTheme('teal')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui blue button" onclick="changeTheme('blue')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui violet button" onclick="changeTheme('violet')"><i class="align icon"></i></button>-->
+<!--                            </div>-->
+<!--                            <div class="ui icon fluid buttons">-->
+<!--                                <button class="ui purple button" onclick="changeTheme('purple')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui pink button" onclick="changeTheme('pink')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui brown button" onclick="changeTheme('brown')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui grey button" onclick="changeTheme('grey')"><i class="align icon"></i></button>-->
+<!--                                <button class="ui inverted black button" onclick="changeTheme('inv_black')"><i class="align icon"></i></button>-->
+<!--                            </div>-->
+
+                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)">Light Theme</div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div id="content">
-                <div id="right_hand_pane" class="ui right fixed inverted vertical menu"
+                <div id="right_hand_pane" class="ui right fixed inverted vertical theme1 menu"
                      style="overflow-y:scroll; padding-bottom: 3em;">
                     <div id="chat_feed" class="ui comments"></div>
 
@@ -119,7 +144,7 @@ if ($room) {
                                 </label>
                                 <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
                             </div>
-                            <div class="ui button" onclick="sendMessage()">Send</div>
+                            <div id="send-button" class="ui button" onclick="sendMessage()">Send</div>
                         </div>
                     </div>
                 </div>
@@ -249,11 +274,11 @@ if ($room) {
 <script>
 
     $(document).ready(function () {
+
         $('.ui.accordion')
             .accordion({
                 exclusive: false
-            })
-        ;
+            });
 
         $('.tabular.menu .item').tab();
 
@@ -330,14 +355,12 @@ if ($room) {
 
             }
         }
-
-
     });
 
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
         if (window.File && window.FileList && window.FileReader) {
-//            initDragDrop();
+            initDragDrop();
         }
     });
 
@@ -388,6 +411,35 @@ if ($room) {
             console.log(data);
             appendInviteCode(data.code);
         });
+    }
+
+    function toggleTheme(elem) {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+
+        if(elem.innerHTML === "Dark Theme"){
+            [].forEach.call(themed_elems, function(e) {
+                e.classList.add("inverted");
+            });
+            [].forEach.call(colored_elems, function(e) {
+                e.classList.add("black");
+            });
+            swapStyleSheet("room_dark.css");
+            elem.innerHTML = "Light Theme"
+        } else {
+            [].forEach.call(themed_elems, function(e) {
+                e.classList.remove("inverted");
+            });
+            [].forEach.call(colored_elems, function(e) {
+                e.classList.remove("black");
+            });
+            swapStyleSheet("room_light.css");
+            elem.innerHTML = "Dark Theme"
+        }
+    }
+
+    function swapStyleSheet(sheet) {
+        document.getElementById("pagestyle").setAttribute("href", "/assets/css/" + sheet);
     }
 
     function updateUserInfo(accountID, nickname) {
@@ -478,9 +530,6 @@ if ($room) {
         }
     }
 
-    function selectAudioSettings() {
-
-    }
     function minimizeDiv(event) {
         var target = event.target;
         if (event.target.id[0] == 'N') {
