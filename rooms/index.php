@@ -98,7 +98,7 @@ if ($room) {
                             <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
                         </div>
                         <div class="row">
-                            <div id="quick-theme-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "dark") ? "Light Theme" : "Dark Theme" ?></div>
+                            <div id="quick-theme-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
                         </div>
                     </div>
                 </div>
@@ -254,9 +254,8 @@ if ($room) {
     $(document).ready(function () {
 
         if (getCookie("theme") === "light") {
-            console.log("inside!");
             var btn = document.getElementById("quick-theme-button");
-            toggleTheme(btn);
+            toggleTheme(btn, true);
         }
 
         $('.ui.accordion')
@@ -400,24 +399,17 @@ if ($room) {
         });
     }
 
-    function toggleTheme(elem) {
+    function toggleTheme(elem, init) {
         var themed_elems = document.getElementsByClassName("theme1");
         var colored_elems = document.getElementsByClassName("theme2");
+        var themeChoice = getCookie("theme");
 
-        if(elem.innerHTML === "Dark Theme"){
-            setCookie("theme", "dark");
-            console.log("theme: " + getCookie("theme"));
-            [].forEach.call(themed_elems, function(e) {
-                e.classList.add("inverted");
-            });
-            [].forEach.call(colored_elems, function(e) {
-                e.classList.add("black");
-            });
-            swapStyleSheet("room_dark.css");
-            elem.innerHTML = "Light Theme"
-        } else {
+        if(!init) //if the website isn't being loaded, toggle the theme
+            themeChoice = (themeChoice === "dark") ? "light" : "dark";
+
+        if(themeChoice === "light"){
             setCookie("theme", "light");
-            console.log("theme: " + getCookie("theme"));
+
             [].forEach.call(themed_elems, function(e) {
                 e.classList.remove("inverted");
             });
@@ -426,6 +418,17 @@ if ($room) {
             });
             swapStyleSheet("room_light.css");
             elem.innerHTML = "Dark Theme"
+        } else {
+            setCookie("theme", "dark");
+
+            [].forEach.call(themed_elems, function(e) {
+                e.classList.add("inverted");
+            });
+            [].forEach.call(colored_elems, function(e) {
+                e.classList.add("black");
+            });
+            swapStyleSheet("room_dark.css");
+            elem.innerHTML = "Light Theme"
         }
     }
 
