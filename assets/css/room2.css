@@ -37,6 +37,10 @@
     margin-bottom: 0!important;
 }
 
+.quickbutton {
+    border-radius: 0!important;
+}
+
 #file_prog {
     display: none;
     position:fixed;
@@ -44,11 +48,17 @@
     right:10px;
     bottom:0;
 }
-input {
+#send-box input {
     background-color: #383838 !important;
     color: #C4C4C4 !important;
 }
 
+.quick_input {
+    background-color: #e0e1e2 !important;
+    color: #5a5a5a !important;
+    border-radius: 0 !important;
+    text-align: center !important;
+}
 .mine.user {
     color:#28f200;
 }

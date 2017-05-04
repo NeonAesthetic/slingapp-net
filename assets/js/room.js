@@ -348,6 +348,30 @@ function createInviteCode(e) {
     });
 }
 
+function quickInvite(elem) {
+    elem.style.display = "none";
+    document.getElementById("quick_invite").style.display = "inline";
+    var roomid = Room.data.RoomID;
+    var token = GetToken();
+    $.ajax({
+        type: 'post',
+        url: '/assets/php/components/room.php',
+        dataType: 'JSON',
+        data: {
+            action: "gencode",
+            room: roomid,
+            token: token
+        },
+        success: function (data) {
+            var quick_inv = document.getElementById("quick_invite_textbox");
+            quick_inv.value = data.Code;
+            quick_inv.select();
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
 function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
@@ -470,7 +494,7 @@ function uploadFile(files) {
     console.log("file specs: ", files);
     var file = files[0];
     var token = GetToken();
-    if (file.size > 0) {
+    if (file.size > 0 && file.size < 536870912) {
         document.getElementById("file_prog").style.display = "block";
         var form = new FormData();
         var xhr = new XMLHttpRequest();
@@ -507,6 +531,9 @@ function uploadFile(files) {
                 }
             }
         }
+    } else {
+        console.log("Filesize invalid");
+        Toast.error(textNode("Must be under 256MB"));
     }
 }
 
