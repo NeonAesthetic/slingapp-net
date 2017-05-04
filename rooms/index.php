@@ -49,11 +49,7 @@ if ($room) {
 <body>
 
 <div class="ui inverted left vertical sidebar menu">
-    <div class="ui styled accordion">
-        
-
-
-    </div>
+    <div class="ui styled accordion"></div>
 </div>
 
 <div class="pusher">
@@ -83,18 +79,20 @@ if ($room) {
                             <div id="quick_input" style="display:none">
                                 <div class="ui large fluid icon input">
                                     <input id="quick_name_change" class="quick_input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
-                                    <i class="checkmark link icon" style="color:#28f200;" onclick="changeScreenName(previousElementSibling.value)"></i>
+                                    <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
                             <div class="ui button fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
                         <div class="row">
                             <div id="quick_invite" class="fluid" style="display:none">
-                                <div class="ui large fluid input">
+                                <div class="ui large fluid icon input">
                                     <input id="quick_invite_textbox" class="quick_input" value="generating..." type="text">
+                                    <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
+
                                 </div>
                             </div>
-                            <div class="ui button fluid quickbutton" onclick="quickInvite(this)">Create Invite Code</div>
+                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="quickInvite()">Create Invite Code</div>
                         </div>
                         <div class="row">
                             <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
@@ -173,11 +171,7 @@ if ($room) {
                 <div class="ui inverted divider"></div>
                 <table class="ui celled table" style="">
                     <thead style="position: fixed; ">
-                    <tr>
-<!--                        <th colspan="3">-->
-<!--                            <div class="ui button green" onclick="createInvite()">Create Invite Code</div>-->
-<!--                        </th>-->
-                    </tr>
+                    <tr></tr>
                     </thead>
                 </table>
             </div>
@@ -219,31 +213,18 @@ if ($room) {
                             <h3 class="ui header">Video Source</h3>
                             <select class="ui dropdown fluid" id="videoSource"></select>
                         </div>
-
-                        <!--                        <video id="video" autoplay></video>-->
                     </div>
-                    <!--                    <div class="ui grid padded ">-->
-                    <!--                        <div class="row column">-->
                 </div>
 
             </div>
         </div>
     </div>
     <div class="actions">
-        <!--                            <div class="four wide right floated column">-->
         <div class="ui positive right labeled icon button" onclick="closeSettings()">
             Done
             <i class="checkmark icon"></i>
         </div>
-        <!--                            </div>-->
-        <!--                        </div>-->
-        <!--                    </div>-->
     </div>
-</div>
-
-<!--    </div>-->
-
-
 </div>
 
 </body>
@@ -281,7 +262,6 @@ if ($room) {
             transition: 'overlay'
         })
             .sidebar('attach events', '#menu');
-        ;
 
         $('.ui.dropdown').dropdown();
 
@@ -304,14 +284,19 @@ if ($room) {
                         })
                     }
                 }
-            })
-//            .onApprove({
-//                $('.ui.modal')
-//            .modal('show')
-//        ;
-//            })
-        ;
+            });
 
+        $("#regen-code")
+            .rotate({
+                bind: {
+                    mouseover: function () {
+                        $(this).rotate({
+                            angle: 0,
+                            animateTo: 360
+                        })
+                    }
+                }
+            });
 
         $("#leave_button")
             .popup();
