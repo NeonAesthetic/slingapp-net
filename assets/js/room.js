@@ -365,11 +365,8 @@ function updateInvites(){
             iCodeDiv.appendChild(tr);
             addCodeEvent(tr);
         }
-
     }
-
 }
-
 
 function changeRemainingUses(code){
     var uses = prompt("Enter remaining uses:");
@@ -612,32 +609,36 @@ function putMessage(sender, _text, before, fileid) {
 }
 
 function DownloadFile(fileurl, filename, fileid) {
-    var xhr = new XMLHttpRequest();
-    var file_selected = document.getElementById("file-" + fileid);
-    var download_prog = document.createElement("div");
-    download_prog.className = "ui tiny progress";
-    download_prog.id = "fileprog-" + fileid;
-    download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
-    file_selected.appendChild(download_prog);
 
-    xhr.open('GET', "https://".concat(fileurl));
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function() {
-        var blob = new Blob([xhr.response], {type: "application/octet-stream"});
-        saveAs(blob, filename.concat(".zip"));
-    };
 
-    xhr.onprogress = function(e) {
-        $('#fileprog-' + fileid).progress({
-            percent: Math.ceil((e.loaded / e.total) * 100)
-        });
-    };
-    xhr.onloadend = function(e) {
-        setTimeout(function(){
-            document.getElementById('file-' + fileid).removeChild(download_prog);
-        }, 1000);
-    };
-    xhr.send(null);
+    if(document.getElementById('fileprog-' + fileid) === null) {
+        var xhr = new XMLHttpRequest();
+        var file_selected = document.getElementById("file-" + fileid);
+        var download_prog = document.createElement("div");
+        download_prog.className = "ui tiny progress";
+        download_prog.id = "fileprog-" + fileid;
+        download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
+        file_selected.appendChild(download_prog);
+
+        xhr.open('GET', "https://".concat(fileurl));
+        xhr.responseType = "arraybuffer";
+        xhr.onload = function () {
+            var blob = new Blob([xhr.response], {type: "application/octet-stream"});
+            saveAs(blob, filename.concat(".zip"));
+        };
+
+        xhr.onprogress = function (e) {
+            $('#fileprog-' + fileid).progress({
+                percent: Math.ceil((e.loaded / e.total) * 100)
+            });
+        };
+        xhr.onloadend = function (e) {
+            setTimeout(function () {
+                document.getElementById('file-' + fileid).removeChild(download_prog);
+            }, 1000);
+        };
+        xhr.send(null);
+    }
 }
 
 function RequestDownload(fileid) {
