@@ -98,29 +98,7 @@ if ($room) {
                             <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
                         </div>
                         <div class="row">
-<!--                            <div class="ui icon fluid buttons">-->
-<!--                                <button class="ui button" onclick="changeTheme('standard')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui black button" onclick="changeTheme('black')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui red button" onclick="changeTheme('red')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui orange button" onclick="changeTheme('orange')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui yellow button" onclick="changeTheme('yellow')"><i class="align icon"></i></button>-->
-<!--                            </div>-->
-<!--                            <div class="ui icon fluid buttons">-->
-<!--                                <button class="ui olive button" onclick="changeTheme('olive')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui green button" onclick="changeTheme('green')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui teal button" onclick="changeTheme('teal')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui blue button" onclick="changeTheme('blue')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui violet button" onclick="changeTheme('violet')"><i class="align icon"></i></button>-->
-<!--                            </div>-->
-<!--                            <div class="ui icon fluid buttons">-->
-<!--                                <button class="ui purple button" onclick="changeTheme('purple')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui pink button" onclick="changeTheme('pink')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui brown button" onclick="changeTheme('brown')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui grey button" onclick="changeTheme('grey')"><i class="align icon"></i></button>-->
-<!--                                <button class="ui inverted black button" onclick="changeTheme('inv_black')"><i class="align icon"></i></button>-->
-<!--                            </div>-->
-
-                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "dark") ? "Light Theme" : "Dark Theme" ?></div>
+                            <div id="quick-theme-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "dark") ? "Light Theme" : "Dark Theme" ?></div>
                         </div>
                     </div>
                 </div>
@@ -277,7 +255,7 @@ if ($room) {
 
         if (getCookie("theme") === "light") {
             console.log("inside!");
-            var btn = document.getElementById("quick-invite-button");
+            var btn = document.getElementById("quick-theme-button");
             toggleTheme(btn);
         }
 
@@ -334,7 +312,7 @@ if ($room) {
 
         $("#share_button")
             .popup();
-        
+
         updateScroll();
 
         checkInVol();
