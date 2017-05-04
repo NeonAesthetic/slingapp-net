@@ -48,10 +48,19 @@ if ($room) {
 
 <body>
 
-<div class="ui inverted left vertical sidebar menu">
-    <div class="ui styled accordion">
-        
+<div class="ui inverted left vertical sidebar menu" style="top: 40px;">
+    <div class="item">
+        <button id="share_button" class="ui circular inverted green basic icon button"
+                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
+            <i class="video icon"></i>
+        </button>
+        <button class="ui circular inverted red basic icon button"
+                data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
+            <i class="remove icon"></i>
+        </button>
+    </div>
 
+    <div class="ui inverted styled accordion" style="background: transparent">
 
     </div>
 </div>
@@ -60,15 +69,12 @@ if ($room) {
     <div class="ui grid">
         <div class="row">
             <div class="ui inverted top attached menu">
-                <a class="item" id="menu">
+                <a class="item" id="menu" >
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <button id="share_button" class="ui circular black icon right floated button"
-                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video icon"></i>
-                </button>
+
                 <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out icon"></i>
@@ -278,10 +284,11 @@ if ($room) {
 
         $('.ui.left.sidebar').sidebar({
             dimPage: false,
-            transition: 'overlay'
+            transition: 'overlay',
+            closable:false,
         })
-            .sidebar('attach events', '#menu');
-        ;
+            .sidebar('attach events', '#menu')
+            .sidebar("show");
 
         $('.ui.dropdown').dropdown();
 
@@ -406,16 +413,8 @@ if ($room) {
     }
 
     function updateUserInfo(accountID, nickname) {
-
-//        console.log("account: ", accountID);
-//        console.log("nickname", nickname);
-//        console.log(Room.data.Accounts[accountID]);
-          Room.data.Accounts[accountID].ScreenName= nickname;
+        Room.data.Accounts[accountID].ScreenName= nickname;
         $('.uid-'+accountID ).html(nickname);
-//
-//        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
-//        document.getElementById('UN' + accountID.toString() + 'mainScreen').innerHTML = nickname;
-//        document.getElementById("modalUsername").innerHTML = nickname;
     }
 
     function newUserSet(size, target) {

@@ -60,12 +60,12 @@
     text-align: center !important;
 }
 .mine.user {
-    color:#28f200;
+    color:#77ff77;
 }
 
 .user {
     color: grey;
-    margin: 0;
+    margin-right: 10px;
 }
 
 .hyperlink {
