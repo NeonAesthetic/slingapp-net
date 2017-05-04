@@ -264,6 +264,7 @@ var AVC = {
             title.className = "title";
             title.innerHTML = "<i class='dropdown icon'></i>" + sn + "</div>";
             content.className = "content";
+            content.style.width = "auto";
 
             video.setAttribute("id", "video-" + id);
             // video.setAttribute("height", 170);
@@ -280,9 +281,11 @@ var AVC = {
             video.divTitle = title;
             video.divContent = content;
 
+
             content.appendChild(video);
 
             var wrapper = document.createElement("div");
+            
             wrapper.appendChild(title);
             wrapper.appendChild(content);
 

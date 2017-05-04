@@ -133,7 +133,7 @@ if ($room) {
                 </div>
             </div>
         </div>
-        <div id="video-container" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll">
+        <div id="video-container"  class="ui inverted" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll; position: relative; display: flex; justify-content: space-around">
             <! --- VIDEO DIV -->
 
 
@@ -364,12 +364,15 @@ if ($room) {
         }
         var thumbnails = document.getElementById("video-thumbnails");
         var videoContainer = document.getElementById("video-container");
-        Sortable.create(thumbnails, { group: "videos" });
+        Sortable.create(thumbnails, { group: "videos" , onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        } });
         Sortable.create(videoContainer, { group: "videos", onAdd:function (event) {
             console.log(event);
             var video = event.item.querySelector('video');
-            video.style.maxWidth = '100%';
-//            video.height='auto';
+            video.play();
         } });
 
 
