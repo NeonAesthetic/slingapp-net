@@ -60,16 +60,16 @@ if ($room) {
         </button>
     </div>
 
-    <div class="ui inverted styled accordion" style="background: transparent">
+    <div id='video-thumbnails' class="ui inverted styled accordion" style="background: transparent; min-height: 100%">
 
     </div>
 </div>
 
 <div class="pusher">
-    <div class="ui grid">
+    <div class="ui grid" style="height: 100vh">
         <div class="row">
             <div class="ui inverted top attached menu">
-                <a class="item" id="menu" >
+                <a class="item" id="menu" ondragover="$('.ui.left.sidebar').sidebar('show')">
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
@@ -133,6 +133,17 @@ if ($room) {
                 </div>
             </div>
         </div>
+        <div id="video-container" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll">
+            <! --- VIDEO DIV -->
+
+
+
+
+
+
+
+        </div>
+
     </div>
 </div>
 
@@ -180,9 +191,7 @@ if ($room) {
                 <table class="ui celled table" style="">
                     <thead style="position: fixed; ">
                     <tr>
-<!--                        <th colspan="3">-->
-<!--                            <div class="ui button green" onclick="createInvite()">Create Invite Code</div>-->
-<!--                        </th>-->
+
                     </tr>
                     </thead>
                 </table>
@@ -268,6 +277,7 @@ if ($room) {
 <script src="/assets/js/peer.js"></script>
 <script src="/assets/js/Autolinker.js"></script>
 <script src="/assets/js/MediaStreams.js"></script>
+<script src="/assets/js/Sortable.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/main.js"></script>
@@ -352,6 +362,15 @@ if ($room) {
 
             }
         }
+        var thumbnails = document.getElementById("video-thumbnails");
+        var videoContainer = document.getElementById("video-container");
+        Sortable.create(thumbnails, { group: "videos" });
+        Sortable.create(videoContainer, { group: "videos", onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.style.maxWidth = '100%';
+//            video.height='auto';
+        } });
 
 
     });

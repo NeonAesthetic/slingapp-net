@@ -267,9 +267,12 @@ var AVC = {
 
             video.setAttribute("id", "video-" + id);
             // video.setAttribute("height", 170);
-            video.setAttribute("width", 235);
+            // video.setAttribute("width", 235);
             video.style.background = "#292929";
             video.style.border = "1px solid #333";
+            video.style.maxHeight = "calc(100vh - 80px)";
+            video.style.maxWidth = "100%";
+
             video.ondblclick = function(){
                 this.webkitRequestFullScreen();
             };
@@ -279,9 +282,12 @@ var AVC = {
 
             content.appendChild(video);
 
+            var wrapper = document.createElement("div");
+            wrapper.appendChild(title);
+            wrapper.appendChild(content);
 
-            $('.ui.sidebar .accordion').append(title);
-            $('.ui.sidebar .accordion').append(content);
+            $('.ui.sidebar .accordion').append(wrapper);
+            // $('.ui.sidebar .accordion').append(content);
         }
 
 

@@ -4,6 +4,7 @@
 
 var Toast = {
     pop:function(text, classname, timeout){
+        console.log("toast");
         if(!timeout) timeout = 3000;
         var toast = document.createElement("div");
         toast.className = "toast " + classname;
