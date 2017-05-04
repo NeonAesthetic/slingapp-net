@@ -14,7 +14,6 @@ require_once "classes/File.php";
 class Chat
 {
     public $_messages = [];
-    public $_files = [];
 
     protected $_roomid;
 
@@ -36,8 +35,7 @@ class Chat
             ":rid" => $this->_roomid,
             ":bef" => $before
         ])
-        )
-        {
+        ) {
             $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($results as $message) {
@@ -63,17 +61,5 @@ class Chat
         ]);
 
         $this->_messages[] = new Message($id, $room, $author, $content, $fileID);
-    }
-
-    public function AddFile($id, $path, $name){
-        $this->_files[] = new File($id, $path, $name);
-    }
-
-    /**
-     * @return File[]
-     */
-    public function getFiles()
-    {
-        return $this->_files;
     }
 }

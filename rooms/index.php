@@ -78,17 +78,27 @@ if ($room) {
                     <i id="settings_icon" class="inverted setting icon"></i>
                 </button>
                 <div class="ui flowing popup bottom left transition inverted hidden">
-                    <div id="quick_input" style="width: 250px; display:none">
-                        <div class="ui large icon input">
-                            <input type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) quickScreenNameClose(this)">
-                            <i class="checkmark icon" style="color:#28f200"></i>
+                    <div class="ui middle aligned" style="width: 15em">
+                        <div class="row">
+                            <div id="quick_input" style="display:none">
+                                <div class="ui large fluid icon input">
+                                    <input id="quick_name_change" class="quick_input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
+                                    <i class="checkmark link icon" style="color:#28f200;" onclick="changeScreenName(previousElementSibling.value)"></i>
+                                </div>
+                            </div>
+                            <div class="ui button fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
-                    </div>
-                    <div class="ui vertical buttons">
-<!--                        <div id="quick_screen_name_change" class="ui button" onclick="openSettings('users-tab')">Change Screen Name</div>-->
-                        <div class="ui button quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
-                        <div class="ui button quickbutton" onclick="openSettings('invite-tab')">Create Invite Code</div>
-                        <div class="ui button quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                        <div class="row">
+                            <div id="quick_invite" class="fluid" style="display:none">
+                                <div class="ui large fluid input">
+                                    <input id="quick_invite_textbox" class="quick_input" value="generating..." type="text">
+                                </div>
+                            </div>
+                            <div class="ui button fluid quickbutton" onclick="quickInvite(this)">Create Invite Code</div>
+                        </div>
+                        <div class="row">
+                            <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,17 +107,23 @@ if ($room) {
                      style="overflow-y:scroll; padding-bottom: 3em;">
                     <div id="chat_feed" class="ui comments"></div>
 
-                    <div id="send-box" class="ui fluid action input">
-                        <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
-                        <div id="file-upload">
-                            <label for="file-input">
-                                <i class="upload icon" style="margin-top: 8px"></i>
-                            </label>
-                            <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                    <div>
+                        <div id="file_prog" class="ui progress">
+                            <div class="bar">
+                                <div class="progress"></div>
+                            </div>
                         </div>
-                        <div class="ui button" onclick="sendMessage()">Send</div>
+                        <div id="send-box" class="ui fluid action input">
+                            <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
+                            <div id="file-upload">
+                                <label for="file-input">
+                                    <i class="upload icon" style="margin-top: 8px"></i>
+                                </label>
+                                <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                            </div>
+                            <div class="ui button" onclick="sendMessage()">Send</div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -276,7 +292,8 @@ if ($room) {
                 position: 'bottom left',
                 delay: {
                     hide: 400
-                }
+                },
+                onHidden: quickMenuClose
             })
             .rotate({
                 bind: {
@@ -355,21 +372,15 @@ if ($room) {
     }
     function quickScreenNameChange() {
         document.getElementsByClassName("quickbutton")[0].style.display = "none";
-        document.getElementsByClassName("quickbutton")[1].style.display = "none";
-        document.getElementsByClassName("quickbutton")[2].style.display = "none";
-        document.getElementById("quick_input").style.display = "block";
+        document.getElementById("quick_input").style.display = "inline";
+        document.getElementById("quick_name_change").focus();
     }
 
-    function quickScreenNameClose(event) {
+    function quickMenuClose() {
         document.getElementsByClassName("quickbutton")[0].style.display = "block";
         document.getElementsByClassName("quickbutton")[1].style.display = "block";
-        document.getElementsByClassName("quickbutton")[2].style.display = "block";
         document.getElementById("quick_input").style.display = "none";
-        if(event.value != ""){
-//            Account.changeName(event.value);
-            changeScreenName(event.value);
-
-        }
+        document.getElementById("quick_invite").style.display ="none";
     }
     function closeSettings() {
         $('.ui.modal')
