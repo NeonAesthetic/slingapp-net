@@ -63,7 +63,7 @@ if ($room) {
                 <p id="r-title">Room Name</p>
                 <button id="share_button" class="ui circular black icon right floated theme2 button"
                         data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video theme1 theme2 icon"></i>
+                    <i class="inverted video theme1 icon"></i>
                 </button>
                 <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
@@ -397,7 +397,7 @@ if ($room) {
         });
     }
 
-    function toggleTheme(elem, init) {
+    function toggleTheme(elem) {
         var themed_elems = document.getElementsByClassName("theme1");
         var colored_elems = document.getElementsByClassName("theme2");
         var themeChoice = getCookie("theme");
