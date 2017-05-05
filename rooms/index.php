@@ -96,7 +96,7 @@ if ($room) {
                         <div class="row">
                             <div id="quick-input" style="display:none">
                                 <div class="ui large fluid icon input">
-                                    <input id="quick-name-change" class="-" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
+                                    <input id="quick-name-change" class="quick-input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
                                     <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
@@ -107,7 +107,6 @@ if ($room) {
                                 <div class="ui large fluid icon input">
                                     <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text">
                                     <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
-
                                 </div>
                             </div>
                             <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="quickInvite()">Create Invite Code</div>
