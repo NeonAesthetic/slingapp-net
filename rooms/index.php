@@ -91,7 +91,7 @@ if ($room) {
                         onclick="openSettings('users-tab')">
                     <i id="settings_icon" class="inverted setting theme1 icon"></i>
                 </button>
-                <div class="ui flowing popup bottom left transition inverted theme1 hidden">
+                <div class="ui flowing popup bottom left transition inverted theme1 hidden darkgrey">
                     <div class="ui middle aligned" style="width: 15em">
                         <div class="row">
                             <div id="quick_input" style="display:none">
@@ -100,7 +100,7 @@ if ($room) {
                                     <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
-                            <div class="ui button fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
+                            <div class="ui button black border theme2 fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
                         <div class="row">
                             <div id="quick_invite" class="fluid" style="display:none">
@@ -110,13 +110,13 @@ if ($room) {
 
                                 </div>
                             </div>
-                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="quickInvite()">Create Invite Code</div>
+                            <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="quickInvite()">Create Invite Code</div>
                         </div>
                         <div class="row">
-                            <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                            <div class="ui button black border fluid theme2 quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
                         </div>
                         <div class="row">
-                            <div id="quick-theme-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
+                            <div id="quick-theme-button" class="ui button black border fluid theme2 quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
                         </div>
                     </div>
                 </div>
@@ -140,7 +140,7 @@ if ($room) {
                                 </label>
                                 <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
                             </div>
-                            <div id="send-button" class="ui button" onclick="sendMessage()">Send</div>
+                            <div id="send-button" class="ui button black theme2" onclick="sendMessage()">Send</div>
                         </div>
                     </div>
                 </div>
