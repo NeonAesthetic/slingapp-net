@@ -41,21 +41,25 @@ if ($room) {
     <link rel="stylesheet" type="text/css" href="/assets/css/semantic.min.css">
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
+    <link rel="stylesheet" href="/assets/css/room.css">
     <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
     <link rel="stylesheet" href="/assets/css/range.css">
+
 </head>
 
-
 <body>
-
+<div id="upload_mask"></div>
+<div id="upload-overlay">
+    <div id="overlay-content"><p>Drag/Drop<br>Files Here</p></div>
+</div>
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
 <!--    <div class="ui styled accordion"></div>-->
     <div class="item">
-        <button id="share_button" class="ui circular inverted green basic icon button"
+        <button id="share_button" class="ui circular inverted green basic icon theme1 button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
             <i class="video icon"></i>
         </button>
-        <button class="ui circular inverted red basic icon button"
+        <button class="ui circular inverted red basic icon theme1 button"
                 data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
             <i class="remove icon"></i>
         </button>
@@ -144,15 +148,7 @@ if ($room) {
         </div>
         <div id="video-container"  class="ui inverted" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll; position: relative; display: flex; justify-content: space-around">
             <! --- VIDEO DIV -->
-
-
-
-
-
-
-
         </div>
-
     </div>
 </div>
 
@@ -384,7 +380,7 @@ if ($room) {
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
 //        if (window.File && window.FileList && window.FileReader) {
-//            initDragDrop();
+            initDragDrop();
 //        }
     });
 

@@ -549,26 +549,29 @@ function uploadFile(files) {
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("upload-overlay");
-
     var doc = document;
+    var mask = document.getElementById("upload_mask");
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
-        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
-        chat.addEventListener("dragover", displayOverlay, false);
-        chat.addEventListener("dragleave", fileDragHover, false);
-        chat.addEventListener("drop", fileSelectorHandler, false);
+        doc.addEventListener("dragover", displayOverlay , false);
+        mask.addEventListener("dragleave", function() {
+            document.getElementById("upload-overlay").style.display = "none";
+            document.getElementById("upload_mask").style.display = "none";
+        }, false);
+        mask.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
 function displayOverlay(e) {
+    document.getElementById("upload_mask").style.display = "block";
     document.getElementById("upload-overlay").style.display = "block";
+
     fileDragHover(e);
 }
 function fileSelectorHandler(e) {
     document.getElementById("upload-overlay").style.display = "none";
+    document.getElementById("upload_mask").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -576,7 +579,6 @@ function fileSelectorHandler(e) {
 function fileDragHover(e) {
     e.stopPropagation();    //prevent file drag from effecting parent nodes
     e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
-    //e.target.className = (e.type == "dragover" ? "hover" : "");
 }
 
 function updateScroll(){
@@ -632,7 +634,7 @@ function putMessage(sender, _text, before, fileid) {
         // file_messages.className = "message";
     }
 
-    chat_messages.innerHTML = "<div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
+    chat_messages.innerHTML = "<div class='ui fitted divider'></div><div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
     //file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
         messageLog.insertBefore(chat_messages, messageLog.firstChild);
