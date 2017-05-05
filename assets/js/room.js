@@ -121,7 +121,7 @@ var Room = {
             var message = JSON.parse(data.data);
             console.log(message);
             if (message.notify) {
-                Toast.pop(textNode(message.notify), 3000);
+                Toast.pop(message.notify, 3000);
             }
             var type = message.type;
             switch (type) {

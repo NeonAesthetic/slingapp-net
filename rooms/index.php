@@ -48,23 +48,37 @@ if ($room) {
 
 <body>
 
-<div class="ui inverted left vertical sidebar theme1 menu">
-    <div class="ui styled accordion"></div>
+<div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
+<!--    <div class="ui styled accordion"></div>-->
+    <div class="item">
+        <button id="share_button" class="ui circular inverted green basic icon button"
+                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
+            <i class="video icon"></i>
+        </button>
+        <button class="ui circular inverted red basic icon button"
+                data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
+            <i class="remove icon"></i>
+        </button>
+    </div>
+
+    <div id='video-thumbnails' class="ui inverted styled accordion" style="background: transparent; min-height: 100%">
+
+    </div>
 </div>
 
 <div class="pusher">
-    <div class="ui grid">
+    <div class="ui grid" style="height: 100vh">
         <div class="row">
             <div class="ui inverted top attached theme1 menu" style="border: none !important;">
-                <a class="item" id="menu">
+                <a class="item" id="menu" ondragover="$('.ui.left.sidebar').sidebar('show')">
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <button id="share_button" class="ui circular black icon right floated theme2 button"
-                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video theme1 icon"></i>
-                </button>
+<!--                <button id="share_button" class="ui circular black icon right floated theme2 button"-->
+<!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
+<!--                    <i class="inverted video theme1 icon"></i>-->
+<!--                </button>-->
                 <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>
@@ -128,6 +142,17 @@ if ($room) {
                 </div>
             </div>
         </div>
+        <div id="video-container"  class="ui inverted" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll; position: relative; display: flex; justify-content: space-around">
+            <! --- VIDEO DIV -->
+
+
+
+
+
+
+
+        </div>
+
     </div>
 </div>
 
@@ -246,6 +271,7 @@ if ($room) {
 <script src="/assets/js/peer.js"></script>
 <script src="/assets/js/Autolinker.js"></script>
 <script src="/assets/js/MediaStreams.js"></script>
+<script src="/assets/js/Sortable.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/main.js"></script>
@@ -265,9 +291,11 @@ if ($room) {
 
         $('.ui.left.sidebar').sidebar({
             dimPage: false,
-            transition: 'overlay'
+            transition: 'overlay',
+            closable:false,
         })
-            .sidebar('attach events', '#menu');
+            .sidebar('attach events', '#menu')
+            .sidebar("show");
 
         $('.ui.dropdown').dropdown();
 
@@ -339,6 +367,18 @@ if ($room) {
 
             }
         }
+        var thumbnails = document.getElementById("video-thumbnails");
+        var videoContainer = document.getElementById("video-container");
+        Sortable.create(thumbnails, { group: "videos" , onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        } });
+        Sortable.create(videoContainer, { group: "videos", onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        } });
     });
 
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
@@ -438,16 +478,8 @@ if ($room) {
     }
 
     function updateUserInfo(accountID, nickname) {
-
-//        console.log("account: ", accountID);
-//        console.log("nickname", nickname);
-//        console.log(Room.data.Accounts[accountID]);
-          Room.data.Accounts[accountID].ScreenName= nickname;
+        Room.data.Accounts[accountID].ScreenName= nickname;
         $('.uid-'+accountID ).html(nickname);
-//
-//        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
-//        document.getElementById('UN' + accountID.toString() + 'mainScreen').innerHTML = nickname;
-//        document.getElementById("modalUsername").innerHTML = nickname;
     }
 
     function newUserSet(size, target) {
