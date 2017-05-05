@@ -41,7 +41,7 @@
     background-color: #27292a !important;
     border: none !important;
 }
-#file_prog {
+#file-prog {
     display: none;
     position:fixed;
     width:280px;
@@ -52,7 +52,7 @@
     border: none;
 }
 
-.quick_input {
+.quick-input {
     background-color: #e0e1e2 !important;
     text-align: center !important;
     color: #5a5a5a !important;
@@ -70,7 +70,7 @@
 .hyperlink {
     text-decoration: underline;
 }
-#chat_feed {
+#chat-feed {
     margin: 3em 1.5em
 }
 
@@ -162,7 +162,7 @@
     text-align:center;
 }
 
-#upload_mask {
+#upload-mask {
     z-index: 999999999;
     display: none;
     position: absolute;

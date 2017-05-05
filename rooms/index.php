@@ -48,14 +48,14 @@ if ($room) {
 </head>
 
 <body>
-<div id="upload_mask"></div>
+<div id="upload-mask"></div>
 <div id="upload-overlay">
     <div id="overlay-content"><p>Drag/Drop<br>Files Here</p></div>
 </div>
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
 <!--    <div class="ui styled accordion"></div>-->
     <div class="item">
-        <button id="share_button" class="ui circular inverted green basic icon theme1 button"
+        <button id="share-button" class="ui circular inverted green basic icon theme1 button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
             <i class="video icon"></i>
         </button>
@@ -83,29 +83,29 @@ if ($room) {
 <!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
 <!--                    <i class="inverted video theme1 icon"></i>-->
 <!--                </button>-->
-                <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
+                <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>
                 </button>
-                <button id="settings_button" class="ui circular black icon right floated theme2 button"
+                <button id="settings-button" class="ui circular black icon right floated theme2 button"
                         onclick="openSettings('users-tab')">
-                    <i id="settings_icon" class="inverted setting theme1 icon"></i>
+                    <i id="settings-icon" class="inverted setting theme1 icon"></i>
                 </button>
                 <div class="ui flowing popup bottom left transition inverted theme1 hidden darkgrey">
                     <div class="ui middle aligned" style="width: 15em">
                         <div class="row">
-                            <div id="quick_input" style="display:none">
+                            <div id="quick-input" style="display:none">
                                 <div class="ui large fluid icon input">
-                                    <input id="quick_name_change" class="quick_input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
+                                    <input id="quick-name-change" class="-" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
                                     <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
                             <div class="ui button black border theme2 fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
                         <div class="row">
-                            <div id="quick_invite" class="fluid" style="display:none">
+                            <div id="quick-invite" class="fluid" style="display:none">
                                 <div class="ui large fluid icon input">
-                                    <input id="quick_invite_textbox" class="quick_input" value="generating..." type="text">
+                                    <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text">
                                     <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
 
                                 </div>
@@ -122,12 +122,12 @@ if ($room) {
                 </div>
             </div>
             <div id="content">
-                <div id="right_hand_pane" class="ui right fixed inverted vertical theme1 menu"
+                <div id="right-hand-pane" class="ui right fixed inverted vertical theme1 menu"
                      style="overflow-y:scroll; padding-bottom: 3em;">
-                    <div id="chat_feed" class="ui comments"></div>
+                    <div id="chat-feed" class="ui comments"></div>
 
                     <div>
-                        <div id="file_prog" class="ui progress">
+                        <div id="file-prog" class="ui progress">
                             <div class="bar">
                                 <div class="progress"></div>
                             </div>
@@ -295,7 +295,7 @@ if ($room) {
 
         $('.ui.dropdown').dropdown();
 
-        $("#settings_button")
+        $("#settings-button")
             .popup({
                 inline: true,
                 hoverable: true,
@@ -328,10 +328,10 @@ if ($room) {
                 }
             });
 
-        $("#leave_button")
+        $("#leave-button")
             .popup();
 
-        $("#share_button")
+        $("#share-button")
             .popup();
 
         updateScroll();
@@ -400,15 +400,15 @@ if ($room) {
     }
     function quickScreenNameChange() {
         document.getElementsByClassName("quickbutton")[0].style.display = "none";
-        document.getElementById("quick_input").style.display = "inline";
-        document.getElementById("quick_name_change").focus();
+        document.getElementById("quick-input").style.display = "inline";
+        document.getElementById("quick-name-change").focus();
     }
 
     function quickMenuClose() {
         document.getElementsByClassName("quickbutton")[0].style.display = "block";
         document.getElementsByClassName("quickbutton")[1].style.display = "block";
-        document.getElementById("quick_input").style.display = "none";
-        document.getElementById("quick_invite").style.display ="none";
+        document.getElementById("quick-input").style.display = "none";
+        document.getElementById("quick-invite").style.display ="none";
     }
     function closeSettings() {
         $('.ui.modal')
