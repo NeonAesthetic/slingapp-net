@@ -86,7 +86,7 @@ function addCodeButtonEvents() {
 var Chat = {
     chatlog: null,
     init: function () {
-        Chat.chatlog = document.getElementById("chat_feed");
+        Chat.chatlog = document.getElementById("chat-feed");
 
     },
     send: function () {
@@ -349,14 +349,14 @@ function createInviteCode(e) {
 }
 
 function newInvite() {
-    document.getElementById("quick_invite_textbox").value = "generating...";
+    document.getElementById("quick-invite-textbox").value = "generating...";
     quickInvite();
 }
 function quickInvite() {
-    var quick_inv = document.getElementById("quick_invite_textbox");
+    var quick_inv = document.getElementById("quick-invite-textbox");
     var invite_button = document.getElementById("quick-invite-button");
     invite_button.style.display = "none";
-    document.getElementById("quick_invite").style.display = "inline";
+    document.getElementById("quick-invite").style.display = "inline";
 
     if(!quick_inv.value.localeCompare("generating...")) {
         var roomid = Room.data.RoomID;
@@ -506,7 +506,7 @@ function uploadFile(files) {
     var file = files[0];
     var token = GetToken();
     if (file.size > 0 && file.size < 536870912) {
-        document.getElementById("file_prog").style.display = "block";
+        document.getElementById("file-prog").style.display = "block";
         var form = new FormData();
         var xhr = new XMLHttpRequest();
         form.append("action", "upload");
@@ -515,14 +515,14 @@ function uploadFile(files) {
         form.append("room", Room.data["RoomID"]);
         xhr.open("POST", "/assets/php/components/room.php");
         xhr.upload.onprogress = function(e) {
-            $('#file_prog').progress({
+            $('#file-prog').progress({
                 percent: Math.ceil((e.loaded / e.total) * 100)
             });
         };
         xhr.upload.onloadend = function(e) {
                 setTimeout(function(){
-                    document.getElementById("file_prog").style.display = "none";
-                    $('#file_prog').progress({
+                    document.getElementById("file-prog").style.display = "none";
+                    $('#file-prog').progress({
                         percent: 0
                     })
                 }, 5000);
@@ -549,26 +549,29 @@ function uploadFile(files) {
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("upload-overlay");
-
     var doc = document;
+    var mask = document.getElementById("upload-mask");
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
-        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
-        chat.addEventListener("dragover", displayOverlay, false);
-        chat.addEventListener("dragleave", fileDragHover, false);
-        chat.addEventListener("drop", fileSelectorHandler, false);
+        doc.addEventListener("dragover", displayOverlay , false);
+        mask.addEventListener("dragleave", function() {
+            document.getElementById("upload-overlay").style.display = "none";
+            document.getElementById("upload-mask").style.display = "none";
+        }, false);
+        mask.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
 function displayOverlay(e) {
+    document.getElementById("upload-mask").style.display = "block";
     document.getElementById("upload-overlay").style.display = "block";
+
     fileDragHover(e);
 }
 function fileSelectorHandler(e) {
     document.getElementById("upload-overlay").style.display = "none";
+    document.getElementById("upload-mask").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -576,18 +579,17 @@ function fileSelectorHandler(e) {
 function fileDragHover(e) {
     e.stopPropagation();    //prevent file drag from effecting parent nodes
     e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
-    //e.target.className = (e.type == "dragover" ? "hover" : "");
 }
 
 function updateScroll(){
-    var element = document.getElementById("right_hand_pane");
+    var element = document.getElementById("right-hand-pane");
     element.scrollTop = element.scrollHeight;
 }
 
 function switchLog(logtype) {
     chat = document.getElementById('chat');
-    chat_tab = document.getElementById('chat_tab');
-    file_tab = document.getElementById('files_tab');
+    chat_tab = document.getElementById('chat-tab');
+    file_tab = document.getElementById('files-tab');
 
     console.log(chat_tab.className);
     console.log(chat.childNodes[1].style.display);
@@ -595,15 +597,15 @@ function switchLog(logtype) {
         chat.childNodes[1].style.display = 'none';
         chat.childNodes[3].style.display = 'block';
 
-        chat_tab.className = "nav-link chat_nav_button_inactive";
-        file_tab.className = "nav-link chat_nav_button";
+        chat_tab.className = "nav-link chat-nav-button-inactive";
+        file_tab.className = "nav-link chat-nav-button";
     }
     else {
         chat.childNodes[1].style.display = 'block';
         chat.childNodes[3].style.display = 'none';
 
-        file_tab.className = "nav-link chat_nav_button_inactive";
-        chat_tab.className = "nav-link chat_nav_button";
+        file_tab.className = "nav-link chat-nav-button-inactive";
+        chat_tab.className = "nav-link chat-nav-button";
     }
 }
 
@@ -614,7 +616,7 @@ function putMessage(sender, _text, before, fileid) {
     else
         text = Autolinker.link(_text);
 
-    var messageLog = document.getElementById("chat_feed");
+    var messageLog = document.getElementById("chat-feed");
     // var fileLog = document.getElementById("file-log");
     // console.log(sender);
     var username = Room.data.Accounts[sender].ScreenName;
@@ -632,7 +634,7 @@ function putMessage(sender, _text, before, fileid) {
         // file_messages.className = "message";
     }
 
-    chat_messages.innerHTML = "<div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
+    chat_messages.innerHTML = "<div class='ui fitted divider'></div><div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
     //file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
         messageLog.insertBefore(chat_messages, messageLog.firstChild);

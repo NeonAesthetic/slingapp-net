@@ -1,11 +1,5 @@
 .pusher {
     background-color: #383838 !important;
-    border: none !important;
-}
-
-.screen {
-    position: fixed;
-
 }
 
 .text *{
@@ -15,130 +9,45 @@
 .theme1 {
     color:#d4d4d4 !important;
 }
-.ui.comments {
-    font-size: .9em;
-}
-.ui.right.fixed.menu {
-    width: 300px!important;
-}
 
-.ui.top.menu{
-    margin: 0 2em 0 1em;
-    z-index: 999;
-}
-.ui.fluid.action.input {
-    position:fixed;
-    width:280px;
-    right:10px;
-    bottom:20px;
-}
-
-.progress {
-    display: none;
-}
-
-*[id^='fileprog-']{
-    margin-bottom: 0!important;
-}
-
-.quickbutton {
-    border-radius: 0!important;
-}
-
-#file_prog {
-    display: none;
-    position:fixed;
-    width:280px;
-    right:10px;
-    bottom:0;
-}
 #send-box input {
     background-color: #383838 !important;
-    border: none;
     color: #C4C4C4 !important;
 }
 
-.quick_input {
-    background-color: #e0e1e2 !important;
-    color: #5a5a5a !important;
-    border-radius: 0 !important;
-    text-align: center !important;
+#send-button {
+    border: solid!important;
+    border-width: 1px!important;
+    border-color: #383838 !important;
 }
+
+.quick-input {
+    background-color: #27292a !important;
+    color: white !important;
+}
+
 .mine.user {
     color:#77ff77;
 }
 
 .user {
     color: grey;
-    margin-right: 10px;
 }
 
 .hyperlink {
     color: #9e9e9e;
-    text-decoration: underline;
 }
-#chat_feed {
-    margin: 3em 1.5em
+.quickbutton {
+    border-style: solid!important;
+    /*border-radius: 0!important;*/
+    border-width: 1px !important;
+    border-color: #27292a !important;
 }
-
 #file-upload{
     background-color: #383838;
     color:#a6a6a6;
-    width:25px;
-}
-
-#file-upload i {
-    cursor: pointer;
-}
-
-#file-upload input {
-    display: none;
 }
 
 #r-title {
     color: white;
-    margin: auto;
-}
-
-::-webkit-scrollbar {
-    width: 0px;  /* remove scrollbar space */
-    background: transparent;  /* optional: just make scrollbar invisible */
-}
-
-@keyframes toast-pop {
-    from {
-        transform: translateY(100px);
-    }
-    to {
-        transform: translateY(-100px);
-    }
-}
-
-.toast {
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    bottom: 0;
-    text-align: center;
-    border-radius: 2px;
-    border: 1px solid lightgrey;
-    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
-    background-color: whitesmoke;
-    min-width: 200px;
-    max-width: 300px;
-    overflow: visible;
-    overflow-wrap: break-word;
-    overflow-clip: wrap;
-    font-size: 1.5em;
-    padding: 15px;
-    animation: 0.3s toast-pop forwards;
-    z-index: 9999999999999999999999999999999;
-}
-
-.toast.error {
-    background-color: #d9534f;
-    border-color: #d43f3a;
-    color: white;
-    font-weight: 600;
 }
