@@ -41,14 +41,15 @@ if ($room) {
     <link rel="stylesheet" type="text/css" href="/assets/css/semantic.min.css">
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
-    <link rel="stylesheet" type="text/css" href="/assets/css/room2.css">
+    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
     <link rel="stylesheet" href="/assets/css/range.css">
 </head>
 
 
 <body>
 
-<div class="ui inverted left vertical sidebar menu" style="top: 40px;">
+<div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
+<!--    <div class="ui styled accordion"></div>-->
     <div class="item">
         <button id="share_button" class="ui circular inverted green basic icon button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
@@ -68,48 +69,56 @@ if ($room) {
 <div class="pusher">
     <div class="ui grid" style="height: 100vh">
         <div class="row">
-            <div class="ui inverted top attached menu">
+            <div class="ui inverted top attached theme1 menu" style="border: none !important;">
                 <a class="item" id="menu" ondragover="$('.ui.left.sidebar').sidebar('show')">
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-
-                <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room"
+<!--                <button id="share_button" class="ui circular black icon right floated theme2 button"-->
+<!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
+<!--                    <i class="inverted video theme1 icon"></i>-->
+<!--                </button>-->
+                <button id="leave_button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
-                    <i class="inverted sign out icon"></i>
+                    <i class="inverted sign out theme1 icon"></i>
                 </button>
-                <button id="settings_button" class="ui circular black icon right floated button"
+                <button id="settings_button" class="ui circular black icon right floated theme2 button"
                         onclick="openSettings('users-tab')">
-                    <i id="settings_icon" class="inverted setting icon"></i>
+                    <i id="settings_icon" class="inverted setting theme1 icon"></i>
                 </button>
-                <div class="ui flowing popup bottom left transition inverted hidden">
+                <div class="ui flowing popup bottom left transition inverted theme1 hidden">
                     <div class="ui middle aligned" style="width: 15em">
                         <div class="row">
                             <div id="quick_input" style="display:none">
                                 <div class="ui large fluid icon input">
                                     <input id="quick_name_change" class="quick_input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
-                                    <i class="checkmark link icon" style="color:#28f200;" onclick="changeScreenName(previousElementSibling.value)"></i>
+                                    <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
                             <div class="ui button fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
                         <div class="row">
                             <div id="quick_invite" class="fluid" style="display:none">
-                                <div class="ui large fluid input">
+                                <div class="ui large fluid icon input">
                                     <input id="quick_invite_textbox" class="quick_input" value="generating..." type="text">
+                                    <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
+
                                 </div>
                             </div>
-                            <div class="ui button fluid quickbutton" onclick="quickInvite(this)">Create Invite Code</div>
+                            <div id="quick-invite-button" class="ui button fluid quickbutton" onclick="quickInvite()">Create Invite Code</div>
                         </div>
                         <div class="row">
                             <div class="ui button fluid quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                        </div>
+                        <div class="row">
+                            <div id="quick-theme-button" class="ui button fluid quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div id="content">
-                <div id="right_hand_pane" class="ui right fixed inverted vertical menu"
+                <div id="right_hand_pane" class="ui right fixed inverted vertical theme1 menu"
                      style="overflow-y:scroll; padding-bottom: 3em;">
                     <div id="chat_feed" class="ui comments"></div>
 
@@ -127,7 +136,7 @@ if ($room) {
                                 </label>
                                 <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
                             </div>
-                            <div class="ui button" onclick="sendMessage()">Send</div>
+                            <div id="send-button" class="ui button" onclick="sendMessage()">Send</div>
                         </div>
                     </div>
                 </div>
@@ -190,9 +199,7 @@ if ($room) {
                 <div class="ui inverted divider"></div>
                 <table class="ui celled table" style="">
                     <thead style="position: fixed; ">
-                    <tr>
-
-                    </tr>
+                    <tr></tr>
                     </thead>
                 </table>
             </div>
@@ -234,31 +241,18 @@ if ($room) {
                             <h3 class="ui header">Video Source</h3>
                             <select class="ui dropdown fluid" id="videoSource"></select>
                         </div>
-
-                        <!--                        <video id="video" autoplay></video>-->
                     </div>
-                    <!--                    <div class="ui grid padded ">-->
-                    <!--                        <div class="row column">-->
                 </div>
 
             </div>
         </div>
     </div>
     <div class="actions">
-        <!--                            <div class="four wide right floated column">-->
         <div class="ui positive right labeled icon button" onclick="closeSettings()">
             Done
             <i class="checkmark icon"></i>
         </div>
-        <!--                            </div>-->
-        <!--                        </div>-->
-        <!--                    </div>-->
     </div>
-</div>
-
-<!--    </div>-->
-
-
 </div>
 
 </body>
@@ -284,11 +278,14 @@ if ($room) {
 <script>
 
     $(document).ready(function () {
+
+        if(getCookie("theme") === "light")
+            resetTheme();
+
         $('.ui.accordion')
             .accordion({
                 exclusive: false
-            })
-        ;
+            });
 
         $('.tabular.menu .item').tab();
 
@@ -321,16 +318,24 @@ if ($room) {
                         })
                     }
                 }
-            })
-//            .onApprove({
-//                $('.ui.modal')
-//            .modal('show')
-//        ;
-//            })
-        ;
+            });
 
+        $("#regen-code")
+            .rotate({
+                bind: {
+                    mouseover: function () {
+                        $(this).rotate({
+                            angle: 0,
+                            animateTo: 360
+                        })
+                    }
+                }
+            });
 
         $("#leave_button")
+            .popup();
+
+        $("#share_button")
             .popup();
 
         updateScroll();
@@ -374,15 +379,13 @@ if ($room) {
             var video = event.item.querySelector('video');
             video.play();
         } });
-
-
     });
 
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
-        if (window.File && window.FileList && window.FileReader) {
+//        if (window.File && window.FileList && window.FileReader) {
 //            initDragDrop();
-        }
+//        }
     });
 
     Account.data = <?=$account->getJSON()?>;
@@ -432,6 +435,46 @@ if ($room) {
             console.log(data);
             appendInviteCode(data.code);
         });
+    }
+
+    function toggleTheme(elem) {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+        var themeChoice = getCookie("theme");
+
+        if(themeChoice === "dark"){
+            setCookie("theme", "light");
+            resetTheme();
+            swapStyleSheet("room_light.css");
+        } else {
+            setCookie("theme", "dark");
+
+            [].forEach.call(themed_elems, function(e) {
+                e.classList.add("inverted");
+            });
+            [].forEach.call(colored_elems, function(e) {
+                e.classList.add("black");
+            });
+            swapStyleSheet("room_dark.css");
+            elem.innerHTML = "Light Theme"
+        }
+    }
+
+    function resetTheme() {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+
+        [].forEach.call(themed_elems, function(e) {
+            e.classList.remove("inverted");
+        });
+        [].forEach.call(colored_elems, function(e) {
+            e.classList.remove("black");
+        });
+        document.getElementById("quick-theme-button").innerHTML = "Dark Theme"
+    }
+
+    function swapStyleSheet(sheet) {
+        document.getElementById("pagestyle").setAttribute("href", "/assets/css/" + sheet);
     }
 
     function updateUserInfo(accountID, nickname) {
@@ -514,9 +557,6 @@ if ($room) {
         }
     }
 
-    function selectAudioSettings() {
-
-    }
     function minimizeDiv(event) {
         var target = event.target;
         if (event.target.id[0] == 'N') {

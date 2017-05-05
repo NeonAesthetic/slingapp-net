@@ -348,29 +348,40 @@ function createInviteCode(e) {
     });
 }
 
-function quickInvite(elem) {
-    elem.style.display = "none";
+function newInvite() {
+    document.getElementById("quick_invite_textbox").value = "generating...";
+    quickInvite();
+}
+function quickInvite() {
+    var quick_inv = document.getElementById("quick_invite_textbox");
+    var invite_button = document.getElementById("quick-invite-button");
+    invite_button.style.display = "none";
     document.getElementById("quick_invite").style.display = "inline";
-    var roomid = Room.data.RoomID;
-    var token = GetToken();
-    $.ajax({
-        type: 'post',
-        url: '/assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "gencode",
-            room: roomid,
-            token: token
-        },
-        success: function (data) {
-            var quick_inv = document.getElementById("quick_invite_textbox");
-            quick_inv.value = data.Code;
-            quick_inv.select();
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
+
+    if(!quick_inv.value.localeCompare("generating...")) {
+        var roomid = Room.data.RoomID;
+        var token = GetToken();
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "gencode",
+                room: roomid,
+                token: token
+            },
+
+
+            success: function (data) {
+
+                quick_inv.value = data.Code;
+                quick_inv.select();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
 }
 function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
