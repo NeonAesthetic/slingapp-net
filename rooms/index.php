@@ -53,7 +53,6 @@ if ($room) {
     <div id="overlay-content"><p>Drag/Drop<br>Files Here</p></div>
 </div>
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
-<!--    <div class="ui styled accordion"></div>-->
     <div class="item">
         <button id="share-button" class="ui circular inverted green basic icon theme1 button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
@@ -79,10 +78,6 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-<!--                <button id="share_button" class="ui circular black icon right floated theme2 button"-->
-<!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
-<!--                    <i class="inverted video theme1 icon"></i>-->
-<!--                </button>-->
                 <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>

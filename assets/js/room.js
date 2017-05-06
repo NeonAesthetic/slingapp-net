@@ -12,6 +12,7 @@ $(document).ready(function () {
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
 
     Room.connect();
+    Room.SetupSemanticUI();
     Chat.init();
     Chat.repopulateMessages();
     Chat.initDragDrop();
@@ -19,83 +20,6 @@ $(document).ready(function () {
     RoomCookies.checkInVol();
     RoomCookies.checkOutVol();
 
-    if (RoomCookies.getCookie("theme") === "light")
-        Settings.resetTheme();
-
-    $('.ui.accordion')
-        .accordion({
-            exclusive: false
-        });
-
-    $('.tabular.menu .item').tab();
-
-    $('.ui.left.sidebar').sidebar({
-        dimPage: false,
-        transition: 'overlay',
-        closable: false,
-    })
-        .sidebar('attach events', '#menu')
-        .sidebar("show");
-
-    $('.ui.dropdown').dropdown();
-
-    $("#settings-button")
-        .popup({
-            inline: true,
-            hoverable: true,
-            position: 'bottom left',
-            delay: {
-                hide: 400
-            },
-            onHidden: Settings.quickMenuClose
-        })
-        .rotate({
-            bind: {
-                mouseover: function () {
-                    $(this).children("i").rotate({
-                        angle: 0,
-                        animateTo: 45
-                    })
-                }
-            }
-        });
-
-    $("#regen-code")
-        .rotate({
-            bind: {
-                mouseover: function () {
-                    $(this).rotate({
-                        angle: 0,
-                        animateTo: 360
-                    })
-                }
-            }
-        });
-
-    $("#leave-button")
-        .popup();
-
-    $("#share-button")
-        .popup();
-
-    $('#range-1').range({
-        min: 0,
-        max: 100,
-        start: RoomCookies.getCookie('inVol'),
-        onChange: function (value) {
-            $('#display-1').html(value);
-            RoomCookies.setCookie('inVol', value, 365);
-        }
-    });
-    $('#range-2').range({
-        min: 0,
-        max: 100,
-        start: RoomCookies.getCookie('outVol'),
-        onChange: function (value) {
-            $('#display-2').html(value);
-            RoomCookies.setCookie('outVol', value, 365);
-        }
-    });
     for (var key in Room.data.RoomCodes) {
         if (Room.data.RoomCodes.hasOwnProperty(key)) {
             var code = Room.data.RoomCodes[key];
@@ -491,6 +415,85 @@ var Room = {
                 Settings.addCodeEvent(tr);
             }
         }
+    },
+    SetupSemanticUI: function () {
+        if (RoomCookies.getCookie("theme") === "light")
+            Settings.resetTheme();
+
+        $('.ui.accordion')
+            .accordion({
+                exclusive: false
+            });
+
+        $('.tabular.menu .item').tab();
+
+        $('.ui.left.sidebar').sidebar({
+            dimPage: false,
+            transition: 'overlay',
+            closable: false,
+        })
+            .sidebar('attach events', '#menu')
+            .sidebar("show");
+
+        $('.ui.dropdown').dropdown();
+
+        $("#settings-button")
+            .popup({
+                inline: true,
+                hoverable: true,
+                position: 'bottom left',
+                delay: {
+                    hide: 400
+                },
+                onHidden: Settings.quickMenuClose
+            })
+            .rotate({
+                bind: {
+                    mouseover: function () {
+                        $(this).children("i").rotate({
+                            angle: 0,
+                            animateTo: 45
+                        })
+                    }
+                }
+            });
+
+        $("#regen-code")
+            .rotate({
+                bind: {
+                    mouseover: function () {
+                        $(this).rotate({
+                            angle: 0,
+                            animateTo: 360
+                        })
+                    }
+                }
+            });
+
+        $("#leave-button")
+            .popup();
+
+        $("#share-button")
+            .popup();
+
+        $('#range-1').range({
+            min: 0,
+            max: 100,
+            start: RoomCookies.getCookie('inVol'),
+            onChange: function (value) {
+                $('#display-1').html(value);
+                RoomCookies.setCookie('inVol', value, 365);
+            }
+        });
+        $('#range-2').range({
+            min: 0,
+            max: 100,
+            start: RoomCookies.getCookie('outVol'),
+            onChange: function (value) {
+                $('#display-2').html(value);
+                RoomCookies.setCookie('outVol', value, 365);
+            }
+        });
     }
 };
 
