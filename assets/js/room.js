@@ -302,7 +302,7 @@ var Room = {
         }
         url += Room.data.RoomID;
 
-        console.log("Attempting to connect to ", url);
+        // console.log("Attempting to connect to ", url);
         Room.socket = new WebSocket(url);
 
         Room.socket.onopen = function () {
@@ -315,7 +315,7 @@ var Room = {
         };
         Room.socket.onmessage = function (data) {
             var message = JSON.parse(data.data);
-            console.log(message);
+            // console.log(message);
             if (message.notify) {
                 Toast.pop(message.notify, 3000);
             }
@@ -346,7 +346,7 @@ var Room = {
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
                     AVC.getPeerVideoStream(accountID + "v", function (stream) {
                         var id = peerid;
-                        console.log('got peer video');
+                        // console.log('got peer video');
                         AVC.setPeerVideoNode(id, stream);
                     });
                 }
@@ -422,7 +422,7 @@ var Room = {
         Room.send(fileJSON);
     },
     requestDownload: function (fileid) {
-        console.log("requesting to download");
+        // console.log("requesting to download");
         Room.socket.send(JSON.stringify({
             action: "Download File",
             token: Account.data.LoginToken,
@@ -445,7 +445,7 @@ var Room = {
                 Room.updateInvites();
             },
             error: function (error) {
-                console.log(error);
+                // console.log(error);
             }
         });
     },
@@ -506,7 +506,7 @@ var UserSection = {
                     var account = Room.data.Accounts[key];
                     //Check to make sure that this user div does not already exist
                     if (document.getElementById('NU' + key.toString()) == null) {
-                        console.log("in New User Set");
+                        // console.log("in New User Set");
                         var newUser = document.createElement('div');
                         newUser.id = 'NU' + key.toString();
                         newUser.className = 'roomSide';
@@ -537,7 +537,7 @@ var UserSection = {
 
                         var accountMS = Room.data.Accounts[keyMS];
 
-                        console.log("in New User Set");
+                        // console.log("in New User Set");
                         var newUserMS = document.createElement('div');
                         newUserMS.id = 'NU' + keyMS.toString() + 'mainScreen';
                         newUserMS.className = 'screen';
@@ -564,7 +564,7 @@ var UserSection = {
         var target = event.target;
         if (event.target.id[0] == 'N') {
             if (target != null) {
-                console.log(event.target.id);
+                // console.log(event.target.id);
                 target.className = 'eRoomSide';
                 target.setAttribute("onclick", "UserSection.minimizeDiv(event)");
             }
@@ -657,7 +657,7 @@ var Settings = {
                     quick_inv.select();
                 },
                 error: function (error) {
-                    console.log(error);
+                    // console.log(error);
                 }
             });
         }
