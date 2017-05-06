@@ -1,96 +1,292 @@
 /**
  * Created by ian on 11/19/16.
  */
+function textNode(msg) {
+    var text = document.createElement("text");
+    text.innerHTML = msg;
+    return text;
+}
 
-
-window.addEventListener("load", function () {
-    Chat.init();
-    Room.connect();
+$(document).ready(function () {
     window.document.title = Room.data.RoomName;
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
-    repopulateMessages();
 
+    Room.connect();
+    Chat.init();
+    Chat.repopulateMessages();
+    Chat.initDragDrop();
+    Chat.updateScroll();
+    RoomCookies.checkInVol();
+    RoomCookies.checkOutVol();
 
-});
+    if (RoomCookies.getCookie("theme") === "light")
+        Settings.resetTheme();
 
-function GetToken() {
-    var cstring = document.cookie;
-    var cookies = cstring.split(";");
-    var tokenstr = null;
-    var rvalue;
-    cookies.forEach(function (c) {
-        if (c.search(/Token/) != -1)
-            tokenstr = c;
-    });
-    if (tokenstr != null) {
-        var keynval = tokenstr.split("=");
-        // var key = keynval[0];
-        rvalue = keynval[1];
-    }
-    else
-        rvalue = null;
-    return rvalue;
-}
-
-function getCodeNodeList(code){
-    //var label = ContextMenu.createLabel(code + " Options");
-
-    //console.log("Menu Link");
-    var setUses = ContextMenu.createMenuLink("Set Uses", "", function() {
-        changeRemainingUses(code);
-        ContextMenu.close();
-    });
-
-
-    var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
-        changeExpirationDate(code);
-        ContextMenu.close();
-    });
-
-    var deleteCode = ContextMenu.createMenuLink("Delete", "", function () {
-        deleteInviteCode(code);
-        ContextMenu.close();
-    });
-
-    return [setUses, expiration, deleteCode];
-}
-
-function addCodeEvent(element){
-    element.addEventListener("contextmenu", function (event) {
-        // console.log(n.object.Code);
-        //console.log(n);
-        ContextMenu.create(event, getCodeNodeList(element.object.Code));
-        return false;
-    });
-}
-
-
-function addCodeButtonEvents() {
-    var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
-
-    console.log(close);
-
-    codes.forEach(function (n) {
-        //console.log("Button Test");
-
-        n.addEventListener("contextmenu", function (event) {
-            console.log(n.object.Code);
-            //console.log(n);
-            ContextMenu.create(event, getCodeNodeList(n.object.Code));
-            return false;
+    $('.ui.accordion')
+        .accordion({
+            exclusive: false
         });
-    });
-}
 
+    $('.tabular.menu .item').tab();
+
+    $('.ui.left.sidebar').sidebar({
+        dimPage: false,
+        transition: 'overlay',
+        closable: false,
+    })
+        .sidebar('attach events', '#menu')
+        .sidebar("show");
+
+    $('.ui.dropdown').dropdown();
+
+    $("#settings-button")
+        .popup({
+            inline: true,
+            hoverable: true,
+            position: 'bottom left',
+            delay: {
+                hide: 400
+            },
+            onHidden: Settings.quickMenuClose
+        })
+        .rotate({
+            bind: {
+                mouseover: function () {
+                    $(this).children("i").rotate({
+                        angle: 0,
+                        animateTo: 45
+                    })
+                }
+            }
+        });
+
+    $("#regen-code")
+        .rotate({
+            bind: {
+                mouseover: function () {
+                    $(this).rotate({
+                        angle: 0,
+                        animateTo: 360
+                    })
+                }
+            }
+        });
+
+    $("#leave-button")
+        .popup();
+
+    $("#share-button")
+        .popup();
+
+    $('#range-1').range({
+        min: 0,
+        max: 100,
+        start: RoomCookies.getCookie('inVol'),
+        onChange: function (value) {
+            $('#display-1').html(value);
+            RoomCookies.setCookie('inVol', value, 365);
+        }
+    });
+    $('#range-2').range({
+        min: 0,
+        max: 100,
+        start: RoomCookies.getCookie('outVol'),
+        onChange: function (value) {
+            $('#display-2').html(value);
+            RoomCookies.setCookie('outVol', value, 365);
+        }
+    });
+    for (var key in Room.data.RoomCodes) {
+        if (Room.data.RoomCodes.hasOwnProperty(key)) {
+            var code = Room.data.RoomCodes[key];
+            Settings.appendInviteCode(code);
+        }
+    }
+    var thumbnails = document.getElementById("video-thumbnails");
+    var videoContainer = document.getElementById("video-container");
+    Sortable.create(thumbnails, {
+        group: "videos", onAdd: function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        }
+    });
+    Sortable.create(videoContainer, {
+        group: "videos", onAdd: function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        }
+    });
+});
 
 var Chat = {
     chatlog: null,
     init: function () {
         Chat.chatlog = document.getElementById("chat-feed");
-
     },
-    send: function () {
+    snFromAccountID: function (id) {
+        var len = Room.data.Accounts.length;
+        for (var i = 0; i < len; i++) {
+            if (Room.data.Accounts[i].ParticipantID == id) {
+                return Room.data.Accounts[i].ScreenName;
+            }
+        }
+    },
+    sendMessage: function () {
+        var tarea = document.getElementById("send-box").querySelector("input");
+        var text = tarea.value;
+        if (text != "")
+            Room.sendMessage(text);
+        tarea.focus();
+        tarea.value = "";
+    },
+    uploadFile: function (files) {
+        var file = files[0];
+        if (file.size > 0 && file.size < 536870912) {
+            document.getElementById("file-prog").style.display = "block";
+            var form = new FormData();
+            var xhr = new XMLHttpRequest();
+            form.append("action", "upload");
+            form.append("token", Account.data.LoginToken);
+            form.append("upload", file);
+            form.append("room", Room.data["RoomID"]);
+            xhr.open("POST", "/assets/php/components/room.php");
+            xhr.upload.onprogress = function (e) {
+                $('#file-prog').progress({
+                    percent: Math.ceil((e.loaded / e.total) * 100)
+                });
+            };
+            xhr.upload.onloadend = function (e) {
+                setTimeout(function () {
+                    document.getElementById("file-prog").style.display = "none";
+                    $('#file-prog').progress({
+                        percent: 0
+                    })
+                }, 5000);
+            };
+            xhr.send(form);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
 
+                        var response = JSON.parse(xhr.responseText);
+                        console.log("response: ", xhr);
+                        Room.uploadFile(response);
+                    } else {
+                        console.log("Error", xhr.statusText);
+                    }
+                }
+            }
+        } else {
+            console.log("Filesize invalid");
+            Toast.error(textNode("Must be under 256MB"));
+        }
+    },
+    initDragDrop: function () {
+        var doc = document;
+        var mask = document.getElementById("upload-mask");
+        var xhr = new XMLHttpRequest();
+
+        if (xhr.upload) {
+            doc.addEventListener("dragover", Chat.displayOverlay, false);
+            mask.addEventListener("dragleave", function () {
+                document.getElementById("upload-overlay").style.display = "none";
+                document.getElementById("upload-mask").style.display = "none";
+            }, false);
+            mask.addEventListener("drop", Chat.fileSelectorHandler, false);
+        }
+    },
+    displayOverlay: function (e) {
+        document.getElementById("upload-mask").style.display = "block";
+        document.getElementById("upload-overlay").style.display = "block";
+        Chat.fileDragHover(e);
+    },
+    fileSelectorHandler: function (e) {
+        document.getElementById("upload-overlay").style.display = "none";
+        document.getElementById("upload-mask").style.display = "none";
+        Chat.fileDragHover(e);
+        Chat.uploadFile(e.dataTransfer.files);
+    },
+    fileDragHover: function (e) {
+        e.stopPropagation();    //prevent file drag from effecting parent nodes
+        e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
+    },
+    updateScroll: function () {
+        var element = document.getElementById("right-hand-pane");
+        element.scrollTop = element.scrollHeight;
+    },
+    putMessage: function (sender, _text, before, fileid) {
+        var text;
+        if (fileid)
+            text = "<a id='file-" + fileid + "' class='hyperlink' href='javascript:Chat.RequestDownload(" + fileid + ")'>" + _text + "</a>";
+        else
+            text = Autolinker.link(_text);
+
+        var messageLog = document.getElementById("chat-feed");
+        var username = Room.data.Accounts[sender].ScreenName;
+        var chat_messages = document.createElement("div");
+        var author;
+
+        if (sender === Account.data.ID) {
+            author = "<p class='author user mine uid-" + sender + "'>";
+            username += " (you)";
+        }
+        else
+            author = "<p class='author user uid-" + sender + "'>";
+
+        chat_messages.innerHTML = "<div class='ui fitted divider'></div><div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
+        if (before)
+            messageLog.insertBefore(chat_messages, messageLog.firstChild);
+        else
+            messageLog.appendChild(chat_messages);
+
+        Chat.updateScroll();
+    },
+    DownloadFile: function (fileurl, filename, fileid) {
+        if (document.getElementById('fileprog-' + fileid) === null) {
+            var xhr = new XMLHttpRequest();
+            var file_selected = document.getElementById("file-" + fileid);
+            var download_prog = document.createElement("div");
+            download_prog.className = "ui tiny progress";
+            download_prog.id = "fileprog-" + fileid;
+            download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
+            file_selected.appendChild(download_prog);
+
+            xhr.open('GET', "https://".concat(fileurl));
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+                var blob = new Blob([xhr.response], {type: "application/octet-stream"});
+                saveAs(blob, filename.concat(".zip"));
+            };
+
+            xhr.onprogress = function (e) {
+                $('#fileprog-' + fileid).progress({
+                    percent: Math.ceil((e.loaded / e.total) * 100)
+                });
+            };
+            xhr.onloadend = function (e) {
+                setTimeout(function () {
+                    document.getElementById('file-' + fileid).removeChild(download_prog);
+                }, 1000);
+            };
+            xhr.send(null);
+        }
+    },
+    RequestDownload: function (fileid) {
+        Room.requestDownload(fileid);
+    },
+    repopulateMessages: function () {
+        var before = false;
+        for (var key in Messages) {
+            if (Messages.hasOwnProperty(key)) {
+                var sender = Messages[key].author;
+                var text = Messages[key].content;
+                var fileid = Messages[key].fileid;
+                Chat.putMessage(sender, text, before, fileid);
+                before = true;
+            }
+        }
     }
 };
 
@@ -129,19 +325,20 @@ var Room = {
                     var text = message.text;
                     var sender = message.sender;
                     var fileid = message.fileid;
-                    putMessage(sender, text, null, fileid);
+                    Chat.putMessage(sender, text, null, fileid);
 
-                } break;
+                }
+                    break;
 
-                case "Connect Video":
-                {
-                    
-                } break;
+                case "Connect Video": {
 
-                case "Disconnect Video":
-                {
+                }
+                    break;
 
-                }break;
+                case "Disconnect Video": {
+
+                }
+                    break;
 
                 case "Participant Joined": {
                     var accountID = message.id;
@@ -152,35 +349,38 @@ var Room = {
                         console.log('got peer video');
                         AVC.setPeerVideoNode(id, stream);
                     });
-                } break;
+                }
+                    break;
 
                 case "Confirmation": {
                     if (message.success === false) {
                         Toast.error(textNode("Action: " + message.action + " failed"));
                     }
-                } break;
+                }
+                    break;
 
                 case "Download": {
-                    DownloadFile(message.filepath, message.filename, message.fileid);
-                } break;
-                case "Room Code Changed":
-                {
+                    Chat.DownloadFile(message.filepath, message.filename, message.fileid);
+                }
+                    break;
+                case "Room Code Changed": {
                     Room.data.RoomCodes[message.inviteCode].UsesRemaining = message.uses;
-                    updateInvites();
-                } break;
+                    Room.updateInvites();
+                }
+                    break;
 
-                case "Room Code Deleted":
-                {
+                case "Room Code Deleted": {
                     Room.data.RoomCodes[message.inviteCode] = null;
-                    updateInvites();
+                    Room.updateInvites();
                     break;
                 }
 
                 case "Participant Changed Their Name": {
-                    updateUserInfo(message.id, message.nick);
-                }break;
+                    UserSection.updateUserInfo(message.id, message.nick);
+                }
+                    break;
 
-                default:{
+                default: {
                     // console.info(message);
                 }
             }
@@ -229,6 +429,26 @@ var Room = {
             fileid: fileid
         }));
     },
+    createInviteCode: function (e) {
+        var roomid = Room.data.RoomID;
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "gencode",
+                room: roomid,
+                token: Account.data.LoginToken
+            },
+            success: function (data) {
+                Room.data.RoomCodes[data.Code] = data;
+                Room.updateInvites();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    },
     getRoomCodes: function () {
         return Room.data.RoomCodes;
     },
@@ -240,6 +460,9 @@ var Room = {
             expires: expires
         }));
     },
+    snFromId: function (id) {
+        return Room.data.Accounts[id].ScreenName;
+    },
     settings: {
         categoryPanel: {
             links: null,
@@ -249,503 +472,378 @@ var Room = {
             panels: null,
             node: null
         }
-    }
+    },
+    updateInvites: function () {
+        var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
+        var iCodeDiv = invitepanel.querySelector("#invite-codes");
+        iCodeDiv.innerHTML = "";
+        for (var code in Room.data.RoomCodes) {
+            if (Room.data.RoomCodes.hasOwnProperty(code) && Room.data.RoomCodes[code] != null) {
+                var rc = Room.data.RoomCodes[code];
+                var tr = document.createElement("tr");
+                tr.object = rc;
+                tr.innerHTML += "<td><input class='form-control iv-code' onclick='Room.select()' readonly value='" + rc.Code + "'></td>";
+                tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
+                tr.innerHTML += "<td>" + (rc.UsesRemaining != null ? rc.UsesRemaining : "Unlimited") + "</td>";
+                tr.innerHTML += "<td>" + (rc.Expires != null ? rc.Expires : "none") + "</td>";
 
+                iCodeDiv.appendChild(tr);
+                Settings.addCodeEvent(tr);
+            }
+        }
+    }
 };
 
-// var Account = {
-//     data: null,
-//     login: function () {
-//         var token = GetToken();
-//         console.log(token);
-//         $.ajax({
-//             type: 'post',
-//             url: '/assets/php/components/account2.php',
-//             dataType: 'JSON',
-//             data: {
-//                 action: "login",
-//                 token: token
-//             },
-//             success: function (data) {
-//                 console.log(data);
-//             },
-//             error: function (error) {
-//                 console.log(error);
-//             }
-//         });
-//     }
-// };
+var UserSection = {
+    updateUserInfo: function (accountID, nickname) {
+        Room.data.Accounts[accountID].ScreenName = nickname;
+        $('.uid-' + accountID).html(nickname);
+    },
+    newUserSet: function (size, target) {
+        if (size == 'small') {   //Small + no EventTarget sent
+            for (var key in Room.data.Accounts) {
+                if (Room.data.Accounts.hasOwnProperty(key)) {
+                    var account = Room.data.Accounts[key];
+                    //Check to make sure that this user div does not already exist
+                    if (document.getElementById('NU' + key.toString()) == null) {
+                        console.log("in New User Set");
+                        var newUser = document.createElement('div');
+                        newUser.id = 'NU' + key.toString();
+                        newUser.className = 'roomSide';
+                        document.getElementById('screensList').appendChild(newUser);
 
-function showSettings(){
-    Modal.create("Settings", "darken");
-}
-function leaveRoom() {
-    window.location.replace("https://dev.slingapp.net");
-}
+                        document.getElementById('NU' + key.toString()).setAttribute("onclick", "UserSection.expandDiv(event)");
+                        document.getElementById('NU' + key.toString()).setAttribute("ondblclick", "UserSection.sendDivToCenter(event)");
 
-function InitSettingsModal() {
-    Room.settings.categoryPanel.node = Resource.dictionary["Settings"].querySelector(".settings-left");
-    Room.settings.optionsPanel = Resource.dictionary["Settings"].querySelector(".settings-right");
-    Room.settings.categoryPanel.links = Room.settings.categoryPanel.node.querySelectorAll("a");
-    Room.settings.optionsPanel.panels = Room.settings.optionsPanel.querySelectorAll(".settings-panel");
+                        var newUserTitle = document.createElement('div');
+                        newUserTitle.id = 'UT' + key.toString();
+                        newUserTitle.className = 'roomSideTitle';
+                        document.getElementById('NU' + key.toString()).appendChild(newUserTitle);
 
-    Room.settings.categoryPanel.links.forEach(function (l) {
-        l.addEventListener("click", function () {
-            Room.settings.optionsPanel.panels.forEach(function (p) {
-                p.removeClass("active");
-            });
-            Room.settings.categoryPanel.links.forEach(function (l) {
-                l.removeClass("selected");
-            });
-            l.className += " selected";
-            var id = l.getAttribute("href").slice(1);
-            document.getElementById(id).className += " active";
-        });
-    });
-
-    updateUsersHere();
-    updateInvites();
-    addCodeButtonEvents();
-}
-
-function updateUsersHere() {
-    //Found it
-    var userPanel = Room.settings.optionsPanel.querySelector("#Users");
-    var here = userPanel.querySelector("#users-here");
-    var you = userPanel.querySelector("#you");
-    here.innerHTML = "";
-    var loggedInUserID = Account.data.ID;
-    you.innerHTML = "";
-    you.innerHTML = "<span class='user' id='modalUsername'>" + Room.data.Accounts[loggedInUserID].ScreenName + "</span><br>" + you.innerHTML;
-    for (var key in Room.data.Accounts) {
-        if (Room.data.Accounts.hasOwnProperty(key)) {
-            var account = Room.data.Accounts[key];
-            if (account.ID != loggedInUserID)
-                here.innerHTML += "<span class='user'>" + account.ScreenName + "</span><br>";
-        }
-    }
-}
-
-function createInviteCode(e) {
-    var roomid = Room.data.RoomID;
-    var token = GetToken();
-    $.ajax({
-        type: 'post',
-        url: '/assets/php/components/room.php',
-        dataType: 'JSON',
-        data: {
-            action: "gencode",
-            room: roomid,
-            token: token
-        },
-        success: function (data) {
-            Room.data.RoomCodes[data.Code] = data;
-            updateInvites();
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-}
-
-function newInvite() {
-    document.getElementById("quick-invite-textbox").value = "generating...";
-    quickInvite();
-}
-function quickInvite() {
-    var quick_inv = document.getElementById("quick-invite-textbox");
-    var invite_button = document.getElementById("quick-invite-button");
-    invite_button.style.display = "none";
-    document.getElementById("quick-invite").style.display = "inline";
-
-    if(!quick_inv.value.localeCompare("generating...")) {
-        var roomid = Room.data.RoomID;
-        var token = GetToken();
-        $.ajax({
-            type: 'post',
-            url: '/assets/php/components/room.php',
-            dataType: 'JSON',
-            data: {
-                action: "gencode",
-                room: roomid,
-                token: token
-            },
-
-
-            success: function (data) {
-
-                quick_inv.value = data.Code;
-                quick_inv.select();
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
-}
-function updateInvites(){
-    var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
-    var iCodeDiv = invitepanel.querySelector("#invite-codes");
-    iCodeDiv.innerHTML = "";
-    for (var code in Room.data.RoomCodes) {
-        if (Room.data.RoomCodes.hasOwnProperty(code) && Room.data.RoomCodes[code] != null ) {
-            var rc = Room.data.RoomCodes[code];
-            var tr = document.createElement("tr");
-            tr.object = rc;
-            tr.innerHTML += "<td><input class='form-control iv-code' onclick='this.select()' readonly value='" + rc.Code + "'></td>";
-            tr.innerHTML += "<td>" + Room.data.Accounts[rc.Creator].ScreenName + "</td>";
-            tr.innerHTML += "<td>"  + (rc.UsesRemaining != null ? rc.UsesRemaining : "Unlimited") + "</td>";
-            tr.innerHTML += "<td>"  + (rc.Expires != null ? rc.Expires : "none") + "</td>";
-
-            iCodeDiv.appendChild(tr);
-            addCodeEvent(tr);
-        }
-    }
-}
-
-function changeRemainingUses(code){
-    var uses = prompt("Enter remaining uses:");
-    event.preventDefault();
-    event.stopPropagation();
-    var token = GetToken();
-    var json = {
-        action:"Change Uses",
-        remaining:uses,
-        token:token,
-        invite: code
-    };
-    Room.socket.send(JSON.stringify(json));
-
-    updateInvites();
-    return false;
-}
-
-function changeExpirationDate(code){
-    var expires = prompt("Enter expiration date:", "mm/dd/yyyy");
-    event.preventDefault();
-    event.stopPropagation();
-    var token = GetToken();
-    var json = {
-        action:"Change Expiration Date",
-        expiration:expires,
-        token:token,
-        invite: code
-    };
-    Room.socket.send(JSON.stringify(json));
-    updateInvites();
-    //closeContextMenu();
-
-    return false;
-}
-
-function deleteInviteCode(code){
-    event.preventDefault();
-    event.stopPropagation();
-    var uses = 99;
-    var token = GetToken();
-    var json = {
-        action:"Delete Code",
-        token:token,
-        remaining:uses,
-        invite: code
-    };
-    Room.socket.send(JSON.stringify(json));
-    updateInvites();
-    //closeContextMenu();
-
-    return false;
-}
-
-
-
-function changeScreenName(name){
-    //var name = prompt("Enter a new nickname:");
-    if(name.length > 0 && name[0] != " ") {
-        // event.preventDefault();
-        // event.stopPropagation();
-        var token = GetToken();
-        var json = {
-            action: "Change Name",
-            user: name,
-            token: token
-        };
-        Room.socket.send(JSON.stringify(json));
-        //Page reload needed
-        //updateUsersHere();
-    }
-    // return false;
-}
-
-function textNode(msg) {
-    var text = document.createElement("text");
-    text.innerHTML = msg;
-    return text;
-}
-
-function snFromAccountID(id) {
-    var len = Room.data.Accounts.length;
-    for (var i = 0; i < len; i++) {
-        if (Room.data.Accounts[i].ParticipantID == id) {
-            return Room.data.Accounts[i].ScreenName;
-        }
-    }
-}
-
-function sendMessage() {
-    var tarea = document.getElementById("send-box").querySelector("input");
-    var text = tarea.value;
-    if (text != "")
-        Room.sendMessage(text);
-    tarea.focus();
-    tarea.value = "";
-
-}
-
-function uploadFile(files) {
-    console.log("file specs: ", files);
-    var file = files[0];
-    var token = GetToken();
-    if (file.size > 0 && file.size < 536870912) {
-        document.getElementById("file-prog").style.display = "block";
-        var form = new FormData();
-        var xhr = new XMLHttpRequest();
-        form.append("action", "upload");
-        form.append("token", token);
-        form.append("upload", file);
-        form.append("room", Room.data["RoomID"]);
-        xhr.open("POST", "/assets/php/components/room.php");
-        xhr.upload.onprogress = function(e) {
-            $('#file-prog').progress({
-                percent: Math.ceil((e.loaded / e.total) * 100)
-            });
-        };
-        xhr.upload.onloadend = function(e) {
-                setTimeout(function(){
-                    document.getElementById("file-prog").style.display = "none";
-                    $('#file-prog').progress({
-                        percent: 0
-                    })
-                }, 5000);
-        };
-
-        xhr.send(form);
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-
-                    var response = JSON.parse(xhr.responseText);
-                    console.log("response: ", xhr);
-                    Room.uploadFile(response);
-                } else {
-                    console.log("Error", xhr.statusText);
+                        var newUserName = document.createElement('span');
+                        newUserName.id = 'UN' + key.toString();
+                        newUserName.className = 'vertical-text';
+                        document.getElementById('UT' + key.toString()).appendChild(newUserName);
+                        document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
+                    }
                 }
             }
         }
-    } else {
-        console.log("Filesize invalid");
-        Toast.error(textNode("Must be under 256MB"));
-    }
-}
+        else {   //Large + EventTarget sent
+            for (var keyMS in Room.data.Accounts) {
+                if (Room.data.Accounts.hasOwnProperty(keyMS)) {
+                    if (target.id == 'NU' + keyMS.toString()) {
+                        //This is the target Screen we want to make a large version of
 
-function initDragDrop() {
-    var doc = document;
-    var mask = document.getElementById("upload-mask");
-    var xhr = new XMLHttpRequest();
+                        var accountMS = Room.data.Accounts[keyMS];
 
-    if (xhr.upload) {
-        doc.addEventListener("dragover", displayOverlay , false);
-        mask.addEventListener("dragleave", function() {
-            document.getElementById("upload-overlay").style.display = "none";
-            document.getElementById("upload-mask").style.display = "none";
-        }, false);
-        mask.addEventListener("drop", fileSelectorHandler, false);
-    }
-}
+                        console.log("in New User Set");
+                        var newUserMS = document.createElement('div');
+                        newUserMS.id = 'NU' + keyMS.toString() + 'mainScreen';
+                        newUserMS.className = 'screen';
+                        document.getElementById('ScreenContainer').appendChild(newUserMS);
 
-function displayOverlay(e) {
-    document.getElementById("upload-mask").style.display = "block";
-    document.getElementById("upload-overlay").style.display = "block";
+                        var newUserTitleMS = document.createElement('div');
+                        newUserTitleMS.id = 'UT' + keyMS.toString() + 'mainScreen';
+                        newUserTitleMS.className = 'roomSideTitleMS';
+                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').appendChild(newUserTitleMS);
 
-    fileDragHover(e);
-}
-function fileSelectorHandler(e) {
-    document.getElementById("upload-overlay").style.display = "none";
-    document.getElementById("upload-mask").style.display = "none";
-    fileDragHover(e);
-    uploadFile(e.dataTransfer.files);
-}
-
-function fileDragHover(e) {
-    e.stopPropagation();    //prevent file drag from effecting parent nodes
-    e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
-}
-
-function updateScroll(){
-    var element = document.getElementById("right-hand-pane");
-    element.scrollTop = element.scrollHeight;
-}
-
-function switchLog(logtype) {
-    chat = document.getElementById('chat');
-    chat_tab = document.getElementById('chat-tab');
-    file_tab = document.getElementById('files-tab');
-
-    console.log(chat_tab.className);
-    console.log(chat.childNodes[1].style.display);
-    if(logtype == 'files') {
-        chat.childNodes[1].style.display = 'none';
-        chat.childNodes[3].style.display = 'block';
-
-        chat_tab.className = "nav-link chat-nav-button-inactive";
-        file_tab.className = "nav-link chat-nav-button";
-    }
-    else {
-        chat.childNodes[1].style.display = 'block';
-        chat.childNodes[3].style.display = 'none';
-
-        file_tab.className = "nav-link chat-nav-button-inactive";
-        chat_tab.className = "nav-link chat-nav-button";
-    }
-}
-
-function putMessage(sender, _text, before, fileid) {
-    var text;
-    if (fileid)
-        text = "<a id='file-" + fileid + "' class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
-    else
-        text = Autolinker.link(_text);
-
-    var messageLog = document.getElementById("chat-feed");
-    // var fileLog = document.getElementById("file-log");
-    // console.log(sender);
-    var username = Room.data.Accounts[sender].ScreenName;
-    var chat_messages = document.createElement("div");
-    var file_messages = document.createElement("div");
-    var author;
-
-    if (sender === Account.data.ID) {
-        author = "<p class='author user mine uid-"+ sender + "'>";
-        // file_messages.className = "message mine";
-        username += " (you)";
-    }
-    else {
-        author = "<p class='author user uid-"+ sender + "'>";
-        // file_messages.className = "message";
-    }
-
-    chat_messages.innerHTML = "<div class='ui fitted divider'></div><div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
-    //file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
-    if (before) {
-        messageLog.insertBefore(chat_messages, messageLog.firstChild);
-        // if(fileid)
-        //     fileLog.insertBefore(file_messages, fileLog.firstChild);
-    } else {
-        messageLog.appendChild(chat_messages);
-        // if(fileid)
-        //     fileLog.appendChild(file_messages);
-    }
-    updateScroll();
-}
-
-function DownloadFile(fileurl, filename, fileid) {
-
-
-    if(document.getElementById('fileprog-' + fileid) === null) {
-        var xhr = new XMLHttpRequest();
-        var file_selected = document.getElementById("file-" + fileid);
-        var download_prog = document.createElement("div");
-        download_prog.className = "ui tiny progress";
-        download_prog.id = "fileprog-" + fileid;
-        download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
-        file_selected.appendChild(download_prog);
-
-        xhr.open('GET', "https://".concat(fileurl));
-        xhr.responseType = "arraybuffer";
-        xhr.onload = function () {
-            var blob = new Blob([xhr.response], {type: "application/octet-stream"});
-            saveAs(blob, filename.concat(".zip"));
-        };
-
-        xhr.onprogress = function (e) {
-            $('#fileprog-' + fileid).progress({
-                percent: Math.ceil((e.loaded / e.total) * 100)
-            });
-        };
-        xhr.onloadend = function (e) {
-            setTimeout(function () {
-                document.getElementById('file-' + fileid).removeChild(download_prog);
-            }, 1000);
-        };
-        xhr.send(null);
-    }
-}
-
-function RequestDownload(fileid) {
-    Room.requestDownload(fileid);
-}
-
-function repopulateMessages() {
-    var before = false;
-    for (var key in Messages) {
-        if (Messages.hasOwnProperty(key)) {
-            var sender = Messages[key].author;
-            var text = Messages[key].content;
-            var fileid = Messages[key].fileid;
-            putMessage(sender, text, before, fileid);
-            before = true;
+                        var newUserNameMS = document.createElement('span');
+                        newUserNameMS.id = 'UN' + keyMS.toString() + 'mainScreen';
+                        newUserNameMS.className = 'vertical-text';
+                        document.getElementById('UT' + keyMS.toString() + 'mainScreen').appendChild(newUserNameMS);
+                        document.getElementById('UN' + keyMS.toString() + 'mainScreen').innerHTML = accountMS.ScreenName;
+                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').setAttribute("onclick", "UserSection.returnDivToSide(event)");
+                    }
+                }
+            }
+        }
+    },
+    //These all only Remain until page reload, they are wiped then.
+    expandDiv: function (event) {
+        var target = event.target;
+        if (event.target.id[0] == 'N') {
+            if (target != null) {
+                console.log(event.target.id);
+                target.className = 'eRoomSide';
+                target.setAttribute("onclick", "UserSection.minimizeDiv(event)");
+            }
+        }
+    },
+    minimizeDiv: function (event) {
+        var target = event.target;
+        if (event.target.id[0] == 'N') {
+            if (target != null) {
+                target.className = 'roomSide';
+                target.setAttribute("onclick", "UserSection.expandDiv(event)");
+            }
+        }
+    },
+    sendDivToCenter: function (event) {
+        var target = event.target;
+        if (target != null && document.getElementById(target.id.toString() + 'mainScreen') == null) {
+            UserSection.newUserSet('large', target);
+        }
+    },
+    returnDivToSide: function (event) {
+        var target = event.target;
+        if (target != null) {
+            var item = document.getElementById(target.id);
+            item.parentNode.removeChild(item);
         }
     }
-}
+};
+
+var Settings = {
+    themed_elems: document.getElementsByClassName("theme1"),
+    colored_elems: document.getElementsByClassName("theme2"),
+    openSettings: function (tab) {
+        $('.ui.modal')
+            .modal('show')
+        ;
+        $('.modal a.' + tab)
+            .click()
+        ;
+    },
+    quickScreenNameChange: function () {
+        document.getElementsByClassName("quickbutton")[0].style.display = "none";
+        document.getElementById("quick-input").style.display = "inline";
+        document.getElementById("quick-name-change").focus();
+    },
+    quickMenuClose: function () {
+        document.getElementsByClassName("quickbutton")[0].style.display = "block";
+        document.getElementsByClassName("quickbutton")[1].style.display = "block";
+        document.getElementById("quick-input").style.display = "none";
+        document.getElementById("quick-invite").style.display = "none";
+    },
+    closeSettings: function () {
+        $('.ui.modal')
+            .modal('hide')
+        ;
+    },
+    changeScreenName: function (name) {
+        if (name.length > 0 && name[0] !== " ") {
+            var json = {
+                action: "Change Name",
+                user: name,
+                token: Account.data.LoginToken
+            };
+            Room.socket.send(JSON.stringify(json));
+        }
+    },
+    quickInvite: function () {
+        document.getElementById("quick-invite-textbox").value = "generating...";
+        var quick_inv = document.getElementById("quick-invite-textbox");
+        var invite_button = document.getElementById("quick-invite-button");
+        invite_button.style.display = "none";
+        document.getElementById("quick-invite").style.display = "inline";
+
+        if (!quick_inv.value.localeCompare("generating...")) {
+            var roomid = Room.data.RoomID;
+            $.ajax({
+                type: 'post',
+                url: '/assets/php/components/room.php',
+                dataType: 'JSON',
+                data: {
+                    action: "gencode",
+                    room: roomid,
+                    token: Account.data.LoginToken
+                },
 
 
-function openInvites() {
-    Modal.create("Settings", "darken");
-    document.getElementById("InvitesLink").click();
-}
+                success: function (data) {
+
+                    quick_inv.value = data.Code;
+                    quick_inv.select();
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    },
+    changeRemainingUses: function (code) {
+        var uses = prompt("Enter remaining uses:");
+        event.preventDefault();
+        event.stopPropagation();
+        var json = {
+            action: "Change Uses",
+            remaining: uses,
+            token: Account.data.LoginToken,
+            invite: code
+        };
+        Room.socket.send(JSON.stringify(json));
+
+        Room.updateInvites();
+        return false;
+    },
+    changeExpirationDate: function (code) {
+        var expires = prompt("Enter expiration date:", "mm/dd/yyyy");
+        event.preventDefault();
+        event.stopPropagation();
+        var json = {
+            action: "Change Expiration Date",
+            expiration: expires,
+            token: Account.data.LoginToken,
+            invite: code
+        };
+        Room.socket.send(JSON.stringify(json));
+        Room.updateInvites();
+
+        return false;
+    },
+    deleteInviteCode: function (code) {
+        event.preventDefault();
+        event.stopPropagation();
+        var uses = 99;
+        var json = {
+            action: "Delete Code",
+            token: Account.data.LoginToken,
+            remaining: uses,
+            invite: code
+        };
+        Room.socket.send(JSON.stringify(json));
+        Room.updateInvites();
+
+        return false;
+    },
+    getCodeNodeList: function (code) {
+        //var label = ContextMenu.createLabel(code + " Options");
+
+        //console.log("Menu Link");
+        var setUses = ContextMenu.createMenuLink("Set Uses", "", function () {
+            Settings.changeRemainingUses(code);
+            ContextMenu.close();
+        });
+
+        var expiration = ContextMenu.createMenuLink("Set Expiration Date", "", function () {
+            Settings.changeExpirationDate(code);
+            ContextMenu.close();
+        });
+
+        var deleteCode = ContextMenu.createMenuLink("Delete", "", function () {
+            Settings.deleteInviteCode(code);
+            ContextMenu.close();
+        });
+
+        return [setUses, expiration, deleteCode];
+    },
+    addCodeEvent: function (element) {
+        element.addEventListener("contextmenu", function (event) {
+            // console.log(n.object.Code);
+            //console.log(n);
+            ContextMenu.create(event, Settings.getCodeNodeList(element.object.Code));
+            return false;
+        });
+    },
+    addCodeButtonEvents: function () {
+        var codes = Room.settings.optionsPanel.querySelector("#Invites").querySelectorAll("tr");
+
+        // console.log(close);
+
+        codes.forEach(function (n) {
+            //console.log("Button Test");
+
+            n.addEventListener("contextmenu", function (event) {
+                // console.log(n.object.Code);
+                //console.log(n);
+                ContextMenu.create(event, Settings.getCodeNodeList(n.object.Code));
+                return false;
+            });
+        });
+    },
+    appendInviteCode: function (code) {
+        var table = document.getElementById('invite-code-table');
+        var row = document.createElement('tr');
+        row.innerHTML = "<td>" + code.Code + "</td><td>" + Room.snFromId(code.Creator) + "</td><td>" + +"</td><td>" + +"</td>";
+        table.appendChild(row);
+    },
+    createInvite: function () {
+        API.room.createInvite(Room.data.RoomID, function (data) {
+            console.log(data);
+            Settings.appendInviteCode(data.code);
+        });
+    },
+    toggleTheme: function (elem) {
+        var themeChoice = RoomCookies.getCookie("theme");
+
+        if (themeChoice === "dark") {
+            RoomCookies.setCookie("theme", "light");
+            Settings.resetTheme();
+            Settings.swapStyleSheet("room_light.css");
+        } else {
+            RoomCookies.setCookie("theme", "dark");
+
+            [].forEach.call(this.themed_elems, function (e) {
+                e.classList.add("inverted");
+            });
+            [].forEach.call(this.colored_elems, function (e) {
+                e.classList.add("black");
+            });
+            Settings.swapStyleSheet("room_dark.css");
+            elem.innerHTML = "Light Theme"
+        }
+    },
+    resetTheme: function () {
+        [].forEach.call(this.themed_elems, function (e) {
+            e.classList.remove("inverted");
+        });
+        [].forEach.call(this.colored_elems, function (e) {
+            e.classList.remove("black");
+        });
+        document.getElementById("quick-theme-button").innerHTML = "Dark Theme"
+    },
+    swapStyleSheet: function (sheet) {
+        document.getElementById("pagestyle").setAttribute("href", "/assets/css/" + sheet);
+    }
+};
+
 //////////////////////////////////
 // Cookie Room Instance Values  //
 //////////////////////////////////
-function setCookie(cookieName, cookieValue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
-}
-function getCookie(cookieName) {
-    var name = cookieName + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
+
+var RoomCookies = {
+    setCookie: function (cookieName, cookieValue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
+    },
+    getCookie: function (cookieName) {
+        var name = cookieName + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
         }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
+        return "";
+    },
+    checkOutVol: function () {
+        var outVol = RoomCookies.getCookie("outVol");
+        if (outVol != "") {
+            //On Reload Get This value
+        } else {
+            RoomCookies.setCookie("outVol", 100, 365);
+            if (outVol != "" && outVol != null) {
+                RoomCookies.setCookie("outVol", 100, 365);
+            }
         }
-    }
-    return "";
-}
-function checkOutVol() {
-    var outVol = getCookie("outVol");
-    if (outVol != "") {
-        //On Reload Get This value
-    } else {
-        setCookie("outVol", 100, 365);
-        if (outVol != "" && outVol != null) {
-            setCookie("outVol", 100, 365);
-        }
-    }
-}
-function checkInVol() {
-    var inVol = getCookie("inVol");
-    if (inVol != "") {
-        //On Reload Get This value
-    } else {
-        setCookie("inVol", 100, 365);
-        if (inVol != "" && inVol != null) {
+    },
+    checkInVol: function () {
+        var inVol = RoomCookies.getCookie("inVol");
+        if (inVol != "") {
+            //On Reload Get This value
+        } else {
             setCookie("inVol", 100, 365);
+            if (inVol != "" && inVol != null) {
+                RoomCookies.setCookie("inVol", 100, 365);
+            }
         }
     }
-}
+};
