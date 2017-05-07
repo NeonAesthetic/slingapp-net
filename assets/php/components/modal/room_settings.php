@@ -26,7 +26,7 @@
                 <span class='user'></span><br>
             </div>
             <div>
-                <button class="btn-circle"  style="margin: 0;" onclick="changeScreenName()">Change Nickname</button>
+                <button class="btn-circle"  style="margin: 0;" onclick="settings.changeScreenName()">Change Nickname</button>
             </div>
 
             <div id="users-here" style="padding: 15px;">
@@ -48,7 +48,7 @@
 
                 </table>
             </div>
-            <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;;" onclick="createInviteCode(this)">Create Invite Code</button>
+            <button class="btn-circle" style="font-size: 1em; position: absolute; bottom: 0; margin-bottom: 15px;" onclick="Room.createInviteCode(this)">Create Invite Code</button>
             
         </div>
         <div id="Sound" class="settings-panel">
