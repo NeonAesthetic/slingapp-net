@@ -101,7 +101,7 @@ if ($room) {
                             <div id="quick-invite" class="fluid" style="display:none">
                                 <div class="ui large fluid icon input">
                                     <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text" onclick="Settings.copyCode()" data-position="left center" data-variation="inverted">
-                                    <i id="regen-code" class="repeat link grey icon" onclick="Settings.quickInvite()"></i>
+                                    <i id="regen-code" class="repeat link grey icon" onclick="Settings.quickInvite(true)"></i>
                                 </div>
                             </div>
                             <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="Settings.quickInvite()">Create Invite Code</div>

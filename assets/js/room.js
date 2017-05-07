@@ -631,10 +631,10 @@ var Settings = {
             Room.socket.send(JSON.stringify(json));
         }
     },
-    quickInvite: function () {
+    quickInvite: function (regenerate) {
         var quick_inv = document.getElementById("quick-invite-textbox");
         var invite_button = document.getElementById("quick-invite-button");
-        
+
         invite_button.style.display = "none";
         document.getElementById("quick-invite").style.display = "inline";
 
@@ -643,6 +643,9 @@ var Settings = {
                 content: ""
             })
             .popup("hide");
+
+        if(regenerate)
+            quick_inv.value = "generating...";
 
         if (!quick_inv.value.localeCompare("generating...")) {
             var roomid = Room.data.RoomID;
