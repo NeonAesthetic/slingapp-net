@@ -81,14 +81,6 @@ var Chat = {
                     percent: Math.ceil((e.loaded / e.total) * 100)
                 });
             };
-            xhr.upload.onloadend = function (e) {
-                setTimeout(function () {
-                    document.getElementById("file-prog").style.display = "none";
-                    $('#file-prog').progress({
-                        percent: 0
-                    })
-                }, 5000);
-            };
             xhr.send(form);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -100,6 +92,11 @@ var Chat = {
                     } else {
                         console.log("Error", xhr.statusText);
                     }
+                    //insert line here
+                        document.getElementById("file-prog").style.display = "none";
+                        $('#file-prog').progress({
+                            percent: 0
+                        })
                 }
             }
         } else {
