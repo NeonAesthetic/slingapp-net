@@ -169,34 +169,29 @@ if ($room) {
         <div class="twelve wide stretched column">
             <div class="ui tab" data-tab="tab-name">
                 <div class="ui segment">
-                    This is an stretched grid column. This AFFsegment will always match the tab height
+                    <?php
+                        $users = $room->getParticipants();
+                        foreach ($users as $user){
+                            ?> <div> <?=$user?> </div> <?php
+                        }
+                    ?>
                 </div>
             </div>
 
             <div class="ui tab" data-tab="tab-name1" style="overflow-y: scroll">
-                <table class="ui celled table" style="">
-                    <thead style="position: fixed; ">
-                    <tr>
-                        <th style="width: 32%">Code</th>
-                        <th style="width: 58%">Creator</th>
-                        <th style="width: 8%">Uses</th>
-                        <th colspan="3">
-                            <div class="ui button green" onclick="createInvite()">Create Code</div>
-                        </th>
+                <table class="ui selectable celled table" style="">
+                    <thead style="">
+                    <tr style="">
+                        <th style="position: fixed; width: 22%;">Code</th>
+                        <th style="position: fixed; margin-left:21.2%; width: 38%;">Creator</th>
+                        <th style="position: fixed; margin-left: 58.3%; width: 15.7%;"data-tooltip="Remaining uses for each room code." data-position="top center" style="">Uses</th>
                     </tr>
                     </thead>
-                </table>
-                <div class="ui inverted divider"></div>
-                <table class="ui celled table" style="">
-                    <tbody id="invite-code-table" style="">
+                    <tbody id="invite-code-table">
+                        <tr></tr>
                     </tbody>
                 </table>
-                <div class="ui inverted divider"></div>
-                <table class="ui celled table" style="">
-                    <thead style="position: fixed; ">
-                    <tr></tr>
-                    </thead>
-                </table>
+
             </div>
             <div class="ui tab" data-tab="tab-name2">
                 <div class="ui segment">
@@ -243,9 +238,26 @@ if ($room) {
         </div>
     </div>
     <div class="actions">
-        <div class="ui positive right labeled icon button" onclick="closeSettings()">
-            Done
-            <i class="checkmark icon"></i>
+        <div class="ui tab" data-tab="tab-name">
+            <div class="ui positive right labeled icon button" onclick="closeSettings()">
+                Done
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+
+        <div class="ui tab" data-tab="tab-name1">
+            <div class="ui positive right labeled icon button" onclick="closeSettings()">
+                Done
+                <i class="checkmark icon"></i>
+            </div>
+            <div class="ui button green" onclick="createInvite()">Create Code</div>
+        </div>
+
+        <div class="ui tab" data-tab="tab-name2">
+            <div class="ui positive right labeled icon button" onclick="closeSettings()">
+                Done
+                <i class="checkmark icon"></i>
+            </div>
         </div>
     </div>
 </div>
@@ -281,6 +293,8 @@ if ($room) {
             .accordion({
                 exclusive: false
             });
+
+        $('.ui.sticky').sticky();
 
         $('.tabular.menu .item').tab();
 
@@ -397,6 +411,11 @@ if ($room) {
         ;
 
     }
+
+    function quickRoomCodeUsesChange() {
+
+    }
+
     function quickScreenNameChange() {
         document.getElementsByClassName("quickbutton")[0].style.display = "none";
         document.getElementById("quick-input").style.display = "inline";
@@ -422,7 +441,7 @@ if ($room) {
     function appendInviteCode(code) {
         var table = document.getElementById('invite-code-table');
         var row = document.createElement('tr');
-        row.innerHTML = "<td>" + code.Code + "</td><td>" + snFromId(code.Creator) + "</td><td>" + + "</td><td>" + +"</td>";
+        row.innerHTML = "<td>" + code.Code + "</td><td>" + snFromId(code.Creator) + "</td><td>" + "None" + "</td>";
         table.appendChild(row);
     }
     function createInvite() {
