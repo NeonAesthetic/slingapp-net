@@ -632,11 +632,17 @@ var Settings = {
         }
     },
     quickInvite: function () {
-        document.getElementById("quick-invite-textbox").value = "generating...";
         var quick_inv = document.getElementById("quick-invite-textbox");
         var invite_button = document.getElementById("quick-invite-button");
+        
         invite_button.style.display = "none";
         document.getElementById("quick-invite").style.display = "inline";
+
+        $(quick_inv)
+            .popup({
+                content: ""
+            })
+            .popup("hide");
 
         if (!quick_inv.value.localeCompare("generating...")) {
             var roomid = Room.data.RoomID;
@@ -655,11 +661,38 @@ var Settings = {
 
                     quick_inv.value = data.Code;
                     quick_inv.select();
+                    $(quick_inv)
+                        .popup({
+                            content: "Select to Copy"
+                        })
+                        .popup("show");
                 },
                 error: function (error) {
                     // console.log(error);
                 }
             });
+        }
+    },
+    copyCode: function () {
+        try {
+            var successful = document.execCommand('copy');
+            var quick_inv =  document.getElementById("quick-invite-textbox");
+            if(successful) {
+                // $(quick_inv).popup('hide');
+                // Room.SetupSemanticUI();
+
+                $(quick_inv)
+                    .popup({
+                        content : "Copied to clipboard"
+                    })
+                    .popup('show');
+            }
+            else {
+                console.log("failed to copy");
+                $(quick_inv).popup('hide');
+            }
+        } catch (err) {
+            console.log("execCommand not supported");
         }
     },
     changeRemainingUses: function (code) {
