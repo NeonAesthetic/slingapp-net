@@ -412,10 +412,6 @@ if ($room) {
 
     }
 
-    function quickRoomCodeUsesChange() {
-
-    }
-
     function quickScreenNameChange() {
         document.getElementsByClassName("quickbutton")[0].style.display = "none";
         document.getElementById("quick-input").style.display = "inline";
