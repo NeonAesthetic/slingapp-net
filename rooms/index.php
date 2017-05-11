@@ -42,7 +42,7 @@ if ($room) {
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
     <link rel="stylesheet" href="/assets/css/room.css">
-    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
+    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "light") ? "/assets/css/room_light.css" : "/assets/css/room_dark.css"?>>
     <link rel="stylesheet" href="/assets/css/range.css">
 
 </head>
