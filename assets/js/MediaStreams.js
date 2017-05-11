@@ -215,7 +215,7 @@ var AVC = {
     },
     createPeerAudioNode:function (stream) {
         var audioNode = createAudioSourceNode();
-        audioNode.src = URL.createObjectURL(stream);
+        audioNode.srcObject = stream;
         document.body.appendChild(audioNode);
         AVC.audioSources.push(audioNode);
         // audioNode.peer = peerid;
@@ -227,11 +227,13 @@ var AVC = {
         videoNode.className = 'user-preview';
         return videoNode;
     },
-    connectScreenCapture:function () {
+    connectScreenCapture:function (callback) {
         AVC.getUserScreencaptureStream(function(stream){
+
             AVC.peerVideoStream = stream;
             console.log("CAPTURE:", stream);
             AVC.getAllPeerVideo(stream);
+            if(callback) callback(true);
         });
 
     },
@@ -247,8 +249,6 @@ var AVC = {
                 Toast.error(textNode("Extension not installed"));
             }
         });
-
-
     },
     setPeerVideoNode:function(id, stream){
         var video = document.getElementById("video-" + id);
@@ -258,13 +258,22 @@ var AVC = {
             var content = document.createElement("div");
             video = document.createElement("video");
             var sn = snFromId(id);
+            if (id == Account.data.ID){
+                sn = "<span class='user mine uid-" + id + "'>" + sn + "</span><a id='video-chat-status' style='float:right;'></a> ";
+            }
             title.className = "title";
             title.innerHTML = "<i class='dropdown icon'></i>" + sn + "</div>";
             content.className = "content";
+            content.style.width = "auto";
 
             video.setAttribute("id", "video-" + id);
-            video.setAttribute("height", 170);
-            video.setAttribute("width", 235);
+            // video.setAttribute("height", 170);
+            // video.setAttribute("width", 235);
+            video.style.background = "#292929";
+            video.style.border = "1px solid #333";
+            video.style.maxHeight = "calc(100vh - 80px)";
+            video.style.maxWidth = "100%";
+
             video.ondblclick = function(){
                 this.webkitRequestFullScreen();
             };
@@ -272,19 +281,26 @@ var AVC = {
             video.divTitle = title;
             video.divContent = content;
 
+
             content.appendChild(video);
 
-            $('.ui.sidebar .accordion').append(title);
-            $('.ui.sidebar .accordion').append(content);
+            var wrapper = document.createElement("div");
+            
+            wrapper.appendChild(title);
+            wrapper.appendChild(content);
+
+            $('.ui.sidebar .accordion').append(wrapper);
+            // $('.ui.sidebar .accordion').append(content);
         }
 
 
-        video.src = URL.createObjectURL(stream);
+        video.srcObject = stream;
         video.autoplay=true;
     },
     getAllPeerVideo:function(stream){
         // AVC.peerVideoStream = stream;
         AVC.setPeerVideoNode(AVC.id, stream);
+        AVC.button.checkStatus();
 
         var accounts = Room.data.Accounts;
         console.log("Attempting to connect video");
@@ -299,8 +315,50 @@ var AVC = {
             }
         }
         AVC.videoConnected = true;
+    },
+    disconnectVideo:function () {
+        if(AVC.peerVideoStream){
+            AVC.peerVideoStream.getTracks()[0].stop();
+            AVC.peerVideoStream = null;
+            AVC.button.checkStatus();
+        }
+    },
+    button:{
+        stopStream:function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            AVC.disconnectVideo();
+            // if(!AVC.peerVideoStream){
+            //     AVC.button.setStatus("OFF", "#ff7777", "Start Streaming", AVC.button.startStream);
+            // }
+        },
+        startStream:function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            AVC.connectScreenCapture(function (streaming) {
+                // if (streaming) {
+                //     AVC.button.setStatus("ON", "#77ff77", "Stop Streaming", AVC.button.stopStream);
+                // }
+            });
+        },
+        setStatus:function (text, color, tooltip, onclick) {
+            var status = document.getElementById("video-chat-status");
+            status.innerHTML = text;
+            status.setAttribute("data-tooltip", tooltip);
+            status.style.color = color;
+            status.onclick = onclick;
+        },
+        checkStatus:function () {
+            if(AVC.peerVideoStream && AVC.peerVideoStream.active){
+                AVC.button.setStatus("Stream ON", "#77ff77", "Stop Streaming", AVC.button.stopStream);
+            }else{
+                AVC.button.setStatus("Stream OFF", "#ff7777", "Start Streaming", AVC.button.startStream);
+            }
+        }
     }
-}
+};
+
+
 
 
 

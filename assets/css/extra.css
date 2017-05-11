@@ -122,14 +122,7 @@
     }
 }
 
-@keyframes toast-pop {
-    from {
-        transform: translateY(100px);
-    }
-    to {
-        transform: translateY(-100px);
-    }
-}
+
 
 .inverted > .item{
     color: #eee !important;

@@ -1,0 +1,56 @@
+.pusher {
+    background-color: #dadada !important;
+}
+
+.text *{
+    color: black;
+}
+
+.theme1 {
+    background-color: #EEEEEE !important;
+}
+
+.theme2 {
+    background-color: #EEEEEE !important;
+    color: #484848 !important;
+}
+
+#send-box input {
+    background-color: #DADADA !important;
+    color: black !important;
+}
+
+.quick-input {
+    background-color: #e0e1e2 !important;
+    color: #5a5a5a !important;
+}
+.mine.user {
+    color: #5488ad;
+    font-weight: bold;
+}
+
+.user {
+    color: black;
+    font-weight: bold;
+}
+
+.hyperlink {
+    color: rgba(21, 73, 85, 0.51);
+}
+
+#file-upload{
+    background-color: #DADADA;
+    color:#5a5a5a;
+}
+
+#send-button {
+    background-color: #b9b8b9 !important;
+}
+
+#r-title {
+    color: #484848;
+}
+
+::-webkit-input-placeholder { /* Chrome */
+    color: #5a5a5a !important;
+}

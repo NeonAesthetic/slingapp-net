@@ -1,0 +1,53 @@
+.pusher {
+    background-color: #383838 !important;
+}
+
+.text *{
+    color: white;
+}
+
+.theme1 {
+    color:#d4d4d4 !important;
+}
+
+#send-box input {
+    background-color: #383838 !important;
+    color: #C4C4C4 !important;
+}
+
+#send-button {
+    border: solid!important;
+    border-width: 1px!important;
+    border-color: #383838 !important;
+}
+
+.quick-input {
+    background-color: #27292a !important;
+    color: white !important;
+}
+
+.mine.user {
+    color:#77ff77;
+}
+
+.user {
+    color: grey;
+}
+
+.hyperlink {
+    color: #9e9e9e;
+}
+.quickbutton {
+    border-style: solid!important;
+    /*border-radius: 0!important;*/
+    border-width: 1px !important;
+    border-color: #27292a !important;
+}
+#file-upload{
+    background-color: #383838;
+    color:#a6a6a6;
+}
+
+#r-title {
+    color: white;
+}

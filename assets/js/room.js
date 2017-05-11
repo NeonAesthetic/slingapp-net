@@ -86,7 +86,7 @@ function addCodeButtonEvents() {
 var Chat = {
     chatlog: null,
     init: function () {
-        Chat.chatlog = document.getElementById("chat_feed");
+        Chat.chatlog = document.getElementById("chat-feed");
 
     },
     send: function () {
@@ -121,7 +121,7 @@ var Room = {
             var message = JSON.parse(data.data);
             console.log(message);
             if (message.notify) {
-                Toast.pop(textNode(message.notify), 3000);
+                Toast.pop(message.notify, 3000);
             }
             var type = message.type;
             switch (type) {
@@ -161,7 +161,7 @@ var Room = {
                 } break;
 
                 case "Download": {
-                    DownloadFile(message.filepath, message.filename);
+                    DownloadFile(message.filepath, message.filename, message.fileid);
                 } break;
                 case "Room Code Changed":
                 {
@@ -222,6 +222,7 @@ var Room = {
         Room.send(fileJSON);
     },
     requestDownload: function (fileid) {
+        console.log("requesting to download");
         Room.socket.send(JSON.stringify({
             action: "Download File",
             token: Account.data.LoginToken,
@@ -347,6 +348,41 @@ function createInviteCode(e) {
     });
 }
 
+function newInvite() {
+    document.getElementById("quick-invite-textbox").value = "generating...";
+    quickInvite();
+}
+function quickInvite() {
+    var quick_inv = document.getElementById("quick-invite-textbox");
+    var invite_button = document.getElementById("quick-invite-button");
+    invite_button.style.display = "none";
+    document.getElementById("quick-invite").style.display = "inline";
+
+    if(!quick_inv.value.localeCompare("generating...")) {
+        var roomid = Room.data.RoomID;
+        var token = GetToken();
+        $.ajax({
+            type: 'post',
+            url: '/assets/php/components/room.php',
+            dataType: 'JSON',
+            data: {
+                action: "gencode",
+                room: roomid,
+                token: token
+            },
+
+
+            success: function (data) {
+
+                quick_inv.value = data.Code;
+                quick_inv.select();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+}
 function updateInvites(){
     var invitepanel = Room.settings.optionsPanel.querySelector("#Invites");
     var iCodeDiv = invitepanel.querySelector("#invite-codes");
@@ -364,11 +400,8 @@ function updateInvites(){
             iCodeDiv.appendChild(tr);
             addCodeEvent(tr);
         }
-
     }
-
 }
-
 
 function changeRemainingUses(code){
     var uses = prompt("Enter remaining uses:");
@@ -472,7 +505,8 @@ function uploadFile(files) {
     console.log("file specs: ", files);
     var file = files[0];
     var token = GetToken();
-    if (file.size > 0) {
+    if (file.size > 0 && file.size < 536870912) {
+        document.getElementById("file-prog").style.display = "block";
         var form = new FormData();
         var xhr = new XMLHttpRequest();
         form.append("action", "upload");
@@ -480,10 +514,20 @@ function uploadFile(files) {
         form.append("upload", file);
         form.append("room", Room.data["RoomID"]);
         xhr.open("POST", "/assets/php/components/room.php");
-        xhr.upload.addEventListener("progress", uploadProgress(), false);
-        xhr.addEventListener("load", uploadComplete(this), false);
-        xhr.addEventListener("error", uploadFailed(this), false);
-        xhr.addEventListener("abort", uploadAbort(this), false);
+        xhr.upload.onprogress = function(e) {
+            $('#file-prog').progress({
+                percent: Math.ceil((e.loaded / e.total) * 100)
+            });
+        };
+        xhr.upload.onloadend = function(e) {
+                setTimeout(function(){
+                    document.getElementById("file-prog").style.display = "none";
+                    $('#file-prog').progress({
+                        percent: 0
+                    })
+                }, 5000);
+        };
+
         xhr.send(form);
 
         xhr.onreadystatechange = function () {
@@ -498,30 +542,36 @@ function uploadFile(files) {
                 }
             }
         }
+    } else {
+        console.log("Filesize invalid");
+        Toast.error(textNode("Must be under 256MB"));
     }
 }
 
 function initDragDrop() {
-    var chat = document.getElementById("upload-overlay");
-
     var doc = document;
+    var mask = document.getElementById("upload-mask");
     var xhr = new XMLHttpRequest();
 
     if (xhr.upload) {
-        doc.addEventListener("dragover", function() {document.getElementById("upload-overlay").style.display = "block";}, false);
-        //doc.addEventListener("dragleave", function() {document.getElementById("upload-overlay").style.display = "none";}, false);
-        chat.addEventListener("dragover", displayOverlay, false);
-        chat.addEventListener("dragleave", fileDragHover, false);
-        chat.addEventListener("drop", fileSelectorHandler, false);
+        doc.addEventListener("dragover", displayOverlay , false);
+        mask.addEventListener("dragleave", function() {
+            document.getElementById("upload-overlay").style.display = "none";
+            document.getElementById("upload-mask").style.display = "none";
+        }, false);
+        mask.addEventListener("drop", fileSelectorHandler, false);
     }
 }
 
 function displayOverlay(e) {
+    document.getElementById("upload-mask").style.display = "block";
     document.getElementById("upload-overlay").style.display = "block";
+
     fileDragHover(e);
 }
 function fileSelectorHandler(e) {
     document.getElementById("upload-overlay").style.display = "none";
+    document.getElementById("upload-mask").style.display = "none";
     fileDragHover(e);
     uploadFile(e.dataTransfer.files);
 }
@@ -529,52 +579,17 @@ function fileSelectorHandler(e) {
 function fileDragHover(e) {
     e.stopPropagation();    //prevent file drag from effecting parent nodes
     e.preventDefault();     //prevent web browser from responding when file is dragged over using default settings
-    //e.target.className = (e.type == "dragover" ? "hover" : "");
 }
-
-function uploadProgress(e) {
-    console.log("uploadProgress");
-    // var progressNumber = document.getElementById('progressNumber');
-    // var percentComplete = Math.round(e.loaded * 100 / e.total);
-    // var progressBar = document.getElementById('prog');
-    //
-    // if(e.lengthComputable) {
-    //     progressNumber.innerHTML = percentComplete + '%';
-    //     progressBar.value = percentComplete;
-    // } else {
-    //     progressNumber.innerHTML = 'error';
-    // }
-}
-
-function uploadComplete(e) {
-    console.log("upload complete");
-}
-
-function uploadFailed(e) {
-    console.log("error uploading file");
-}
-
-function uploadAbort(e) {
-    console.log("upload canceled by user");
-}
-
-// function updateScroll() {
-//     var element = document.getElementById("right_hand_pane");
-//     // var element2 = document.getElementById("file-log");
-//
-//     element.scrollTop = element.scrollHeight;
-//     element2.scrollTop = element.scrollHeight;
-// }
 
 function updateScroll(){
-    var element = document.getElementById("right_hand_pane");
+    var element = document.getElementById("right-hand-pane");
     element.scrollTop = element.scrollHeight;
 }
 
 function switchLog(logtype) {
     chat = document.getElementById('chat');
-    chat_tab = document.getElementById('chat_tab');
-    file_tab = document.getElementById('files_tab');
+    chat_tab = document.getElementById('chat-tab');
+    file_tab = document.getElementById('files-tab');
 
     console.log(chat_tab.className);
     console.log(chat.childNodes[1].style.display);
@@ -582,27 +597,26 @@ function switchLog(logtype) {
         chat.childNodes[1].style.display = 'none';
         chat.childNodes[3].style.display = 'block';
 
-        chat_tab.className = "nav-link chat_nav_button_inactive";
-        file_tab.className = "nav-link chat_nav_button";
+        chat_tab.className = "nav-link chat-nav-button-inactive";
+        file_tab.className = "nav-link chat-nav-button";
     }
     else {
         chat.childNodes[1].style.display = 'block';
         chat.childNodes[3].style.display = 'none';
 
-        file_tab.className = "nav-link chat_nav_button_inactive";
-        chat_tab.className = "nav-link chat_nav_button";
+        file_tab.className = "nav-link chat-nav-button-inactive";
+        chat_tab.className = "nav-link chat-nav-button";
     }
 }
 
 function putMessage(sender, _text, before, fileid) {
-    // console.log("fileid: ", fileid);
     var text;
     if (fileid)
-        text = "<a class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
+        text = "<a id='file-" + fileid + "' class='hyperlink' href='javascript:RequestDownload(" + fileid + ")'>" + _text + "</a>";
     else
         text = Autolinker.link(_text);
 
-    var messageLog = document.getElementById("chat_feed");
+    var messageLog = document.getElementById("chat-feed");
     // var fileLog = document.getElementById("file-log");
     // console.log(sender);
     var username = Room.data.Accounts[sender].ScreenName;
@@ -610,7 +624,7 @@ function putMessage(sender, _text, before, fileid) {
     var file_messages = document.createElement("div");
     var author;
 
-    if (sender == Account.data.ID) {
+    if (sender === Account.data.ID) {
         author = "<p class='author user mine uid-"+ sender + "'>";
         // file_messages.className = "message mine";
         username += " (you)";
@@ -620,7 +634,7 @@ function putMessage(sender, _text, before, fileid) {
         // file_messages.className = "message";
     }
 
-    chat_messages.innerHTML = "<div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
+    chat_messages.innerHTML = "<div class='ui fitted divider'></div><div class='content'>" + author + username + "</p><div class='text'><p>" + text + "</p></div></div>";
     //file_messages.innerHTML = "<span class='user'>" + username + "</span><br><span class='message-text'>" + text + "</span>";
     if (before) {
         messageLog.insertBefore(chat_messages, messageLog.firstChild);
@@ -634,17 +648,37 @@ function putMessage(sender, _text, before, fileid) {
     updateScroll();
 }
 
-function DownloadFile(fileurl, filename) {
-    var xhr = new XMLHttpRequest();
+function DownloadFile(fileurl, filename, fileid) {
 
-    xhr.open('GET', "https://".concat(fileurl));
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function() {
-        var blob = new Blob([xhr.response], {type: "application/octet-stream"});
-        saveAs(blob, filename.concat(".zip"));
+
+    if(document.getElementById('fileprog-' + fileid) === null) {
+        var xhr = new XMLHttpRequest();
+        var file_selected = document.getElementById("file-" + fileid);
+        var download_prog = document.createElement("div");
+        download_prog.className = "ui tiny progress";
+        download_prog.id = "fileprog-" + fileid;
+        download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
+        file_selected.appendChild(download_prog);
+
+        xhr.open('GET', "https://".concat(fileurl));
+        xhr.responseType = "arraybuffer";
+        xhr.onload = function () {
+            var blob = new Blob([xhr.response], {type: "application/octet-stream"});
+            saveAs(blob, filename.concat(".zip"));
+        };
+
+        xhr.onprogress = function (e) {
+            $('#fileprog-' + fileid).progress({
+                percent: Math.ceil((e.loaded / e.total) * 100)
+            });
+        };
+        xhr.onloadend = function (e) {
+            setTimeout(function () {
+                document.getElementById('file-' + fileid).removeChild(download_prog);
+            }, 1000);
+        };
+        xhr.send(null);
     }
-    ;
-    xhr.send(null);
 }
 
 function RequestDownload(fileid) {

@@ -41,75 +41,112 @@ if ($room) {
     <link rel="stylesheet" type="text/css" href="/assets/css/semantic.min.css">
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
-    <link rel="stylesheet" type="text/css" href="/assets/css/room2.css">
+    <link rel="stylesheet" href="/assets/css/room.css">
+    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
     <link rel="stylesheet" href="/assets/css/range.css">
+
 </head>
 
-
 <body>
+<div id="upload-mask"></div>
+<div id="upload-overlay">
+    <div id="overlay-content"><p>Drag/Drop<br>Files Here</p></div>
+</div>
+<div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
+<!--    <div class="ui styled accordion"></div>-->
+    <div class="item">
+        <button id="share-button" class="ui circular inverted green basic icon theme1 button"
+                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
+            <i class="video icon"></i>
+        </button>
+        <button class="ui circular inverted red basic icon theme1 button"
+                data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
+            <i class="remove icon"></i>
+        </button>
+    </div>
 
-<div class="ui inverted left vertical sidebar menu">
-    <div class="ui styled accordion">
-        
-
+    <div id='video-thumbnails' class="ui inverted styled accordion" style="background: transparent; min-height: 100%">
 
     </div>
 </div>
 
 <div class="pusher">
-    <div class="ui grid">
+    <div class="ui grid" style="height: 100vh">
         <div class="row">
-            <div class="ui inverted top attached menu">
-                <a class="item" id="menu">
+            <div class="ui inverted top attached theme1 menu" style="border: none !important;">
+                <a class="item" id="menu" ondragover="$('.ui.left.sidebar').sidebar('show')">
                     <i class="sidebar icon"></i>
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <button id="share_button" class="ui circular black icon right floated button"
-                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">
-                    <i class="inverted video icon"></i>
-                </button>
-                <button id="leave_button" class="ui circular black icon right floated button" data-content="Leave Room"
+<!--                <button id="share_button" class="ui circular black icon right floated theme2 button"-->
+<!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
+<!--                    <i class="inverted video theme1 icon"></i>-->
+<!--                </button>-->
+                <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
-                    <i class="inverted sign out icon"></i>
+                    <i class="inverted sign out theme1 icon"></i>
                 </button>
-                <button id="settings_button" class="ui circular black icon right floated button"
+                <button id="settings-button" class="ui circular black icon right floated theme2 button"
                         onclick="openSettings('users-tab')">
-                    <i id="settings_icon" class="inverted setting icon"></i>
+                    <i id="settings-icon" class="inverted setting theme1 icon"></i>
                 </button>
-                <div class="ui flowing popup bottom left transition inverted hidden">
-                    <div id="quick_input" style="width: 250px; display:none">
-                        <div class="ui large icon input">
-                            <input type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) quickScreenNameClose(this)">
-                            <i class="checkmark icon" style="color:#28f200"></i>
+                <div class="ui flowing popup bottom left transition inverted theme1 hidden darkgrey">
+                    <div class="ui middle aligned" style="width: 15em">
+                        <div class="row">
+                            <div id="quick-input" style="display:none">
+                                <div class="ui large fluid icon input">
+                                    <input id="quick-name-change" class="quick-input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
+                                    <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
+                                </div>
+                            </div>
+                            <div class="ui button black border theme2 fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
                         </div>
-                    </div>
-                    <div class="ui vertical buttons">
-<!--                        <div id="quick_screen_name_change" class="ui button" onclick="openSettings('users-tab')">Change Screen Name</div>-->
-                        <div class="ui button quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
-                        <div class="ui button quickbutton" onclick="openSettings('invite-tab')">Create Invite Code</div>
-                        <div class="ui button quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                        <div class="row">
+                            <div id="quick-invite" class="fluid" style="display:none">
+                                <div class="ui large fluid icon input">
+                                    <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text">
+                                    <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
+                                </div>
+                            </div>
+                            <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="quickInvite()">Create Invite Code</div>
+                        </div>
+                        <div class="row">
+                            <div class="ui button black border fluid theme2 quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                        </div>
+                        <div class="row">
+                            <div id="quick-theme-button" class="ui button black border fluid theme2 quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div id="content">
-                <div id="right_hand_pane" class="ui right fixed inverted vertical menu"
+                <div id="right-hand-pane" class="ui right fixed inverted vertical theme1 menu"
                      style="overflow-y:scroll; padding-bottom: 3em;">
-                    <div id="chat_feed" class="ui comments"></div>
+                    <div id="chat-feed" class="ui comments"></div>
 
-                    <div id="send-box" class="ui fluid action input">
-                        <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
-                        <div id="file-upload">
-                            <label for="file-input">
-                                <i class="upload icon" style="margin-top: 8px"></i>
-                            </label>
-                            <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                    <div>
+                        <div id="file-prog" class="ui progress">
+                            <div class="bar">
+                                <div class="progress"></div>
+                            </div>
                         </div>
-                        <div class="ui button" onclick="sendMessage()">Send</div>
+                        <div id="send-box" class="ui fluid action input">
+                            <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
+                            <div id="file-upload">
+                                <label for="file-input">
+                                    <i class="upload icon" style="margin-top: 8px"></i>
+                                </label>
+                                <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                            </div>
+                            <div id="send-button" class="ui button black theme2" onclick="sendMessage()">Send</div>
+                        </div>
                     </div>
-
                 </div>
             </div>
+        </div>
+        <div id="video-container"  class="ui inverted" style="width: 100%; height: 100%;margin: 10px; margin-right: 310px; overflow-y: scroll; position: relative; display: flex; justify-content: space-around">
+            <! --- VIDEO DIV -->
         </div>
     </div>
 </div>
@@ -157,11 +194,7 @@ if ($room) {
                 <div class="ui inverted divider"></div>
                 <table class="ui celled table" style="">
                     <thead style="position: fixed; ">
-                    <tr>
-<!--                        <th colspan="3">-->
-<!--                            <div class="ui button green" onclick="createInvite()">Create Invite Code</div>-->
-<!--                        </th>-->
-                    </tr>
+                    <tr></tr>
                     </thead>
                 </table>
             </div>
@@ -203,31 +236,18 @@ if ($room) {
                             <h3 class="ui header">Video Source</h3>
                             <select class="ui dropdown fluid" id="videoSource"></select>
                         </div>
-
-                        <!--                        <video id="video" autoplay></video>-->
                     </div>
-                    <!--                    <div class="ui grid padded ">-->
-                    <!--                        <div class="row column">-->
                 </div>
 
             </div>
         </div>
     </div>
     <div class="actions">
-        <!--                            <div class="four wide right floated column">-->
         <div class="ui positive right labeled icon button" onclick="closeSettings()">
             Done
             <i class="checkmark icon"></i>
         </div>
-        <!--                            </div>-->
-        <!--                        </div>-->
-        <!--                    </div>-->
     </div>
-</div>
-
-<!--    </div>-->
-
-
 </div>
 
 </body>
@@ -246,37 +266,43 @@ if ($room) {
 <script src="/assets/js/peer.js"></script>
 <script src="/assets/js/Autolinker.js"></script>
 <script src="/assets/js/MediaStreams.js"></script>
+<script src="/assets/js/Sortable.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/main.js"></script>
 <script>
 
     $(document).ready(function () {
+
+        if(getCookie("theme") === "light")
+            resetTheme();
+
         $('.ui.accordion')
             .accordion({
                 exclusive: false
-            })
-        ;
+            });
 
         $('.tabular.menu .item').tab();
 
         $('.ui.left.sidebar').sidebar({
             dimPage: false,
-            transition: 'overlay'
+            transition: 'overlay',
+            closable:false,
         })
-            .sidebar('attach events', '#menu');
-        ;
+            .sidebar('attach events', '#menu')
+            .sidebar("show");
 
         $('.ui.dropdown').dropdown();
 
-        $("#settings_button")
+        $("#settings-button")
             .popup({
                 inline: true,
                 hoverable: true,
                 position: 'bottom left',
                 delay: {
                     hide: 400
-                }
+                },
+                onHidden: quickMenuClose
             })
             .rotate({
                 bind: {
@@ -287,16 +313,24 @@ if ($room) {
                         })
                     }
                 }
-            })
-//            .onApprove({
-//                $('.ui.modal')
-//            .modal('show')
-//        ;
-//            })
-        ;
+            });
 
+        $("#regen-code")
+            .rotate({
+                bind: {
+                    mouseover: function () {
+                        $(this).rotate({
+                            angle: 0,
+                            animateTo: 360
+                        })
+                    }
+                }
+            });
 
-        $("#leave_button")
+        $("#leave-button")
+            .popup();
+
+        $("#share-button")
             .popup();
 
         updateScroll();
@@ -328,15 +362,25 @@ if ($room) {
 
             }
         }
-
-
+        var thumbnails = document.getElementById("video-thumbnails");
+        var videoContainer = document.getElementById("video-container");
+        Sortable.create(thumbnails, { group: "videos" , onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        } });
+        Sortable.create(videoContainer, { group: "videos", onAdd:function (event) {
+            console.log(event);
+            var video = event.item.querySelector('video');
+            video.play();
+        } });
     });
 
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
     window.addEventListener("load", function () {
-        if (window.File && window.FileList && window.FileReader) {
-//            initDragDrop();
-        }
+//        if (window.File && window.FileList && window.FileReader) {
+            initDragDrop();
+//        }
     });
 
     Account.data = <?=$account->getJSON()?>;
@@ -355,21 +399,15 @@ if ($room) {
     }
     function quickScreenNameChange() {
         document.getElementsByClassName("quickbutton")[0].style.display = "none";
-        document.getElementsByClassName("quickbutton")[1].style.display = "none";
-        document.getElementsByClassName("quickbutton")[2].style.display = "none";
-        document.getElementById("quick_input").style.display = "block";
+        document.getElementById("quick-input").style.display = "inline";
+        document.getElementById("quick-name-change").focus();
     }
 
-    function quickScreenNameClose(event) {
+    function quickMenuClose() {
         document.getElementsByClassName("quickbutton")[0].style.display = "block";
         document.getElementsByClassName("quickbutton")[1].style.display = "block";
-        document.getElementsByClassName("quickbutton")[2].style.display = "block";
-        document.getElementById("quick_input").style.display = "none";
-        if(event.value != ""){
-//            Account.changeName(event.value);
-            changeScreenName(event.value);
-
-        }
+        document.getElementById("quick-input").style.display = "none";
+        document.getElementById("quick-invite").style.display ="none";
     }
     function closeSettings() {
         $('.ui.modal')
@@ -394,17 +432,49 @@ if ($room) {
         });
     }
 
-    function updateUserInfo(accountID, nickname) {
+    function toggleTheme(elem) {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+        var themeChoice = getCookie("theme");
 
-//        console.log("account: ", accountID);
-//        console.log("nickname", nickname);
-//        console.log(Room.data.Accounts[accountID]);
-          Room.data.Accounts[accountID].ScreenName= nickname;
+        if(themeChoice === "dark"){
+            setCookie("theme", "light");
+            resetTheme();
+            swapStyleSheet("room_light.css");
+        } else {
+            setCookie("theme", "dark");
+
+            [].forEach.call(themed_elems, function(e) {
+                e.classList.add("inverted");
+            });
+            [].forEach.call(colored_elems, function(e) {
+                e.classList.add("black");
+            });
+            swapStyleSheet("room_dark.css");
+            elem.innerHTML = "Light Theme"
+        }
+    }
+
+    function resetTheme() {
+        var themed_elems = document.getElementsByClassName("theme1");
+        var colored_elems = document.getElementsByClassName("theme2");
+
+        [].forEach.call(themed_elems, function(e) {
+            e.classList.remove("inverted");
+        });
+        [].forEach.call(colored_elems, function(e) {
+            e.classList.remove("black");
+        });
+        document.getElementById("quick-theme-button").innerHTML = "Dark Theme"
+    }
+
+    function swapStyleSheet(sheet) {
+        document.getElementById("pagestyle").setAttribute("href", "/assets/css/" + sheet);
+    }
+
+    function updateUserInfo(accountID, nickname) {
+        Room.data.Accounts[accountID].ScreenName= nickname;
         $('.uid-'+accountID ).html(nickname);
-//
-//        document.getElementById('UN' + accountID.toString()).innerHTML = nickname;
-//        document.getElementById('UN' + accountID.toString() + 'mainScreen').innerHTML = nickname;
-//        document.getElementById("modalUsername").innerHTML = nickname;
     }
 
     function newUserSet(size, target) {
@@ -482,9 +552,6 @@ if ($room) {
         }
     }
 
-    function selectAudioSettings() {
-
-    }
     function minimizeDiv(event) {
         var target = event.target;
         if (event.target.id[0] == 'N') {
