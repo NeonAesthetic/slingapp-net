@@ -257,7 +257,7 @@ var AVC = {
             var title = document.createElement("div");
             var content = document.createElement("div");
             video = document.createElement("video");
-            var sn = snFromId(id);
+            var sn = Room.snFromId(id);
             if (id == Account.data.ID){
                 sn = "<span class='user mine uid-" + id + "'>" + sn + "</span><a id='video-chat-status' style='float:right;'></a> ";
             }

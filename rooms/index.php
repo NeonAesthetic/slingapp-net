@@ -42,7 +42,7 @@ if ($room) {
     <link rel='stylesheet prefetch'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
     <link rel="stylesheet" href="/assets/css/room.css">
-    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "dark") ? "/assets/css/room_dark.css" : "/assets/css/room_light.css" ?>>
+    <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "light") ? "/assets/css/room_light.css" : "/assets/css/room_dark.css"?>>
     <link rel="stylesheet" href="/assets/css/range.css">
 
 </head>
@@ -53,7 +53,6 @@ if ($room) {
     <div id="overlay-content"><p>Drag/Drop<br>Files Here</p></div>
 </div>
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
-<!--    <div class="ui styled accordion"></div>-->
     <div class="item">
         <button id="share-button" class="ui circular inverted green basic icon theme1 button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
@@ -79,16 +78,12 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-<!--                <button id="share_button" class="ui circular black icon right floated theme2 button"-->
-<!--                        data-content="Share Your Screen" onclick="AVC.connectScreenCapture()">-->
-<!--                    <i class="inverted video theme1 icon"></i>-->
-<!--                </button>-->
                 <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>
                 </button>
                 <button id="settings-button" class="ui circular black icon right floated theme2 button"
-                        onclick="openSettings('users-tab')">
+                        onclick="Settings.openSettings('users-tab')">
                     <i id="settings-icon" class="inverted setting theme1 icon"></i>
                 </button>
                 <div class="ui flowing popup bottom left transition inverted theme1 hidden darkgrey">
@@ -96,26 +91,26 @@ if ($room) {
                         <div class="row">
                             <div id="quick-input" style="display:none">
                                 <div class="ui large fluid icon input">
-                                    <input id="quick-name-change" class="quick-input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) changeScreenName(this.value)">
-                                    <i class="checkmark link green icon" onclick="changeScreenName(previousElementSibling.value)"></i>
+                                    <input id="quick-name-change" class="quick-input" type="text" placeholder="New Screen Name..." onkeypress="if (event.keyCode == 13) Settings.changeScreenName(this.value)">
+                                    <i class="checkmark link green icon" onclick="Settings.changeScreenName(previousElementSibling.value)"></i>
                                 </div>
                             </div>
-                            <div class="ui button black border theme2 fluid quickbutton" onclick="quickScreenNameChange()">Change Screen Name</div>
+                            <div class="ui button black border theme2 fluid quickbutton" onclick="Settings.quickScreenNameChange()">Change Screen Name</div>
                         </div>
                         <div class="row">
                             <div id="quick-invite" class="fluid" style="display:none">
                                 <div class="ui large fluid icon input">
-                                    <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text">
-                                    <i id="regen-code" class="repeat link grey icon" onclick="newInvite()"></i>
+                                    <input id="quick-invite-textbox" class="quick-input" value="generating..." type="text" onclick="Settings.copyCode()" data-position="left center" data-variation="inverted">
+                                    <i id="regen-code" class="repeat link grey icon" onclick="Settings.quickInvite(true)"></i>
                                 </div>
                             </div>
-                            <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="quickInvite()">Create Invite Code</div>
+                            <div id="quick-invite-button" class="ui button black border fluid theme2 quickbutton" onclick="Settings.quickInvite()">Create Invite Code</div>
                         </div>
                         <div class="row">
-                            <div class="ui button black border fluid theme2 quickbutton" onclick="openSettings('audio-tab')">Media Settings</div>
+                            <div class="ui button black border fluid theme2 quickbutton" onclick="Settings.openSettings('audio-tab')">Media Settings</div>
                         </div>
                         <div class="row">
-                            <div id="quick-theme-button" class="ui button black border fluid theme2 quickbutton" onclick="toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
+                            <div id="quick-theme-button" class="ui button black border fluid theme2 quickbutton" onclick="Settings.toggleTheme(this)"><?php echo ($_COOKIE['theme'] == "light") ? "Dark Theme" : "Light Theme" ?></div>
                         </div>
                     </div>
                 </div>
@@ -132,14 +127,14 @@ if ($room) {
                             </div>
                         </div>
                         <div id="send-box" class="ui fluid action input">
-                            <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) sendMessage()">
+                            <input type="text" placeholder="Message..." onkeypress="if (event.keyCode == 13) Chat.sendMessage()">
                             <div id="file-upload">
                                 <label for="file-input">
                                     <i class="upload icon" style="margin-top: 8px"></i>
                                 </label>
-                                <input id="file-input" name="upload-file" type="file" onchange="uploadFile(this.files)"/>
+                                <input id="file-input" name="upload-file" type="file" onchange="Chat.uploadFile(this.files)"/>
                             </div>
-                            <div id="send-button" class="ui button black theme2" onclick="sendMessage()">Send</div>
+                            <div id="send-button" class="ui button black theme2" onclick="Chat.sendMessage()">Send</div>
                         </div>
                     </div>
                 </div>
@@ -181,7 +176,7 @@ if ($room) {
                         <th style="width: 58%">Creator</th>
                         <th style="width: 8%">Uses</th>
                         <th colspan="3">
-                            <div class="ui button green" onclick="createInvite()">Create Code</div>
+                            <div class="ui button green" onclick="Settings.createInvite()">Create Code</div>
                         </th>
                     </tr>
                     </thead>
@@ -243,7 +238,7 @@ if ($room) {
         </div>
     </div>
     <div class="actions">
-        <div class="ui positive right labeled icon button" onclick="closeSettings()">
+        <div class="ui positive right labeled icon button" onclick="Settings.closeSettings()">
             Done
             <i class="checkmark icon"></i>
         </div>
@@ -271,310 +266,12 @@ if ($room) {
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/main.js"></script>
 <script>
-
-    $(document).ready(function () {
-
-        if(getCookie("theme") === "light")
-            resetTheme();
-
-        $('.ui.accordion')
-            .accordion({
-                exclusive: false
-            });
-
-        $('.tabular.menu .item').tab();
-
-        $('.ui.left.sidebar').sidebar({
-            dimPage: false,
-            transition: 'overlay',
-            closable:false,
-        })
-            .sidebar('attach events', '#menu')
-            .sidebar("show");
-
-        $('.ui.dropdown').dropdown();
-
-        $("#settings-button")
-            .popup({
-                inline: true,
-                hoverable: true,
-                position: 'bottom left',
-                delay: {
-                    hide: 400
-                },
-                onHidden: quickMenuClose
-            })
-            .rotate({
-                bind: {
-                    mouseover: function () {
-                        $(this).children("i").rotate({
-                            angle: 0,
-                            animateTo: 45
-                        })
-                    }
-                }
-            });
-
-        $("#regen-code")
-            .rotate({
-                bind: {
-                    mouseover: function () {
-                        $(this).rotate({
-                            angle: 0,
-                            animateTo: 360
-                        })
-                    }
-                }
-            });
-
-        $("#leave-button")
-            .popup();
-
-        $("#share-button")
-            .popup();
-
-        updateScroll();
-
-        checkInVol();
-        checkOutVol();
-        $('#range-1').range({
-            min: 0,
-            max: 100,
-            start: getCookie('inVol'),
-            onChange: function (value) {
-                $('#display-1').html(value);
-                setCookie('inVol', value, 365);
-            }
-        });
-        $('#range-2').range({
-            min: 0,
-            max: 100,
-            start: getCookie('outVol'),
-            onChange: function (value) {
-                $('#display-2').html(value);
-                setCookie('outVol', value, 365);
-            }
-        });
-        for (var key in Room.data.RoomCodes) {
-            if (Room.data.RoomCodes.hasOwnProperty(key)) {
-                var code = Room.data.RoomCodes[key];
-                appendInviteCode(code);
-
-            }
-        }
-        var thumbnails = document.getElementById("video-thumbnails");
-        var videoContainer = document.getElementById("video-container");
-        Sortable.create(thumbnails, { group: "videos" , onAdd:function (event) {
-            console.log(event);
-            var video = event.item.querySelector('video');
-            video.play();
-        } });
-        Sortable.create(videoContainer, { group: "videos", onAdd:function (event) {
-            console.log(event);
-            var video = event.item.querySelector('video');
-            video.play();
-        } });
-    });
-
     var Account = JSON.parse('<?=$account ? $account->getJSON() : '{}'?>');
-    window.addEventListener("load", function () {
-//        if (window.File && window.FileList && window.FileReader) {
-            initDragDrop();
-//        }
-    });
 
     Account.data = <?=$account->getJSON()?>;
     AVC.id = Account.data.ID;
     Room.data = <?=$room->getJSON()?>;
     Messages = <?=$room->getMessages()?>;
-
-    function openSettings(tab) {
-        $('.ui.modal')
-            .modal('show')
-        ;
-        $('.modal a.' + tab)
-            .click()
-        ;
-
-    }
-    function quickScreenNameChange() {
-        document.getElementsByClassName("quickbutton")[0].style.display = "none";
-        document.getElementById("quick-input").style.display = "inline";
-        document.getElementById("quick-name-change").focus();
-    }
-
-    function quickMenuClose() {
-        document.getElementsByClassName("quickbutton")[0].style.display = "block";
-        document.getElementsByClassName("quickbutton")[1].style.display = "block";
-        document.getElementById("quick-input").style.display = "none";
-        document.getElementById("quick-invite").style.display ="none";
-    }
-    function closeSettings() {
-        $('.ui.modal')
-            .modal('hide')
-        ;
-    }
-
-    function snFromId(id) {
-        return Room.data.Accounts[id].ScreenName;
-    }
-
-    function appendInviteCode(code) {
-        var table = document.getElementById('invite-code-table');
-        var row = document.createElement('tr');
-        row.innerHTML = "<td>" + code.Code + "</td><td>" + snFromId(code.Creator) + "</td><td>" + + "</td><td>" + +"</td>";
-        table.appendChild(row);
-    }
-    function createInvite() {
-        API.room.createInvite(Room.data.RoomID, function (data) {
-            console.log(data);
-            appendInviteCode(data.code);
-        });
-    }
-
-    function toggleTheme(elem) {
-        var themed_elems = document.getElementsByClassName("theme1");
-        var colored_elems = document.getElementsByClassName("theme2");
-        var themeChoice = getCookie("theme");
-
-        if(themeChoice === "dark"){
-            setCookie("theme", "light");
-            resetTheme();
-            swapStyleSheet("room_light.css");
-        } else {
-            setCookie("theme", "dark");
-
-            [].forEach.call(themed_elems, function(e) {
-                e.classList.add("inverted");
-            });
-            [].forEach.call(colored_elems, function(e) {
-                e.classList.add("black");
-            });
-            swapStyleSheet("room_dark.css");
-            elem.innerHTML = "Light Theme"
-        }
-    }
-
-    function resetTheme() {
-        var themed_elems = document.getElementsByClassName("theme1");
-        var colored_elems = document.getElementsByClassName("theme2");
-
-        [].forEach.call(themed_elems, function(e) {
-            e.classList.remove("inverted");
-        });
-        [].forEach.call(colored_elems, function(e) {
-            e.classList.remove("black");
-        });
-        document.getElementById("quick-theme-button").innerHTML = "Dark Theme"
-    }
-
-    function swapStyleSheet(sheet) {
-        document.getElementById("pagestyle").setAttribute("href", "/assets/css/" + sheet);
-    }
-
-    function updateUserInfo(accountID, nickname) {
-        Room.data.Accounts[accountID].ScreenName= nickname;
-        $('.uid-'+accountID ).html(nickname);
-    }
-
-    function newUserSet(size, target) {
-        if (size == 'small') {   //Small + no EventTarget sent
-            for (var key in Room.data.Accounts) {
-                if (Room.data.Accounts.hasOwnProperty(key)) {
-                    var account = Room.data.Accounts[key];
-                    //Check to make sure that this user div does not already exist
-                    if (document.getElementById('NU' + key.toString()) == null) {
-                        console.log("in New User Set");
-                        var newUser = document.createElement('div');
-                        newUser.id = 'NU' + key.toString();
-                        newUser.className = 'roomSide';
-                        document.getElementById('screensList').appendChild(newUser);
-
-                        document.getElementById('NU' + key.toString()).setAttribute("onclick", "expandDiv(event)");
-                        document.getElementById('NU' + key.toString()).setAttribute("ondblclick", "sendDivToCenter(event)");
-
-                        var newUserTitle = document.createElement('div');
-                        newUserTitle.id = 'UT' + key.toString();
-                        newUserTitle.className = 'roomSideTitle';
-                        document.getElementById('NU' + key.toString()).appendChild(newUserTitle);
-
-                        var newUserName = document.createElement('span');
-                        newUserName.id = 'UN' + key.toString();
-                        newUserName.className = 'vertical-text';
-                        document.getElementById('UT' + key.toString()).appendChild(newUserName);
-
-                        document.getElementById('UN' + key.toString()).innerHTML = account.ScreenName;
-                    }
-                }
-            }
-        }
-        else {   //Large + EventTarget sent
-            for (var keyMS in Room.data.Accounts) {
-                if (Room.data.Accounts.hasOwnProperty(keyMS)) {
-                    if (target.id == 'NU' + keyMS.toString()) {
-                        //This is the target Screen we want to make a large version of
-
-                        var accountMS = Room.data.Accounts[keyMS];
-
-                        console.log("in New User Set");
-                        var newUserMS = document.createElement('div');
-                        newUserMS.id = 'NU' + keyMS.toString() + 'mainScreen';
-                        newUserMS.className = 'screen';
-                        document.getElementById('ScreenContainer').appendChild(newUserMS);
-
-                        var newUserTitleMS = document.createElement('div');
-                        newUserTitleMS.id = 'UT' + keyMS.toString() + 'mainScreen';
-                        newUserTitleMS.className = 'roomSideTitleMS';
-                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').appendChild(newUserTitleMS);
-
-                        var newUserNameMS = document.createElement('span');
-                        newUserNameMS.id = 'UN' + keyMS.toString() + 'mainScreen';
-                        newUserNameMS.className = 'vertical-text';
-                        document.getElementById('UT' + keyMS.toString() + 'mainScreen').appendChild(newUserNameMS);
-
-                        document.getElementById('UN' + keyMS.toString() + 'mainScreen').innerHTML = accountMS.ScreenName;
-
-                        document.getElementById('NU' + keyMS.toString() + 'mainScreen').setAttribute("onclick", "returnDivToSide(event)");
-                    }
-                }
-            }
-        }
-    }
-    //These all only Remain until page reload, they are wiped then.
-    function expandDiv(event) {
-        var target = event.target;
-        if (event.target.id[0] == 'N') {
-            if (target != null) {
-                console.log(event.target.id);
-                target.className = 'eRoomSide';
-                target.setAttribute("onclick", "minimizeDiv(event)");
-            }
-        }
-    }
-
-    function minimizeDiv(event) {
-        var target = event.target;
-        if (event.target.id[0] == 'N') {
-            if (target != null) {
-                target.className = 'roomSide';
-                target.setAttribute("onclick", "expandDiv(event)");
-            }
-        }
-    }
-    function sendDivToCenter(event) {
-        var target = event.target;
-        if (target != null && document.getElementById(target.id.toString() + 'mainScreen') == null) {
-            newUserSet('large', target);
-        }
-    }
-    function returnDivToSide(event) {
-        var target = event.target;
-        if (target != null) {
-            var item = document.getElementById(target.id);
-            item.parentNode.removeChild(item);
-        }
-    }
-
 </script>
 
 </html>
