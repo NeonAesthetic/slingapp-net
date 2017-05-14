@@ -53,16 +53,32 @@ if ($room) {
     <div class="item">
         <button id="share_button" class="ui circular inverted green basic icon button"
                 data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
-            <i class="video icon"></i>
+            <i class="desktop icon"></i>
         </button>
         <button class="ui circular inverted red basic icon button"
                 data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
             <i class="remove icon"></i>
         </button>
+        <button class="ui circular inverted blue basic icon button right floated"
+                data-tooltip="Enter Voice Channel" data-position="left center" onclick="AVC.enterVoiceChannel()">
+            <i class="call icon"></i>
+        </button>
     </div>
 
     <div id='video-thumbnails' class="ui inverted styled accordion" style="background: transparent; min-height: 100%">
+        <div class="wrapper" id="preview-<?=$account->getAccountID()?>">
+            <div class="title">
+                <i class='dropdown icon'></i>
+                <span class="user mine uid-<?=$account->getAccountID()?>"><?=$account->getScreenName()?></span>
+                <a class="video-status ui circular button mini icon inverted right floated red" data-position="top right"><i class="icon desktop"></i></a>
+                <a class="audio-status ui circular button mini icon inverted right floated red" data-position="top right"><i class="icon call"></i></a>
+            </div>
+            <div class="content">
+                <video class="user-video-preview" autoplay ondblclick="this.webkitRequestFullScreen()">
 
+                </video>
+            </div>
+        </div>
     </div>
 </div>
 

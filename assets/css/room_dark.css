@@ -142,3 +142,11 @@
     color: white;
     font-weight: 600;
 }
+
+
+.user-video-preview{
+    background-color: #252525;
+    border: 1px solid #333;
+    max-width: 100%;
+    max-height: calc(100vh - 80px);
+}

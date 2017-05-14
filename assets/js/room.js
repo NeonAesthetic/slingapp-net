@@ -147,9 +147,13 @@ var Room = {
                     var accountID = message.id;
                     var sn = message.nick;
                     Room.data.Accounts[accountID] = {ScreenName: sn, ID: accountID};
+                    AVC.getUserPreviewNode(accountID);
+                    if(AVC.audioConnected){
+                        AVC.getPeerAudioStream(accountID + "a");
+                    }
+
                     AVC.getPeerVideoStream(accountID + "v", function (stream) {
                         var id = peerid;
-                        console.log('got peer video');
                         AVC.setPeerVideoNode(id, stream);
                     });
                 } break;
