@@ -78,6 +78,7 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
+                <p class="ui user mine theme2" id="u_name" style="margin-top: 1em ">Screen Name</p>
                 <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>
@@ -169,6 +170,8 @@ if ($room) {
             </div>
 
             <div class="ui tab" data-tab="tab-name1" style="overflow-y: scroll">
+                <div class="ui container">
+                <div class="ui" style=" padding-bottom: 5em; position: fixed; z-index: 999">
                 <table class="ui celled table" style="">
                     <thead style="position: fixed; ">
                     <tr>
@@ -181,18 +184,17 @@ if ($room) {
                     </tr>
                     </thead>
                 </table>
-                <div class="ui inverted divider"></div>
-                <table class="ui celled table" style="">
-                    <tbody id="invite-code-table" style="">
-                    </tbody>
-                </table>
-                <div class="ui inverted divider"></div>
-                <table class="ui celled table" style="">
-                    <thead style="position: fixed; ">
-                    <tr></tr>
-                    </thead>
-                </table>
+                </div>
+                    <div class="ui" style=" padding-bottom: 5em;"></div>
+                    <div class="ui segment">
+                        <table class="ui celled table" style="">
+                            <tbody id="invite-code-table" style="">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
             <div class="ui tab" data-tab="tab-name2">
                 <div class="ui segment">
                     <h3 class="ui header">Media Settings</h3>
