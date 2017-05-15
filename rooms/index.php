@@ -179,7 +179,7 @@ if ($room) {
             </div>
 
             <div class="ui tab" data-tab="tab-name1" style="overflow-y: scroll">
-                <table class="ui selectable celled table" style="">
+                <table class="ui selectable celled table">
                     <thead style="">
                     <tr style="">
                         <th style="position: fixed; width: 22%;">Code</th>
