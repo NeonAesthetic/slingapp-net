@@ -165,7 +165,12 @@ if ($room) {
         <div class="twelve wide stretched column">
             <div class="ui tab" data-tab="tab-name">
                 <div class="ui segment">
-                    This is an stretched grid column. This AFFsegment will always match the tab height
+                    <?php
+                            $users = $room->getParticipants();
+                            foreach ($users as $user){
+                                ?> <div> <?=$user?> </div> <?php
+                            }
+                    ?>
                 </div>
             </div>
 

@@ -11,21 +11,11 @@ assert_options(ASSERT_WARNING, 0);
 assert_options(ASSERT_QUIET_EVAL, 0);
 
 $GLOBALS['TEST_FAILED'] = false;
-
 set_include_path(realpath($_SERVER["DOCUMENT_ROOT"]) . "/assets/php/");
 
-function create_test_json(){
-    $GLOBALS['json'] = [];
-    $GLOBALS['json']["type"] = "Test Results";
-    $GLOBALS['json']["success"] = false;
-    $GLOBALS['json']["total-time"] = 0;
-    $GLOBALS['json']["timing"] = [];
-    $GLOBALS['json']["output"] = null;
-}
-
-
 function test_end(){
-    $GLOBALS["json"]["output"] = ob_get_clean();
+    $GLOBALS["TEST_OUTPUT"] = ob_get_clean();
+//    echo $GLOBALS["TEST_OUTPUT"];
     if(function_exists("cleanup"))
         call_user_func("cleanup");
 }
@@ -42,70 +32,35 @@ function assert_handler($file, $line, $code, $desc = null)
     fail_test();
 };
 
-function get_fatal_error(){
-    $error = error_get_last();
-    $str = null;
-    if($error)
-        $str = "PHP Fatal Error on line " . $error["line"] . " in file " . $error['file'] . ": " . $error['message'];
-    return $str;
-}
-
-
 register_shutdown_function(function (){
     test_end();
-    $error = get_fatal_error();
-    if($error){
-        $GLOBALS['json']['output'] .= $error;
-        fail_test();
-    }
     if($GLOBALS['TEST_FAILED']){
-        $GLOBALS["json"]["success"] = false;
+        echo "<span class='test-fail'>Test Failed</span><br>";
+//        echo $GLOBALS["TEST_OUTPUT"];
     }else{
-        if(isset($GLOBALS['RunTime']))
-            $ms = round($GLOBALS['RunTime']*1000, 3);
-        $GLOBALS["json"]["success"] = true;
+        echo "<span class='test-pass'>Test Passed</span><br>";
     }
-    echo json_encode($GLOBALS["json"]);
+    echo $GLOBALS["TEST_OUTPUT"];
 
 
 });
-
 assert_options(ASSERT_CALLBACK, 'assert_handler');
 
 set_exception_handler(function(Throwable $exception){
     echo "PHP Exception on line " . $exception->getLine() . " of " . $exception->getFile() . ". " . $exception->getMessage() . "<br>";
+//    var_dump($exception->getTrace());
+
     fail_test();
 });
-
-set_error_handler(function($errno, $errstr, $errfile, $errline){
+set_error_handler(function($errno, $errstr, $errline, $errfile){
     echo "PHP Error: " . $errstr . " at line " . $errline . " in " . $errfile . "<br>";
     fail_test();
 });
 
-
-
-function mark($comment = null){
-    static $start = 0;
-    if($comment == null){
-        $start = microtime(true);
-    }else{
-        $end = microtime(true);
-        $elapsed = ($end - $start);
-        echo $comment . ": <span class='timing-value'>" . round($elapsed * 1000, 3) . "</span> ms <br>";
-        $start = $end;
-    }
-}
-
 if(isset($_GET['test'])){
     ob_start();
-    $start = microtime(true);
-    create_test_json();
 
-    include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/". $_GET["test"]);
-
-    
-    $end = microtime(true);
-    $GLOBALS["json"]["total-time"] = round(($end - $start)*1000, 3);
+    include(realpath($_SERVER['DOCUMENT_ROOT']) . "/testing/tests/". $_GET["test"]);
 }else{
     echo "Test file name was not provided<br>";
 }
