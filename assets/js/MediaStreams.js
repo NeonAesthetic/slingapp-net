@@ -246,7 +246,8 @@ var AVC = {
                 options.video.mandatory.chromeMediaSourceId = response.media_id;
                 AVC.getUserMedia(options, callback);
             }else{
-                Toast.error(textNode("Extension not installed"));
+                $('#plugin-prompt')
+                    .modal('show');
             }
         });
     },

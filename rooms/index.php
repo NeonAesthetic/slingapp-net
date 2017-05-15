@@ -55,7 +55,7 @@ if ($room) {
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
     <div class="item">
         <button id="share-button" class="ui circular inverted green basic icon theme1 button"
-                data-tooltip="Share Your Screen" data-position="right center" onclick="Room.checkExtension();">
+                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture();">
             <i class="video icon"></i>
         </button>
         <button class="ui circular inverted red basic icon theme1 button"

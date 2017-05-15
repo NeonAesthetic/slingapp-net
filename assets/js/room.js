@@ -498,21 +498,6 @@ var Room = {
             }
         });
     },
-    checkExtension: function () {
-        var extensionId = "pecpbndlndfegjibmbaplkjdkhdgmnei";
-
-        chrome.runtime.sendMessage(extensionId, { message: "version" }, function (reply) {
-            if (reply) {
-                if (reply.version) {
-                    AVC.connectScreenCapture()
-                } else {
-                    console.log("no message");
-                    $('#plugin-prompt')
-                        .modal('show');
-                }
-            }
-        });
-    },
     closePluginPrompt: function() {
         $('.ui.modal')
             .modal('hide');
