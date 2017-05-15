@@ -20,6 +20,9 @@ $(document).ready(function () {
     RoomCookies.checkInVol();
     RoomCookies.checkOutVol();
 
+    if((RoomCookies.getCookie("theme") === ""))
+        RoomCookies.setCookie("theme", "dark");
+
     for (var key in Room.data.RoomCodes) {
         if (Room.data.RoomCodes.hasOwnProperty(key)) {
             var code = Room.data.RoomCodes[key];
@@ -473,6 +476,9 @@ var Room = {
         $("#share-button")
             .popup();
 
+        $('#plugin-prompt')
+            .modal();
+
         $('#range-1').range({
             min: 0,
             max: 100,
@@ -491,6 +497,30 @@ var Room = {
                 RoomCookies.setCookie('outVol', value, 365);
             }
         });
+    },
+    checkExtension: function () {
+        var extensionId = "pecpbndlndfegjibmbaplkjdkhdgmnei";
+
+        chrome.runtime.sendMessage(extensionId, { message: "version" }, function (reply) {
+            if (reply) {
+                if (reply.version) {
+                    AVC.connectScreenCapture()
+                } else {
+                    console.log("no message");
+                    $('#plugin-prompt')
+                        .modal('show');
+                }
+            }
+        });
+    },
+    closePluginPrompt: function() {
+        $('.ui.modal')
+            .modal('hide');
+    },
+    openExtensionTab: function() {
+        console.log("here");
+        window.open('https://chrome.google.com/webstore/detail/sling-desktop-share/pecpbndlndfegjibmbaplkjdkhdgmnei', '_blank');
+        Room.closePluginPrompt();
     }
 };
 
@@ -876,7 +906,7 @@ var RoomCookies = {
         if (inVol != "") {
             //On Reload Get This value
         } else {
-            setCookie("inVol", 100, 365);
+            RoomCookies.setCookie("inVol", 100, 365);
             if (inVol != "" && inVol != null) {
                 RoomCookies.setCookie("inVol", 100, 365);
             }
