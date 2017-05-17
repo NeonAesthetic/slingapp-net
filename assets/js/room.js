@@ -499,11 +499,9 @@ var Room = {
         });
     },
     closePluginPrompt: function() {
-        $('.ui.modal')
-            .modal('hide');
+        $('#plugin-prompt').modal('hide');
     },
     openExtensionTab: function() {
-        console.log("here");
         window.open('https://chrome.google.com/webstore/detail/sling-desktop-share/pecpbndlndfegjibmbaplkjdkhdgmnei', '_blank');
         Room.closePluginPrompt();
     }

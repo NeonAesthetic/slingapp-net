@@ -257,8 +257,8 @@ if ($room) {
         </div>
     </div>
     <div class="actions">
-        <div class="ui inverted red button"><i class="icon cancel" onclick="Room.closePluginPrompt()"></i>Cancel</div>
-        <div class="ui inverted green button"><i class="icon checkmark" onclick="Room.openExtensionTab()"></i>OK</div>
+        <div class="ui inverted basic red button" onclick="Room.closePluginPrompt()"><i class="icon cancel" ></i>Cancel</div>
+        <div class="ui inverted basic green button" onclick="Room.openExtensionTab()"><i class="icon checkmark"></i>OK</div>
     </div>
 </div>
 
