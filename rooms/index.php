@@ -93,7 +93,7 @@ if ($room) {
                     <i class="users icon"></i>
                 </a>
                 <p id="r-title">Room Name</p>
-                <p class="ui user mine theme2" id="u_name" style="margin-top: 1em ">Screen Name</p>
+                <span class="user mine theme2 uid-<?=$account->getAccountID()?>" id="u_name" style="margin-top: 1em "><?=$account->getScreenName()?></span>
                 <button id="leave-button" class="ui circular black icon right floated theme2 button" data-content="Leave Room"
                         onclick="location='/'">
                     <i class="inverted sign out theme1 icon"></i>

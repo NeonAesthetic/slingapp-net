@@ -10,7 +10,6 @@ function textNode(msg) {
 $(document).ready(function () {
     window.document.title = Room.data.RoomName;
     document.getElementById("r-title").innerHTML = Room.data.RoomName;
-
     Room.connect();
     Room.SetupSemanticUI();
     Chat.init();
@@ -516,6 +515,7 @@ var UserSection = {
     updateUserInfo: function (accountID, nickname) {
         Room.data.Accounts[accountID].ScreenName = nickname;
         $('.uid-' + accountID).html(nickname);
+        document.getElementById("u_name").innerHTML = nickname;
     },
     newUserSet: function (size, target) {
         if (size == 'small') {   //Small + no EventTarget sent
