@@ -33,6 +33,12 @@ var MEDIA = {
 window.addEventListener("load", function(){
     AVC.peerVideoStream = new MediaStream();
     AVC.videoConnection = AVC.connectToPeerServer(AVC.id + "v", AVC.videoConnection, AVC.acceptPeerVideoStream);
+    AVC.connectVoice();
+    AVC.BASE_VIDEO_NODE = document.getElementById("preview-"+AVC.id).cloneNode(true);
+    var $bn = $(AVC.BASE_VIDEO_NODE);
+    $bn.find('.mine')[0].classList.remove("mine");
+    $bn.find('.button').unbind("click");
+    AVC.BASE_VIDEO_NODE = $bn[0];
 
 });
 
@@ -49,7 +55,7 @@ var AVC = {
         secure: true
 
     },
-    audioSources:[],
+    audioCalls:{},
     videoSources:[],
     peerVideoStream:null,
     audioConnected:false,
@@ -102,11 +108,10 @@ var AVC = {
     },
     connectVoice:function(){
         if(!AVC.audioConnection){
-            AVC.peerAudioID = AVC.id + "a";
-            AVC.audioConnection = new Peer(AVC.peerAudioID, AVC.options);
-
+            AVC.audioConnection = new Peer(AVC.id + "a", AVC.options);
             AVC.audioConnection.on("open", function (id) {
-                console.log("PeerID is " + id);
+                AVC.button.checkStatus();
+                console.log("Peer Audio ID is " + id);
             });
 
             AVC.audioConnection.on("call", AVC.acceptPeerAudioStream);
@@ -116,60 +121,76 @@ var AVC = {
                     console.log("Peer could not be found.");
                 }
             })
-        }else{
+        }else if(AVC.audioConnection.disconnected){
             AVC.audioConnection.reconnect();
+        }else{
+            return
         }
 
 
+
+
+    },
+    leaveVoiceChannel:function(){
+        if(AVC.audioConnection){
+            for(var peerid in AVC.audioCalls){
+                if(AVC.audioCalls.hasOwnProperty(peerid)){
+                    console.log(peerid);
+                    var call = AVC.audioCalls[peerid];
+                    console.log("Close call to peer " + call.peer);
+                    call.close();
+                }
+            }
+            AVC.audioCalls = [];
+            AVC.audioConnected = false;
+        }
+        AVC.button.checkStatus();
+    },
+    enterVoiceChannel:function(){
         var accounts = Room.data.Accounts;
-        var len = accounts.length;
+        AVC.audioConnected = true;
         console.log("Attempting to connect voice");
         for(var peerid in accounts){
             if(accounts.hasOwnProperty(peerid) && peerid != Account.data.ID){
                 console.log("Connecting to peer with id: " + peerid);
                 AVC.getPeerAudioStream(peerid + "a", function (stream) {
-                    AVC.createPeerAudioNode(stream);
+                    AVC.setUserStatus(peerid, true, null);
                 });
             }
         }
-        AVC.audioConnected = true;
-        AVC.connectButton.innerHTML = "DISCONNECT VOICE";
-        AVC.connectButton.classList.add("button-green");
-        AVC.connectButton.onclick = function () {
-            AVC.disconnectVoice();
-        }
+        AVC.button.checkStatus();
     },
-    disconnectVoice:function(){
-        AVC.audioConnection.destroy();
-        AVC.audioConnection = null;
-        console.log("Disconnecting");
-        AVC.connectButton.innerHTML = "CONNECT VOICE";
-        AVC.connectButton.classList.remove("button-green");
-        AVC.connectButton.onclick = function () {
-            AVC.connectVoice();
-        }
-    },
-
     getPeerAudioStream:function (peerid, callback) {
         AVC.createAudioStream(function (stream) {
             var call = AVC.audioConnection.call(peerid, stream);
             call.on("stream", function(stream){
-                callback(stream);
+                var peerid = call.peer.slice(0,-1);
+                AVC.setUserStatus(peerid, true, null);
+                call.node = AVC.createPeerAudioNode(stream);
+                AVC.audioCalls[call.peer] = call;
             });
+            call.on("close", function () {
+                console.log("Peer closed connection");
+                AVC.setUserStatus(call.peer.slice(0,-1), false, null);
+                console.log("GPAS on close rem");
+                document.body.removeChild(call.node);
+                delete AVC.audioCalls[call.peer];
+            });
+
         });
 
     },
     getPeerVideoStream:function (peerid, callback) {
-        console.log("Get Peer Video Stream: ", peerid);
         var call = AVC.videoConnection.call(peerid, AVC.peerVideoStream);
-        call.on("stream", callback);
+        call.on("stream", function (stream) {
+            AVC.setUserStatus(peerid, false, stream.active);
+            callback(stream);
+        });
         call.on("close", function () {
             console.info("Close");
-            var video = $('#video-' + call.peer)[0];
+            var preview = $('#preview-' + call.peer)[0];
 
-            $('.ui.sidebar .accordion').removeChild(video.divTitle);
-            $('.ui.sidebar .accordion').removeChild(video.divContent);
-            $('.ui.sidebar .accordion').removeChild(video);
+            $('.ui.sidebar .accordion').removeChild(preview);
         });
         call.on("error", function (err) {
             console.error(err);
@@ -179,23 +200,30 @@ var AVC = {
         AVC.getUserMedia(MEDIA.AUDIO, callback);
     },
     acceptPeerAudioStream:function (call) {
-        console.log("Client attempting to connect");
+        console.log("Recieving RTC Call - Audio");
+        AVC.setUserStatus(call.peer.slice(0,-1), true, null);
         if (AVC.audioConnected){
             AVC.createAudioStream(function (stream) {
                 call.answer(stream);
                 call.on("stream", function (stream) {
-                    AVC.createPeerAudioNode(stream)
+                    var peerid = call.peer.slice(0,-1);
+                    AVC.setUserStatus(peerid, true, null);
+                    call.node = AVC.createPeerAudioNode(stream);
                 });
+                call.on("close", function () {
+                    console.log("Peer closed connection");
+                    AVC.setUserStatus(call.peer.slice(0,-1), false, null);
+                    document.body.removeChild(call.node);
+                    delete AVC.audioCalls[call.peer];
+                });
+                AVC.audioCalls[call.peer] = call;
             });
         }
     },
     acceptPeerVideoStream:function(call){
-        console.log("Peer attempting to connect");
-        console.log(AVC.peerVideoStream);
+        AVC.getUserPreviewNode(call.peer.slice(0,-1));
         call.answer(AVC.peerVideoStream);
         call.on("stream", function (stream) {
-            console.log(stream);
-            console.log("Accepted Peer Media Stream");
             AVC.setPeerVideoNode(call.peer.slice(0,-1), stream);
         });
         call.on("error", function (error) {
@@ -204,11 +232,10 @@ var AVC = {
         call.on("close", function () {
             var id = call.peer.slice(0,-1);
             console.info("Disconnect: ", id);
-            var video = $('#video-' + id)[0];
+            var preview = $('#preview-' + id)[0];
 
             var accordion = $('.ui.sidebar .accordion')[0];
-            accordion.removeChild(video.divTitle);
-            accordion.removeChild(video.divContent);
+            accordion.removeChild(preview);
         });
 
 
@@ -217,15 +244,8 @@ var AVC = {
         var audioNode = createAudioSourceNode();
         audioNode.srcObject = stream;
         document.body.appendChild(audioNode);
-        AVC.audioSources.push(audioNode);
-        // audioNode.peer = peerid;
-
-    },
-    createPeerVideoNode:function (stream) {
-        var videoNode = createVideoSourceNode();
-        videoNode.src = URL.createObjectURL(stream);
-        videoNode.className = 'user-preview';
-        return videoNode;
+        console.log("appending audio node");
+        return audioNode;
     },
     connectScreenCapture:function (callback) {
         AVC.getUserScreencaptureStream(function(stream){
@@ -252,48 +272,9 @@ var AVC = {
         });
     },
     setPeerVideoNode:function(id, stream){
-        var video = document.getElementById("video-" + id);
-        if(!video){
-
-            var title = document.createElement("div");
-            var content = document.createElement("div");
-            video = document.createElement("video");
-            var sn = Room.snFromId(id);
-            if (id == Account.data.ID){
-                sn = "<span class='user mine uid-" + id + "'>" + sn + "</span><a id='video-chat-status' style='float:right;'></a> ";
-            }
-            title.className = "title";
-            title.innerHTML = "<i class='dropdown icon'></i>" + sn + "</div>";
-            content.className = "content";
-            content.style.width = "auto";
-
-            video.setAttribute("id", "video-" + id);
-            // video.setAttribute("height", 170);
-            // video.setAttribute("width", 235);
-            video.style.background = "#292929";
-            video.style.border = "1px solid #333";
-            video.style.maxHeight = "calc(100vh - 80px)";
-            video.style.maxWidth = "100%";
-
-            video.ondblclick = function(){
-                this.webkitRequestFullScreen();
-            };
-
-            video.divTitle = title;
-            video.divContent = content;
-
-
-            content.appendChild(video);
-
-            var wrapper = document.createElement("div");
-            
-            wrapper.appendChild(title);
-            wrapper.appendChild(content);
-
-            $('.ui.sidebar .accordion').append(wrapper);
-            // $('.ui.sidebar .accordion').append(content);
-        }
-
+        var userPreviewNode = AVC.getUserPreviewNode(id);
+        AVC.setUserStatus(id, null, stream.active);
+        var video = $(userPreviewNode).find('video')[0];
 
         video.srcObject = stream;
         video.autoplay=true;
@@ -311,6 +292,7 @@ var AVC = {
                 AVC.getPeerVideoStream(peerid + "v", function (stream) {
                     var id = peerid;
                     console.log('got peer video');
+                    AVC.getUserPreviewNode(id);
                     AVC.setPeerVideoNode(id, stream);
                 });
             }
@@ -325,36 +307,89 @@ var AVC = {
         }
     },
     button:{
-        stopStream:function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            AVC.disconnectVideo();
-            // if(!AVC.peerVideoStream){
-            //     AVC.button.setStatus("OFF", "#ff7777", "Start Streaming", AVC.button.startStream);
-            // }
-        },
-        startStream:function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            AVC.connectScreenCapture(function (streaming) {
-                // if (streaming) {
-                //     AVC.button.setStatus("ON", "#77ff77", "Stop Streaming", AVC.button.stopStream);
-                // }
-            });
-        },
-        setStatus:function (text, color, tooltip, onclick) {
-            var status = document.getElementById("video-chat-status");
-            status.innerHTML = text;
-            status.setAttribute("data-tooltip", tooltip);
-            status.style.color = color;
-            status.onclick = onclick;
-        },
         checkStatus:function () {
-            if(AVC.peerVideoStream && AVC.peerVideoStream.active){
-                AVC.button.setStatus("Stream ON", "#77ff77", "Stop Streaming", AVC.button.stopStream);
+            var audio = false;
+            var video = false;
+            video = (AVC.peerVideoStream && AVC.peerVideoStream.active);
+            audio = AVC.audioConnected;
+
+            AVC.setUserStatus(AVC.id, audio, video);
+        }
+    },
+    getUserPreviewNode:function(id){
+        console.log("Create node for ", id);
+        var node = document.getElementById("preview-" + id);
+        if(!node){
+
+            node = AVC.BASE_VIDEO_NODE.cloneNode(true);
+
+            node.setAttribute('id', "preview-" + id);
+            var name = node.querySelector('.title').querySelector('.user');
+            name.className = "user uid-" + id;
+            name.innerHTML = Room.snFromId(id);
+
+            $('.ui.sidebar .accordion').append(node);
+
+        }
+        return node;
+    },
+    setUserStatus:function (id, audio, video) {
+        var userPreview = AVC.getUserPreviewNode(id);
+        console.log($(userPreview).find('.audio-status')[0]);
+        var audioStatus = $(userPreview).find('.audio-status')[0];
+        var videoStatus = $(userPreview).find('.video-status')[0];
+        if (audio != null){
+            if(audio){
+                audioStatus.classList.remove("red");
+                audioStatus.classList.add("green");
+                audioStatus.setAttribute("data-tooltip", "Connected");
+                if(id == Account.data.ID)
+                    audioStatus.onclick = function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        AVC.leaveVoiceChannel();
+                    }
             }else{
-                AVC.button.setStatus("Stream OFF", "#ff7777", "Start Streaming", AVC.button.startStream);
+                audioStatus.classList.remove("green");
+                audioStatus.classList.add("red");
+                audioStatus.setAttribute("data-tooltip", "Disconnected.");
+                if(id == Account.data.ID)
+                    audioStatus.onclick = function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        AVC.enterVoiceChannel();
+                    }
             }
+        }
+
+        if(video != null){
+            if(video){
+                videoStatus.classList.remove("red");
+                videoStatus.classList.add("green");
+                videoStatus.setAttribute("data-tooltip", "Sharing");
+                if(id == Account.data.ID)
+                    videoStatus.onclick = function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        AVC.disconnectVideo();
+                    }
+            }else{
+                videoStatus.classList.remove("green");
+                videoStatus.classList.add("red");
+                videoStatus.setAttribute("data-tooltip", "Not Sharing");
+                if(id == Account.data.ID)
+                    videoStatus.onclick = function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        AVC.connectScreenCapture();
+                    }
+            }
+        }
+
+    },
+    events:{
+        peerCloseAudioConnection:function(){
+
         }
     }
 };

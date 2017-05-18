@@ -44,7 +44,6 @@ if ($room) {
     <link rel="stylesheet" href="/assets/css/room.css">
     <link id="pagestyle" rel="stylesheet" type="text/css" href=<?php echo ($_COOKIE['theme'] == "light") ? "/assets/css/room_light.css" : "/assets/css/room_dark.css"?>>
     <link rel="stylesheet" href="/assets/css/range.css">
-
 </head>
 
 <body>
@@ -54,18 +53,34 @@ if ($room) {
 </div>
 <div class="ui inverted left vertical sidebar theme1 menu" style="top: 40px;">
     <div class="item">
-        <button id="share-button" class="ui circular inverted green basic icon theme1 button"
-                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture();">
-            <i class="video icon"></i>
+        <button id="share_button" class="ui circular inverted green basic icon button"
+                data-tooltip="Share Your Screen" data-position="right center" onclick="AVC.connectScreenCapture()">
+            <i class="desktop icon"></i>
         </button>
         <button class="ui circular inverted red basic icon theme1 button"
                 data-tooltip="Stop Sharing" data-position="right center" onclick="AVC.disconnectVideo()">
             <i class="remove icon"></i>
         </button>
+        <button class="ui circular inverted blue basic icon button right floated"
+                data-tooltip="Enter Voice Channel" data-position="left center" onclick="AVC.enterVoiceChannel()">
+            <i class="call icon"></i>
+        </button>
     </div>
 
     <div id='video-thumbnails' class="ui inverted styled accordion" style="background: transparent; min-height: 100%">
+        <div class="wrapper" id="preview-<?=$account->getAccountID()?>">
+            <div class="title">
+                <i class='dropdown icon'></i>
+                <span class="user mine uid-<?=$account->getAccountID()?>"><?=$account->getScreenName()?></span>
+                <a class="video-status ui circular button mini icon inverted right floated red" data-position="top right"><i class="icon desktop"></i></a>
+                <a class="audio-status ui circular button mini icon inverted right floated red" data-position="top right"><i class="icon call"></i></a>
+            </div>
+            <div class="content">
+                <video class="user-video-preview" autoplay ondblclick="this.webkitRequestFullScreen()">
 
+                </video>
+            </div>
+        </div>
     </div>
 </div>
 
