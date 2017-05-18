@@ -121,7 +121,7 @@
                             </div>
 
                             <div class="ui two buttons fluid">
-                                <button onclick="SubmitLoginForm()" type="button" class="ui button primary" style="">
+                                <button onclick="SubmitLoginForm()" type="button" class="ui button primary">
                                     Sign in
                                 </button>
                                 <div class="or"></div>
@@ -164,8 +164,6 @@
                         </p>
                     </div>
                 </div>
-
-
             </div>
             <div class="ui column very padded"  style="">
                 <form class="ui form" id="registerForm" style="">
