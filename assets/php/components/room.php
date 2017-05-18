@@ -97,9 +97,9 @@ switch ($p['action']) {
         $alias = randStrGen();
         $uploadfldr = $_SERVER['DOCUMENT_ROOT'] . '/uploads/';
         $uploadDir = $uploadfldr . $p['room'] . "/";
-        $urlPath = $_SERVER['SERVER_NAME'] . '/uploads/' . $p['room'] . "/" . $alias;
+//        $urlPath = $_SERVER['SERVER_NAME'] . '/uploads/' . $p['room'] . "/" . $alias;
         $fullPath = $uploadDir . $alias;
-
+        $databaseDir = '/uploads/' . $p['room'] . "/" . $alias . ".zip";
         if (!file_exists($uploadfldr))
             mkdir($uploadfldr);
 
@@ -112,7 +112,7 @@ switch ($p['action']) {
                 $zip->close();
                 unlink($fullPath);
 
-                $fileJSON = File::Insert($urlPath . ".zip", $fileName);
+                $fileJSON = File::Insert($databaseDir, $fileName);
                 echo ($fileJSON) ? $fileJSON : json_encode(false);
         }
         else

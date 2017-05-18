@@ -176,7 +176,7 @@ var Chat = {
             download_prog.innerHTML = "<div class='bar'> <div class='progress'></div> </div>";
             file_selected.appendChild(download_prog);
 
-            xhr.open('GET', "https://".concat(fileurl));
+            xhr.open('GET', fileurl);
             xhr.responseType = "arraybuffer";
             xhr.onload = function () {
                 var blob = new Blob([xhr.response], {type: "application/octet-stream"});
