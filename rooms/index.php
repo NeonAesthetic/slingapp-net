@@ -180,6 +180,8 @@ if ($room) {
         <div class="twelve wide stretched column">
             <div class="ui tab" data-tab="tab-name">
                 <div class="ui segment">
+                    <h3 class="ui header">Users</h3>
+                    <div class="ui section divider"></div>
                     <?php
                             $users = $room->getParticipants();
                             foreach ($users as $user){
