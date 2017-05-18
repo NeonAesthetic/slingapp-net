@@ -266,13 +266,14 @@ var AVC = {
                 options.video.mandatory.chromeMediaSourceId = response.media_id;
                 AVC.getUserMedia(options, callback);
             }else{
-                Toast.error(textNode("Extension not installed"));
+                $('#plugin-prompt')
+                    .modal('show');
             }
         });
     },
     setPeerVideoNode:function(id, stream){
         var userPreviewNode = AVC.getUserPreviewNode(id);
-        AVC.setUserStatus(id, false, stream.active);
+        AVC.setUserStatus(id, null, stream.active);
         var video = $(userPreviewNode).find('video')[0];
 
         video.srcObject = stream;
@@ -325,7 +326,7 @@ var AVC = {
             node.setAttribute('id', "preview-" + id);
             var name = node.querySelector('.title').querySelector('.user');
             name.className = "user uid-" + id;
-            name.innerHTML = snFromId(id);
+            name.innerHTML = Room.snFromId(id);
 
             $('.ui.sidebar .accordion').append(node);
 

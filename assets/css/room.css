@@ -1,0 +1,171 @@
+.pusher {
+    border: none !important;
+}
+
+.screen {
+    position: fixed;
+
+}
+
+.text {
+    margin-bottom: .45em;
+}
+
+.ui.comments {
+    font-size: .9em;
+}
+.ui.right.fixed.menu {
+    width: 300px!important;
+}
+
+.ui.top.menu{
+    margin: 0 1em 0 1em;
+    z-index: 999;
+}
+.ui.fluid.action.input {
+    position:fixed;
+    width:280px;
+    right:10px;
+    bottom:20px;
+}
+
+.progress {
+    display: none;
+}
+
+*[id^='fileprog-']{
+    margin-bottom: 0!important;
+}
+
+.darkgrey {
+    background-color: #27292a !important;
+    border: none !important;
+}
+#file-prog {
+    display: none;
+    position:fixed;
+    width:280px;
+    right:10px;
+    bottom:0;
+}
+#send-box input {
+    border: none;
+}
+
+.quick-input {
+    background-color: #e0e1e2 !important;
+    text-align: center !important;
+    color: #5a5a5a !important;
+}
+
+.author.user {
+    margin-bottom: 0;
+    margin-top: .45em;
+}
+
+.user {
+    margin-right: 10px;
+}
+
+.hyperlink {
+    text-decoration: underline;
+}
+#chat-feed {
+    margin: 3em 1.5em
+}
+
+#file-upload{
+    width:25px;
+}
+
+#file-upload i {
+    cursor: pointer;
+}
+
+#file-upload input {
+    display: none;
+}
+
+#r-title {
+    margin: auto;
+}
+
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+@keyframes toast-pop {
+    from {
+        transform: translateY(100px);
+    }
+    to {
+        transform: translateY(-100px);
+    }
+}
+
+.toast {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    bottom: 0;
+    text-align: center;
+    border-radius: 2px;
+    border: 1px solid lightgrey;
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
+    background-color: whitesmoke;
+    min-width: 200px;
+    max-width: 300px;
+    overflow: visible;
+    overflow-wrap: break-word;
+    overflow-clip: wrap;
+    font-size: 1.5em;
+    padding: 15px;
+    animation: 0.3s toast-pop forwards;
+    z-index: 9999999999999999999999999999999;
+}
+
+.toast.error {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: white;
+    font-weight: 600;
+}
+
+#upload-overlay{
+    z-index: 99999999;
+    position: absolute;
+    width: 300px;
+    opacity: 0.6;
+    background-color: #000000;
+    top: 38px;
+    bottom: 0;
+    right: 0;
+    display:none;
+}
+
+#overlay-content{
+    width: 90%;
+    height: 95%;
+    margin: 1em;
+    color: white;
+    border: dotted 10px white;
+    border-radius: 5%;
+}
+
+#overlay-content > p {
+    position: absolute;
+    top: 42%;
+    left: 13%;
+    font-size: 3.3em;
+    text-align:center;
+}
+
+#upload-mask {
+    z-index: 999999999;
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
